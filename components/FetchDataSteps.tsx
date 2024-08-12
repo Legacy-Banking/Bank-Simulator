@@ -91,8 +91,8 @@ export default function FetchDataSteps() {
         <Code code={client} />
       </Step>
 
-      <Step title="Build in a weekend and scale to millions!">
-        <p>You're ready to launch your product to the world! 🚀</p>
+      <Step title="navigate to corresponding page">
+        <p>Add /notes to your http routes</p>
       </Step>
     </ol>
   );
