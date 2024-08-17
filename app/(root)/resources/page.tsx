@@ -1,9 +1,9 @@
 import React from 'react'
 
-const page = () => {
+const Resources = () => {
   return (
-    <div>page</div>
+    <div>Resources</div>
   )
 }
 
-export default page
+export default Resources

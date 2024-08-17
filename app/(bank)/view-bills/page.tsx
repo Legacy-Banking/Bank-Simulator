@@ -1,9 +1,9 @@
 import React from 'react'
 
-const page = () => {
+const ViewBills = () => {
   return (
-    <div>page</div>
+    <div>View Bills</div>
   )
 }
 
-export default page
+export default ViewBills

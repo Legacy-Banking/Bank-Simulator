@@ -1,9 +1,9 @@
 import React from 'react'
 
-const page = () => {
+const Inbox = () => {
   return (
-    <div>page</div>
+    <div>Inbox</div>
   )
 }
 
-export default page
+export default Inbox
