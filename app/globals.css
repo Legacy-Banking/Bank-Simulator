@@ -2,6 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+
+.flexCenter {
+  @apply flex justify-center items-center;
+}
+
+.flexBetween {
+  @apply flex justify-between items-center;
+}
+
+.flexStart {
+  @apply flex items-center justify-start;
+}
+
+
+/* Navbar */
+.navbar {
+  @apply py-5 px-8 border-b border-blue-25 gap-4;
+}
+
+
+.bg-yellow-gradient {
+  background: linear-gradient(90deg, #F6CA4D 0%, #FFE18D 100%);
+}
+
+.bg-blue-gradient {
+  background: linear-gradient(90deg, #1A70B8 0%, #468DC6 100%);
+}
+
 @layer base {
   :root {
     --background: 200 20% 98%;

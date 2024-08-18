@@ -26,10 +26,10 @@ module.exports = {
         },
         yellow: {
           25: "#F6CA4D",
-          100: "FFE18D",
+          100: "#FFE18D",
           200: "#F4B953",
           225: "#E2B102",
-          300: "FFF5DC",
+          300: "#FFF5DC",
         },  
         green: {
           50: "#F6FEF9",
@@ -51,12 +51,13 @@ module.exports = {
         grey: {
           100: "#D0D5DD",
           200: "#EAECF0",
-          300: "F5F5F5",
+          300: "#F5F5F5",
         },
         white: {
           100: "#FCFCFD",
           200: "#FFFFFF",
         },
+
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         btn: {
@@ -70,7 +71,7 @@ module.exports = {
       },
       fontFamily: {
         inter: "var(--font-inter)",
-        "ibm-plex-serif": "var(--font-ibm-plex-serif)",
+        "poppins": "var(--font-poppins)",
       },
 
     },

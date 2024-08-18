@@ -1,11 +1,12 @@
-import {Inter, IBM_Plex_Serif} from "next/font/google";
+import {Inter, Poppins} from "next/font/google";
 import "./globals.css";
+import Navbar from "@/components/Navbar";
 
 const inter = Inter({subsets: ["latin"], variable: "--font-inter"});
-const ibmPlexSerif = IBM_Plex_Serif({
+const poppins = Poppins({
   subsets: ['latin'],
   weight: ['400', '700'],
-  variable: '--font-ibm-plex-serif'
+  variable: '--font-poppins'
 });
 
 const defaultUrl = process.env.VERCEL_URL
@@ -24,8 +25,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${ibmPlexSerif.variable}`}>
+    <html lang="en" className={`${inter.variable} ${poppins.variable}`}>
       <body className="bg-background text-foreground">
+      <Navbar />
         <main className="min-h-screen flex flex-col items-center">
           {children}
         </main>
