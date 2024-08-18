@@ -4,14 +4,25 @@ import { bankNavLinks, transferPayLinks } from '@/constants'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 const BankNavbar = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const session = null;
+    const session = null; // Placeholder session object
+    const router = useRouter(); // Next.js router
 
     // Function to close the dropdown menu
     const handleLinkClick = () => {
         setIsDropdownOpen(false);
+    };
+
+    // Placeholder logout function
+    const handleLogout = () => {
+        // Placeholder for logout logic (e.g., API call to log out the user)
+        console.log("User logged out");
+
+        // Redirect to the home page after logout
+        router.push('/home');
     };
 
     return (
@@ -50,7 +61,7 @@ const BankNavbar = () => {
                     {/* Transfer & Pay Dropdown */}
                     <li className='relative font-inter'>
                         <button
-                            className='flex items-center gap-2 hover:text-blue-25'
+                            className='flex items-center gap-2 hover:text-blue-25 hover:underline underline-blue-25'
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                         >
                             Transfer & Pay
@@ -96,14 +107,17 @@ const BankNavbar = () => {
 
                 <div className='flexCenter gap-12'>
                     {session ? (
-                        <Link href="/admin" className='font-inter hover:text-blue-25 hover:underline underline-blue-25' onClick={handleLinkClick}>
+                        <Link href="/admin" className='font-inter hover:text-blue-25 hover:underline underline-blue-25'>
                             Admin
                         </Link>
                     ) : null}
 
-                    <Link href="/home" className="bg-yellow-gradient text-blackText-100 font-inter font-bold py-2 px-7 rounded-2xl inline-flex items-center justify-center shadow-md hover:text-blue-25 hover:underline underline-blue-25">
+                    <button 
+                        onClick={handleLogout} 
+                        className="bg-yellow-gradient text-blackText-100 font-inter font-bold py-2 px-7 rounded-2xl inline-flex items-center justify-center shadow-md hover:text-blue-25 hover:underline underline-blue-25"
+                    >
                         Log Out
-                    </Link>
+                    </button>
                 </div>
             </div>
         </nav>
