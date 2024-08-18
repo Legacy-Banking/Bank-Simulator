@@ -4,7 +4,7 @@ import "./globals.css";
 const inter = Inter({subsets: ["latin"], variable: "--font-inter"});
 const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['400', '700'],
+  weight: ['500', '700'],
   variable: '--font-poppins'
 });
 

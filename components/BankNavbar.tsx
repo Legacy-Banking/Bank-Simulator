@@ -7,7 +7,12 @@ import React, { useState } from 'react'
 
 const BankNavbar = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const session = {};
+    const session = null;
+
+    // Function to close the dropdown menu
+    const handleLinkClick = () => {
+        setIsDropdownOpen(false);
+    };
 
     return (
         <nav className="flexBetween navbar">
@@ -30,14 +35,14 @@ const BankNavbar = () => {
                 <ul className='xl:flex hidden text-small gap-12'>
                     {/* Dashboard */}
                     <li key="/dashboard" className='font-inter'>
-                        <Link href="/dashboard" className='hover:text-blue-25'>
+                        <Link href="/dashboard" className='hover:text-blue-25 hover:underline underline-blue-25' onClick={handleLinkClick}>
                             Dashboard
                         </Link>
                     </li>
 
                     {/* Transaction History */}
                     <li key="/transaction-history" className='font-inter'>
-                        <Link href="/transaction-history" className='hover:text-blue-25'>
+                        <Link href="/transaction-history" className='hover:text-blue-25 hover:underline underline-blue-25' onClick={handleLinkClick}>
                             Transaction History
                         </Link>
                     </li>
@@ -45,25 +50,26 @@ const BankNavbar = () => {
                     {/* Transfer & Pay Dropdown */}
                     <li className='relative font-inter'>
                         <button
-                            className='flex items-center gap-2  hover:text-blue-25'
+                            className='flex items-center gap-2 hover:text-blue-25'
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                         >
                             Transfer & Pay
                             <Image
                                 src="/chevron-down.svg"
                                 alt="Dropdown Icon"
-                                className={`transition-transform ${isDropdownOpen ? 'rotate-180' : 'rotate-0'} `}
+                                className={`transition-transform ${isDropdownOpen ? 'rotate-180' : 'rotate-0'}`}
                                 width={16}
                                 height={16}
                             />
                         </button>
                         {isDropdownOpen && (
-                            <ul className='absolute top-full left-0 mt-2 bg-white-100 shadow-lg rounded-lg w-36'>
+                            <ul className='absolute top-full left-0 mt-3 bg-white-100 shadow-lg rounded-lg w-44'>
                                 {transferPayLinks.map((link) => (
                                     <li key={link.route} className='font-inter'>
                                         <Link
                                             href={link.route}
-                                            className='block px-4 py-2 hover:text-blue-25'
+                                            className='block px-5 py-4 hover:text-blue-25 hover:underline underline-blue-25'
+                                            onClick={handleLinkClick}
                                         >
                                             {link.label}
                                         </Link>
@@ -75,14 +81,14 @@ const BankNavbar = () => {
 
                     {/* Bills */}
                     <li key="/view-bills" className='font-inter'>
-                        <Link href="/view-bills" className='hover:text-blue-25'>
+                        <Link href="/view-bills" className='hover:text-blue-25 hover:underline underline-blue-25' onClick={handleLinkClick}>
                             Bills
                         </Link>
                     </li>
 
                     {/* Inbox */}
                     <li key="/inbox" className='font-inter'>
-                        <Link href="/inbox" className='hover:text-blue-25'>
+                        <Link href="/inbox" className='hover:text-blue-25 hover:underline underline-blue-25' onClick={handleLinkClick}>
                             Inbox
                         </Link>
                     </li>
@@ -90,12 +96,12 @@ const BankNavbar = () => {
 
                 <div className='flexCenter gap-12'>
                     {session ? (
-                        <Link href="/admin" className='font-inter hover:text-blue-25'>
+                        <Link href="/admin" className='font-inter hover:text-blue-25 hover:underline underline-blue-25' onClick={handleLinkClick}>
                             Admin
                         </Link>
                     ) : null}
 
-                    <Link href="/home" className="bg-yellow-gradient text-blackText-100 font-inter font-bold py-2 px-7 rounded-2xl inline-flex items-center justify-center hover:text-blue-25">
+                    <Link href="/home" className="bg-yellow-gradient text-blackText-100 font-inter font-bold py-2 px-7 rounded-2xl inline-flex items-center justify-center shadow-md hover:text-blue-25 hover:underline underline-blue-25">
                         Log Out
                     </Link>
                 </div>
