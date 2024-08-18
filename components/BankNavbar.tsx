@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React, { useState } from 'react'
 
-const Navbar = () => {
+const BankNavbar = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const session = {};
 
@@ -104,4 +104,4 @@ const Navbar = () => {
     )
 }
 
-export default Navbar
+export default BankNavbar
