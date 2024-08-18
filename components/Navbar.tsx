@@ -7,7 +7,7 @@ import React, { useState } from 'react'
 
 const Navbar = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const session = null;
+    const session = {};
 
     return (
         <nav className="flexBetween navbar">
@@ -20,7 +20,7 @@ const Navbar = () => {
                         alt="LearntoBank"
                     />
                     <span className="font-poppins font-medium text-[32px]">
-                        <span className="text-yellow-25">Learnto</span>
+                        <span className="text-yellow-500">Learnto</span>
                         <span className="text-blue-25">Bank</span>
                     </span>
                 </Link>

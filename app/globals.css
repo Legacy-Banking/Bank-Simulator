@@ -18,7 +18,7 @@
 
 /* Navbar */
 .navbar {
-  @apply py-5 px-8 border-b border-blue-25 gap-4;
+  @apply py-3 px-8 border-b border-blue-25 gap-4;
 }
 
 

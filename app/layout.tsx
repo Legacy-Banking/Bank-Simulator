@@ -25,12 +25,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${poppins.variable}`}>
-      <body className="bg-background text-foreground">
-      <Navbar />
-        <main className="min-h-screen flex flex-col items-center">
-          {children}
-        </main>
+    <html lang="en" >
+      <body className={`${inter.variable} ${poppins.variable}`}>
+        {children}
       </body>
     </html>
   );
