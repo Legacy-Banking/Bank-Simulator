@@ -116,7 +116,7 @@ const BankNavbar = () => {
 
                     <button 
                         onClick={handleLogout} 
-                        className="bg-yellow-gradient text-blackText-100 font-inter font-bold py-2 px-7 rounded-2xl inline-flex items-center justify-center shadow-md hover:text-blue-25 hover:underline underline-blue-25 hidden xl:block "
+                        className="bg-yellow-gradient text-blackText-100 font-inter font-bold py-2 px-7 rounded-2xl items-center justify-center shadow-md hover:text-blue-25 hover:underline underline-blue-25 hidden xl:block "
                     >
                         Log Out
                     </button>
