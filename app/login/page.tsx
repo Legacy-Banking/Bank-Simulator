@@ -55,8 +55,12 @@ export default function Login({
   return (
     <div className="flex items-center justify-center min-h-screen bg-[#F6CA4D] w-full">
       <div className="flex flex-col w-full p-10 sm:max-w-md justify-center gap-2 bg-[#ffffff] rounded-2xl drop-shadow-2xl shadow-2xl shadow-stone-500">
-        <div className="pb-4"> 
-          <img src="logo.png" alt="Logo" className="w-full "/>
+        <div className="pb-4 flex items-center"> 
+          <img src="logo.png" width={44} height={44} alt="Logo"/>
+          <span className="font-poppins font-medium text-[32px] ml-2">
+            <span className="text-yellow-500">Learnto</span>
+            <span className="text-blue-25">Bank</span>
+          </span>
         </div>
         <div className="py-6">
           <div className="text-4xl text-[#101828] font-semibold pb-4">Log in</div>
