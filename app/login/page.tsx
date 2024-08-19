@@ -82,7 +82,7 @@ export default function Login({
         </form>
         <div className="mt-5 text-xs text-center font-normal text-[#475467]">
           Don't have an account? 
-          <SubmitButton className="border border-foreground/20 rounded-md px-1 text-foreground text-[#3D87C3] font-semibold" 
+          <SubmitButton className="border border-foreground/20 rounded-md px-1 text-foreground text-[#3f8bca] font-semibold" 
                         formAction={signUp}
                         pendingText="Signing Up...">Sign Up</SubmitButton>
         </div>
