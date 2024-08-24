@@ -1,5 +1,6 @@
 
 import AuthButton from "@/components/AuthButton";
+import TestAccountForm from "@/components/dev/TestAccountForm";
 import { createClient } from "@/utils/supabase/server";
 import Header from "@/components/Header";
 import { redirect } from "next/navigation";
@@ -20,6 +21,7 @@ export default async function ProtectedPage() {
       <Header />
       <div className="flex flex-col gap-8 items-center">
         <AuthButton />
+        <TestAccountForm />
       </div>
     </div>
   );
