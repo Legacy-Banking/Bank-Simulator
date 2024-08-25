@@ -1,11 +1,9 @@
 import AnimatedCounter from './AnimatedCounter';
 
-const TotalBalanceBox = ({
+const BalanceBox = ({
   accounts = [], currentBalance
-}: TotalBalanceBoxProps) => {
+}: BalanceBoxProps) => {
   return (
-    <section className="total-balance bg-yellow-25 shadow-md">
-
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
           <p className="total-balance-label text-blackText-50">
@@ -17,8 +15,8 @@ const TotalBalanceBox = ({
           </div>
         </div>
       </div>
-    </section>
+
   )
 }
 
-export default TotalBalanceBox
+export default BalanceBox
