@@ -1,9 +1,45 @@
+"use client"
 import React from 'react'
 import SearchBar from '@/components/SearchBar'
 import AdminSideBar from '@/components/AdminSideBar'
+import { useEffect, useState } from 'react';
+import { createClient } from '@/utils/supabase/client';
 
+type User = {
+  id: number;
+  accountType: string;
+  balance: number;
+  owner: string;
+  opening_balance: number;
+};
 
 const Accounts = () => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+
+  const supabase = createClient();
+  useEffect(() => {
+    const fetchUsers = async () => {
+        const { data, error } = await supabase
+            .from('account')
+            .select('*');
+
+        if (error) {
+            setError(error.message);
+        } else {
+            setUsers(data || []);
+        }
+        setLoading(false);
+    };
+
+    fetchUsers();
+}, []); // Empty dependency array ensures this runs once when the component mounts
+
+if (loading) return <p>Loading...</p>;
+if (error) return <p>Error: {error}</p>;
+
   return (
     <div className='flex flex-auto'>
     <AdminSideBar />
@@ -22,7 +58,13 @@ const Accounts = () => {
 
           </div>
 
-          <div className='border-2 border-black mt-6'> Table</div>
+          <div className='border-2 border-black mt-6'> Table
+            <ul>
+              {users.map((user) => (
+                  <li key={user.id}> {user.owner} {user.accountType} {user.id}</li> // Adjust according to your table schema
+              ))}
+            </ul>
+          </div>
 
         </div>
       </div>
