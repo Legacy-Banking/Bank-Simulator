@@ -30,7 +30,7 @@ const Dashboard = () => {
 
   return (
     <section className="flex w-full flex-row max-xl:max-h-screen max-xl:overflow-y-scroll font-inter">
-      <div className="flex w-full flex-1 flex-col gap-8 px-5 sm:px-8 py-7 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen xl:overflow-y-scroll">
+      <div className="flex w-full flex-1 flex-col gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen xl:overflow-y-scroll">
                                                                                    
         <header className="home-header">
           <HeaderBox 
@@ -42,9 +42,9 @@ const Dashboard = () => {
         </header>
       
         {/* Divider */}
-        <div className="border-t border-gray-200 my-2"></div>
+        <div className="border-t border-gray-200 my-1 sm:my-4"></div>
 
-        <div className="subheader mt-4 mb-6">
+        <div className="subheader mt-2 sm:mt-4 mb-4 sm:mb-6">
           <h2 className="text-20 lg:text-24 font-semibold text-blackText-50">Accounts:</h2>
         </div>
 
@@ -97,10 +97,10 @@ const Dashboard = () => {
         </div>
 
         {/* Divider */}
-        <div className="border-t-2 border-blackText-100 my-4"></div>
+        <div className="border-t-2 border-blackText-100 my-2 sm:my-4"></div>
 
         {/* Total Balance Section */}
-        <div className="flex w-full justify-between items-center gap-4 p-8 sm:gap-6 sm:p-6">
+        <div className="flex w-full justify-between items-center gap-4 p-4 sm:gap-6 sm:p-6">
           <h2 className="text-24 lg:text-26 font-bold text-blackText-50">Total Balance</h2>
           <div className="total-balance-amount text-right text-bold">
             <AnimatedCounter amount={totalBalance} />
@@ -108,7 +108,7 @@ const Dashboard = () => {
         </div>
 
 
-      </div>
+    </div>
     </section>
   )
 }
