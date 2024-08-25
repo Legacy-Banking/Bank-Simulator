@@ -2,6 +2,7 @@ import HeaderBox from '@/components/HeaderBox'
 import BalanceBox from '@/components/BalanceBox';
 import AnimatedCounter from '@/components/AnimatedCounter';
 import React from 'react'
+import Link from 'next/link';
 
 const Dashboard = () => {
 
@@ -52,7 +53,11 @@ const Dashboard = () => {
         <div className="space-y-6">
           <div className="flex flex-col justify-between gap-4 rounded-lg border-y bg-yellow-gradient px-6 py-6 md:flex-row shadow-md">
             <div className="flex flex-col gap-2">
-              <h2 className="text-24 lg:text-26 font-bold text-blackText-50">{account?.data1.name}</h2>
+              <Link href="/transaction-history">
+                  <h2 className="text-24 lg:text-26 font-bold text-blackText-50 hover:underline hover:text-white-100">
+                    {account?.data1.name}
+                  </h2>
+                </Link>
               <p className="text-14 text-blackText-100">
                 {account?.data1.officialName}
               </p>
@@ -76,7 +81,11 @@ const Dashboard = () => {
         <div className="space-y-6">
           <div className="flex flex-col justify-between gap-4 rounded-lg border-y bg-blue-gradient px-6 py-6 md:flex-row shadow-md">
             <div className="flex flex-col gap-2">
-              <h2 className="text-24 lg:text-26 font-bold text-blackText-50">{account?.data2.name}</h2>
+            <Link href="/transaction-history">
+                  <h2 className="text-24 lg:text-26 font-bold text-blackText-50 hover:underline hover:text-white-100">
+                    {account?.data2.name}
+                  </h2>
+                </Link>
               <p className="text-14 text-blackText-100">
                 {account?.data2.officialName}
               </p>
