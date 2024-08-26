@@ -1,27 +1,10 @@
 'use client';
+
 import React, { useState } from 'react';
 import { Account, AccountType } from '@/types/Account';
 import { createClient } from '@/utils/supabase/client';
-import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
-import { updateUserId } from '@/app/store/userSlice';
+import { useAppSelector } from '@/app/store/hooks';
 
-// Utility function to get user ID
-const fetchUserId = async (dispatch: Function) => {
-    const supabase = createClient();
-    try {
-        const { data, error } = await supabase.auth.getUser();
-        if (error || !data.user) {
-            throw new Error('Failed to fetch user');
-        }
-        dispatch(updateUserId(data.user.id || ""));
-        return data.user.id || "";
-    } catch (error) {
-        console.error('Error fetching user ID:', error);
-        return "";
-    }
-};
-
-// Utility function to handle form submission
 const handleFormSubmit = async (account: Partial<Account>, user_id: string) => {
     const supabase = createClient();
     try {
@@ -45,14 +28,12 @@ const handleFormSubmit = async (account: Partial<Account>, user_id: string) => {
     }
 };
 
-const AccountForm: React.FC = () => {
-    const user = useAppSelector((state) => state.user);
-    const dispatch = useAppDispatch();
-
+const TestAccountForm: React.FC = () => {
+    const user_id = useAppSelector((state) => state.user.user_id);
     const [account, setAccount] = useState<Partial<Account>>({
         type: AccountType.SAVINGS,
         balance: 0,
-        user_id: 'hello',
+        user_id,
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -65,10 +46,7 @@ const AccountForm: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!account.user_id) {
-            account.user_id = await fetchUserId(dispatch);
-        }
-        const result = await handleFormSubmit(account, account.user_id);
+        const result = await handleFormSubmit(account, user_id);
         if (result) {
             console.log('Form submitted successfully:', result);
         }
@@ -145,4 +123,4 @@ const FormField: React.FC<FormFieldProps> = ({ id, label, value, onChange, optio
     </div>
 );
 
-export default AccountForm;
+export default TestAccountForm;

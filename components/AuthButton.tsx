@@ -1,30 +1,58 @@
-import { createClient } from "@/utils/supabase/server";
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { createClient } from "@/utils/supabase/client";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { useAppDispatch } from "@/app/store/hooks";
+import { updateUserId } from "@/app/store/userSlice";
+import { useRouter } from "next/navigation";
+type User = {
+  email: string
+  id: string
+}
 
-export default async function AuthButton() {
+const AuthButton: React.FC = () => {
+  const [user, setUser] = useState<Partial<User>>({});
   const supabase = createClient();
+  const dispatch = useAppDispatch();
+  const router = useRouter();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const { data, error } = await supabase.auth.getUser();
+        if (error || !data.user) {
+          throw new Error("Failed to fetch user");
+        }
+        setUser(data.user);
+        dispatch(updateUserId(data.user.id || ""));
+      } catch (error) {
+        console.error("Error fetching user ID:", error);
+      }
+    };
+
+    fetchUser();
+  }, [dispatch, supabase]);
 
   const signOut = async () => {
-    "use server";
-
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    return redirect("/login");
+    try {
+      await supabase.auth.signOut();
+      dispatch(updateUserId(""));
+      router.push("/login");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   };
 
   return user ? (
     <div className="flex items-center gap-4">
       Hey, {user.email}!
-      <form action={signOut}>
-        <button className="py-2 px-4 rounded-md no-underline bg-btn-background hover:bg-btn-background-hover">
-          Logout
-        </button>
-      </form>
+      <button
+        onClick={signOut}
+        className="py-2 px-4 rounded-md no-underline bg-btn-background hover:bg-btn-background-hover"
+      >
+        Logout
+      </button>
     </div>
   ) : (
     <Link
@@ -34,4 +62,6 @@ export default async function AuthButton() {
       Login
     </Link>
   );
-}
+};
+
+export default AuthButton;
