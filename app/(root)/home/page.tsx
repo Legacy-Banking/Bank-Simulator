@@ -4,32 +4,24 @@ import Link from 'next/link'
 
 const Home = () => {
   return (
-    <div className="flex flex-col items-center justify-center bg-white px-6">
-      <div className="relative w-full max-w-7xl">
+    <div className="flex flex-col items-center bg-white">
+      <div className="flex w-full m-5 px-10 max-w-7xl">
 
         {/* Title Section */}
-        <div className="flex flex-col justify-center space-y-6 mt-[30px]">
+        <div className="flex flex-col space-y-6 mt-[30px]">
 
           {/* Title */}
-          <h1 className="text-[78px] font-bold leading-none text-[#222223]">
-            Learning made
-          </h1>
-
-          {/* Title 2 */}
-          <h1 className="text-[78px] font-bold leading-8 tracking-wide text-[#222223]">
-            <span className="relative z-10">easy</span>
-            <span className="absolute w-[190px] h-[56px] border-[3px] border-[#F3A723] rounded-full rotate-[-3deg] top-[134px] left-[-4px]"></span>
-            <span className="absolute w-[190px] h-[56px] border-[3px] border-[#FAD880] rounded-full rotate-[4deg] top-[132px] left-[-10px]"></span>
-            <span className="relative inline-block"></span>
+          <h1 className="text-xl md:text-5xl lg:text-7xl xl:text-7xl font-bold leading-none text-[#222223] items-center">
+            Learning made easy
           </h1>
 
           {/* Subtitle */}
-          <p className="text-lg font-normal leading-[60px] text-[#535354]">
+          <p className="text-sm md:text-base lg:text-lg font-normal leading-6 text-[#535354]">
             Simple and modern banking simulator made to make learning easy
           </p>
 
           {/* Subtitle 2 */}
-          <p className="text-lg font-semibold leading-[10px] text-[#535351]">
+          <p className="text-sm md:text-base lg:text-lg font-semibold leading-none text-[#535351]">
             Login Or Sign Up to START NOW !
           </p>
 
@@ -49,16 +41,16 @@ const Home = () => {
         </div>
 
         {/* Image Section */}
-        <div className="absolute right-[-15px] top-[-24px]">
-          <Image src="/homecard.png" alt="Home Card" width={650} height={520} />
+        <div className="left-[100px] top-[100px]">
+          <Image src="/homecard.png" alt="Home Card" width={650} height={600} />
         </div>
       </div>
 
       {/* Bottom Section */}
-      <div className="container flex flex-col flex-grow items-center justify-center bg-[#9d9d9d] w-full h-autol py-10 border-b-[20px] border-[#0B0A0B]">
-        <div className="max-w-[1400px] w-full flex flex-col items-center">
+      <div className="flex flex-col flex-grow items-center justify-center bg-[#9d9d9d] w-full h-autol py-10 border-b-[20px] border-[#0B0A0B]">
+        <div className="max-w-none w-full flex flex-col items-center">
           {/* Box Frame */}
-          <div className="flex justify-center items-start gap-[180px] w-full">
+          <div className="flex justify-center items-start gap-20 w-full">
             {/* Column 1 */}
             <Link href="/resources">
               <div className="flex flex-col items-start space-y-2 w-[280px]">

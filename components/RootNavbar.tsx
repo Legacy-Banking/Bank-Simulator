@@ -27,7 +27,7 @@ const RootNavbar = () => {
     };
 
     return (
-        <nav className="flexBetween py-3 px-20 gap-10 relative z-10">
+        <nav className="flexBetween py-3 px-6 gap-10 relative z-10">
             <div className='flex-1 flexStart gap-12'>
                 <Link href="/home" className="flex items-center gap-0.5" onClick={handleLinkClick}>
                     <Image
@@ -59,14 +59,14 @@ const RootNavbar = () => {
                 </ul>
 
                 <div className='flexCenter gap-12'>
-
-
-                    <button
-                        onClick={handleLogout}
-                        className="bg-yellow-gradient text-blackText-100 font-inter font-bold py-2 px-7 rounded-2xl items-center justify-center shadow-md hover:text-blue-25 hover:underline underline-blue-25 hidden xl:block "
-                    >
-                        Log In
-                    </button>
+                    <Link href="/login">
+                        <button
+                            onClick={handleLogout}
+                            className="bg-yellow-gradient text-blackText-100 font-inter font-bold py-2 px-7 rounded-2xl items-center justify-center shadow-md hover:text-blue-25 hover:underline underline-blue-25 hidden xl:block "
+                        >
+                            Log In
+                        </button>
+                    </Link>
                 </div>
 
                 {/* Mobile Hamburger Menu */}
@@ -98,12 +98,14 @@ const RootNavbar = () => {
 
                     {/* Log In button for mobile */}
                     <li className='font-inter text-left px-3 py-2'>
-                        <button
-                            onClick={handleLogout}
-                            className="bg-yellow-gradient text-blackText-100 font-inter font-bold py-2 px-7 rounded-2xl inline-flex items-center justify-center shadow-md hover:text-blue-25 hover:underline underline-blue-25"
-                        >
-                            Log In
-                        </button>
+                        <Link href="/login">
+                            <button
+                                onClick={handleLogout}
+                                className="bg-yellow-gradient text-blackText-100 font-inter font-bold py-2 px-7 rounded-2xl inline-flex items-center justify-center shadow-md hover:text-blue-25 hover:underline underline-blue-25"
+                            >
+                                Log In
+                            </button>
+                        </Link>
                     </li>
                 </ul>
             )}
