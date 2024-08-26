@@ -12,7 +12,6 @@ const Dashboard = () => {
     data1: {
       name: 'Personal Account',
       officialName: 'Karen\'s Personal Account',
-      mask: '1234',
       bsb: '123456',
       accNum: '123456789',
       balance: 475.50,
@@ -20,7 +19,6 @@ const Dashboard = () => {
     data2: {
       name: 'Saving Account',
       officialName: 'Karen\'s Saving Account',
-      mask: '4321',
       bsb: '654321',
       accNum: '987654321',
       balance: 2245.50,
@@ -90,7 +88,7 @@ const Dashboard = () => {
                 {account?.data2.officialName}
               </p>
               <p className="text-14 font-semibold tracking-[1.1px] text-blackText-100">
-              BSB: {account?.data2.bsb} <span className="mx-4"> </span> Account Number: ●●●● ●●●● ●●●● {account?.data2.mask}
+              BSB: {account?.data2.bsb} <span className="mx-4"> </span> Account Number: {account?.data2.accNum}
               </p>
             </div>
             
