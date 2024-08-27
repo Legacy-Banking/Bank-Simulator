@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation'
 
 const BankNavbar = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const session = {}; // Placeholder session object
+    const session = null; // Placeholder session object
     const router = useRouter(); // Next.js router
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
