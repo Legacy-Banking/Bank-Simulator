@@ -1,5 +1,7 @@
 
 import AuthButton from "@/components/AuthButton";
+import UserState from "@/components/dev/UserState";
+import TestAccountForm from "@/components/dev/TestAccountForm";
 import { createClient } from "@/utils/supabase/server";
 import Header from "@/components/Header";
 import { redirect } from "next/navigation";
@@ -15,11 +17,14 @@ export default async function ProtectedPage() {
     return redirect("/login");
   }
 
+
   return (
     <div className="flex-1 w-full flex flex-col gap-20 items-center">
       <Header />
       <div className="flex flex-col gap-8 items-center">
         <AuthButton />
+        <UserState />
+        <TestAccountForm />
       </div>
     </div>
   );
