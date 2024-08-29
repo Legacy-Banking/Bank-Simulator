@@ -59,7 +59,7 @@ const RootNavbar = () => {
                 </ul>
 
                 <div className='flexCenter gap-12'>
-                    <Link href="/login">
+                    <Link href="/log-in">
                         <button
                             onClick={handleLogout}
                             className="bg-yellow-gradient text-blackText-100 font-inter font-bold py-2 px-7 rounded-2xl items-center justify-center shadow-md hover:text-blue-25 hover:underline underline-blue-25 hidden xl:block "

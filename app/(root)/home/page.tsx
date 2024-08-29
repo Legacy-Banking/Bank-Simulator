@@ -11,29 +11,29 @@ const Home = () => {
         <div className="flex flex-col space-y-6 mt-[30px]">
 
           {/* Title */}
-          <h1 className="text-xl md:text-5xl lg:text-7xl xl:text-7xl font-bold leading-none text-[#222223] items-center">
+          <h1 className="text-xl md:text-6xl lg:text-7xl xl:text-7xl font-bold leading-none text-[#222223] items-center">
             Learning made easy
           </h1>
 
           {/* Subtitle */}
-          <p className="text-sm md:text-base lg:text-lg font-normal leading-6 text-[#535354]">
+          <p className="text-l md:text-base lg:text-lg font-normal leading-6 text-[#535354]">
             Simple and modern banking simulator made to make learning easy
           </p>
 
           {/* Subtitle 2 */}
-          <p className="text-sm md:text-base lg:text-lg font-semibold leading-none text-[#535351]">
+          <p className="text-l md:text-base lg:text-lg font-semibold leading-none text-[#535351]">
             Login Or Sign Up to START NOW !
           </p>
 
           {/* Buttons for Login & Signup*/}
-          <div className="flex space-x-10">
+          <div className="flex flex-col md:flex-row place-items-start space-x-0 space-y-4 md:space-x-10 md:space-y-0">
             <Link href="/log-in">
-              <button className="px-8 py-3 text-lg font-medium text-[#FFFFFF] bg-gradient-to-r from-[#468DC6] to-[#1A70B8] rounded-lg shadow-md hover:text-gray-600 shadow-2xl">
+              <button className="w-full md:w-auto px-6 md:px-8 py-2 md:py-3 text-base md:text-lg font-medium text-[#FFFFFF] bg-gradient-to-r from-[#468DC6] to-[#1A70B8] rounded-lg shadow-md hover:text-gray-600 shadow-2xl">
                 → Login
               </button>
             </Link>
             <Link href="/sign-up">
-              <button className="px-8 py-3 text-lg font-medium text-[#FFFFFF] bg-gradient-to-r from-[#468DC6] to-[#1A70B8] rounded-lg shadow-md hover:text-gray-600 shadow-2xl">
+              <button className="w-full md:w-auto px-6 md:px-8 py-2 md:py-3 text-base md:text-lg font-medium text-[#FFFFFF] bg-gradient-to-r from-[#468DC6] to-[#1A70B8] rounded-lg shadow-md hover:text-gray-600 shadow-2xl">
                 → Sign up
               </button>
             </Link>
@@ -41,16 +41,16 @@ const Home = () => {
         </div>
 
         {/* Image Section */}
-        <div className="left-[100px] top-[100px]">
+        <div className="hidden md:block left-[100px] top-[100px]">
           <Image src="/homecard.png" alt="Home Card" width={650} height={600} />
         </div>
       </div>
 
       {/* Bottom Section */}
-      <div className="flex flex-col flex-grow items-center justify-center bg-[#9d9d9d] w-full h-autol py-10 border-b-[20px] border-[#0B0A0B]">
-        <div className="max-w-none w-full flex flex-col items-center">
+      <div className="flex flex-row bg-[#9d9d9d] w-full py-10 border-b-[20px] border-[#0B0A0B] ">
+        <div className="flex flex-row w-full justify-center items-center px-10">
           {/* Box Frame */}
-          <div className="flex justify-center items-start gap-20 w-full">
+          <div className="flex flex-wrap justify-center items-start w-full max-w-screen-lg px-10 gap-10">
             {/* Column 1 */}
             <Link href="/resources">
               <div className="flex flex-col items-start space-y-2 w-[280px]">
@@ -68,7 +68,7 @@ const Home = () => {
               </div>
             </Link>
             {/* Column 3 */}
-            <Link href="https://beconnected.esafety.gov.au/topic-library/introduction-to-online-banking/getting-started-with-online-banking" target="_blank" rel="noreferrer">
+            <Link href="https://www.seniorsit.com.au/" target="_blank" rel="noreferrer">
               <div className="flex flex-col items-start space-y-2 w-[280px]">
                 <div className="w-full h-[148px] bg-[#D9D9D9]"></div>
                 <h3 className="text-[20px] font-bold text-[#17181A] hover:underline">SeniorIT Program</h3>
