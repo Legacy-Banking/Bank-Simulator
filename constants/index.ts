@@ -51,11 +51,12 @@ export const bankNavLinks = [
       label: "Home",
     },
     {
-      route: "/resources",
-      label: "Resources",
-    },
-    {
       route: "/about-us",
       label: "About Us",
     },
+    {
+      route: "/resources",
+      label: "Resources",
+    },
+
   ];
