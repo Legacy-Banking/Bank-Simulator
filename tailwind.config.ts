@@ -41,6 +41,8 @@ module.exports = {
         red: {
           50: "#B55252",
           100: "#FFCBCB",
+          150: "#FFFBFA",
+          200: "#F04438",
         },
         blackText: {
           50: "#000000",

@@ -42,24 +42,38 @@ interface Account {
   currentBalance: number;
 }
 
-  declare type Transaction = {
-    id: string;
-    $id: string;
-    name: string;
-    paymentChannel: string;
-    type: string;
-    accountId: string;
-    amount: number;
-    pending: boolean;
-    category: string;
-    date: string;
-    image: string;
-    type: string;
-    $createdAt: string;
-    channel: string;
-    senderBankId: string;
-    receiverBankId: string;
+declare type Transaction = {
+  id: string;
+  name: string;
+  date: string | Date;
+  amount: number;
+  totalBalance: number;
+  description?: string; // Optional if it might not exist
+};
+
+  // declare type Transaction = {
+  //   id: string;
+  //   $id: string;
+  //   name: string;
+  //   paymentChannel: string;
+  //   type: string;
+  //   accountId: string;
+  //   amount: number;
+  //   pending: boolean;
+  //   category: string;
+  //   date: string;
+  //   image: string;
+  //   type: string;
+  //   $createdAt: string;
+  //   channel: string;
+  //   senderBankId: string;
+  //   receiverBankId: string;
+  // };
+
+  type TransactionTableProps = {
+    transactions: Transaction[];
   };
+  
 
   declare type Category = "Food and Drink" | "Travel" | "Transfer";
 
