@@ -1,11 +1,15 @@
 
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from './userSlice';
+import bankReducer from './bankSlice'
+import transferReducer from './transferSlice';
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
     // Add other reducers here as needed
+    bank: bankReducer,
+    transfer: transferReducer,  // Add the transfer reducer
   },
 });
 

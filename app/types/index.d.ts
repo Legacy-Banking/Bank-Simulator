@@ -36,13 +36,11 @@ declare type SearchParamProps = {
     type: "full" | "card";
   }
 
-  declare type Account = {
-    id: string;
-    availableBalance: number;
-    currentBalance: number;
-    name: string;
-    type: string;
-  };
+interface Account {
+  id: string;
+  name: string;
+  currentBalance: number;
+}
 
   declare type Transaction = {
     id: string;
@@ -64,3 +62,12 @@ declare type SearchParamProps = {
   };
 
   declare type Category = "Food and Drink" | "Travel" | "Transfer";
+
+
+  declare interface BankDropdownProps {
+    accounts: Account[];
+    setValue?: UseFormSetValue<any>;
+    otherStyles?: string;
+  }
+
+  
