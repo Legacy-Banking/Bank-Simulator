@@ -42,22 +42,25 @@ export const TransactionsTable = ({ transactions = [] }: TransactionTableProps) 
 
         <TableBody>
           {transactions.map((t: Transaction) => {
-            const name = t.name;
             const amount = t.amount;
-            const isDeduct = amount < 0; // Check if the amount is negative to determine deduction
+            const isSignificantChange = Math.abs(amount) > 50; // Check if the change is more than $50
 
             return (
               <TableRow
                 key={t.id}
                 className={`${
-                  isDeduct ? 'bg-red-150' : 'bg-green-50'
+                  isSignificantChange
+                    ? amount < 0
+                      ? 'bg-red-150'
+                      : 'bg-green-50'
+                    : ''
                 } !over:bg-none !border-b-DEFAULT cursor-pointer`}
                 onClick={() => openTransactionDetails(t)} // Open the sheet on row click
               >
                 <TableCell className="max-w-[250px] pl-8 pr-10">
                   <div className="flex items-center gap-3">
                     <h1 className="text-14 truncate font-semibold text-[#344054]">
-                      {name}
+                      {t.name}
                     </h1>
                   </div>
                 </TableCell>
@@ -68,7 +71,11 @@ export const TransactionsTable = ({ transactions = [] }: TransactionTableProps) 
 
                 <TableCell
                   className={`pl-2 pr-10 font-semibold ${
-                    isDeduct ? 'text-red-200' : 'text-green-100'
+                    isSignificantChange
+                      ? amount < 0
+                        ? 'text-red-200'
+                        : 'text-green-100'
+                      : ''
                   }`}
                 >
                   {formatAmount(amount)}
