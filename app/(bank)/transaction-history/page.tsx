@@ -176,7 +176,7 @@ const TransactionHistory = () => {
         <div className="space-y-6">
           <div className="flex flex-col justify-between gap-4 rounded-lg border-y bg-yellow-gradient px-6 py-6 md:flex-row shadow-md">
             <div className="flex flex-col gap-2">
-              <h2 className="text-24 lg:text-26 font-bold text-blackText-50 hover:underline hover:text-white-100">
+              <h2 className="text-24 lg:text-26 font-bold text-blackText-50">
                 {account[selectedAccount].name}
               </h2>
               <p className="text-14 text-blackText-100">
