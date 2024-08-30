@@ -1,4 +1,4 @@
-import BankNavbar from "@/components/BankNavbar";
+import RootNavbar from "@/components/RootNavbar";
 
 export default function RootLayout({
   children,
@@ -8,7 +8,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-background text-foreground">
-        <BankNavbar/>
+        <RootNavbar/>
         <main className="min-h-screen flex flex-col items-center bg-yellow-25">
           {children}
         </main>
