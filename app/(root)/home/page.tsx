@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 const Home = () => {
   return (
-    <div className="flex flex-col items-center bg-white">
+    <div className="flex flex-col min-h-screen items-center bg-white">
       <div className="flex w-full m-5 px-10 max-w-7xl">
 
         {/* Title Section */}
@@ -47,10 +47,10 @@ const Home = () => {
       </div>
 
       {/* Bottom Section */}
-      <div className="flex flex-row bg-[#9d9d9d] w-full py-10 border-b-[20px] border-[#0B0A0B] ">
+      <div className="flex flex-row bg-[#9d9d9d] w-full py-10 border-b-[20px] border-[#0B0A0B] flex-grow">
         <div className="flex flex-row w-full justify-center items-center px-10">
           {/* Box Frame */}
-          <div className="flex flex-wrap justify-center items-start w-full max-w-screen-lg px-10 gap-10">
+          <div className="flex flex-wrap justify-center items-start w-full max-w-screen-lg px-10 gap-10 mx-auto">
             {/* Column 1 */}
             <Link href="/resources">
               <div className="flex flex-col items-start space-y-2 w-[280px]">
@@ -83,3 +83,8 @@ const Home = () => {
 }
 
 export default Home
+
+
+
+
+{/* <div className="flex flex-wrap justify-center items-start w-full max-w-screen-lg px-10 gap-10 mx-auto"> */ }
