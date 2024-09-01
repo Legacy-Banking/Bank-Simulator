@@ -11,6 +11,9 @@ export interface Account {
     id: string;
     type: AccountType;
     balance: number;
-    user_id: string; // Foreign key to the User entity (UUID)
+    owner: string; 
+    bsb: string;
+    acc: string;
+    opening_balance: number;
   }
   
