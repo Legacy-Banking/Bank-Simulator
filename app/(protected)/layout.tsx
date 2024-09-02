@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { useEffect } from "react";
 import { useAppDispatch, updateUserId } from "../store/userSlice";
 import { useAppSelector } from '@/app/store/hooks'
+import BankNavbar from "@/components/BankNavbar";
 import UserState from "@/components/dev/UserState";
 
 const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -33,6 +34,7 @@ const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children
 
     return (
         <div>
+            <BankNavbar />
             <UserState />
             {children}
         </div>

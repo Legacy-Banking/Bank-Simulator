@@ -1,13 +1,14 @@
-import React from 'react'
-import Link from 'next/link'
-import BalanceBox from './BalanceBox'
-import { Account } from '@/types/Account'
+import React from 'react';
+import { useRouter } from 'next/navigation';
+import BalanceBox from './BalanceBox';
+import { Account } from '@/types/Account';
 
 type AccountBoxProps = {
     account: Partial<Account>;
 }
 
 const AccountBox: React.FC<AccountBoxProps> = ({ account }) => {
+    const router = useRouter();
     const variant = account.type === 'savings' ? 'primary' : 'secondary';
     const boxStyle = variant === 'primary'
         ? 'bg-yellow-gradient'
@@ -22,15 +23,20 @@ const AccountBox: React.FC<AccountBoxProps> = ({ account }) => {
     }
     const accountType = parseUpperCase(account.type || '');
 
+    const handleLinkClick = () => {
+        router.push(`/transaction-history?accountid=${account.id}`);
+    };
+
     return (
         <div className={`space-y-6 ${boxStyle} rounded-lg shadow-md`}>
             <div className='flex flex-col justify-between gap-4 rounded-lg border-y px-6 py-6 md:flex-row'>
                 <div className="flex flex-col gap-2">
-                    <Link href="/transaction-history">
-                        <h2 className={`text-24 lg:text-26 font-bold ${textColor} hover:underline`}>
-                            {accountType} Account
-                        </h2>
-                    </Link>
+                    <h2
+                        className={`text-24 lg:text-26 font-bold ${textColor} hover:underline cursor-pointer`}
+                        onClick={handleLinkClick}
+                    >
+                        {accountType} Account
+                    </h2>
                     <p className={`text-14 ${textColor}`}>
                         Karen's {account?.type} Account
                     </p>
@@ -49,7 +55,7 @@ const AccountBox: React.FC<AccountBoxProps> = ({ account }) => {
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 export default AccountBox;
