@@ -22,7 +22,7 @@ import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 
 // Placeholder function to create a transfer
-const createTransfer = async (params: { fromBank: string; toBank: string; amount: string; note?: string }) => {
+const createTransfer = async (params: { fromBank: string; toBank: string; amount: string; description?: string }) => {
   // Implement your logic to create a transfer
   return true; // Assuming the transfer is successful
 };
@@ -32,7 +32,7 @@ const formSchema = z.object({
   fromBank: z.string().min(1, "Please select a valid bank account"),
   toBank: z.string().min(1, "Please select a valid bank account"),
   amount: z.string().min(1, "Amount is required").regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"),
-  note: z.string().optional(),
+  description: z.string().optional(),
 });
 
 const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
@@ -45,7 +45,7 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
       fromBank: "",
       toBank: "",
       amount: "",
-      note: "",
+      description: "",
     },
   });
 
@@ -57,7 +57,7 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
         fromBank: data.fromBank,
         toBank: data.toBank,
         amount: data.amount,
-        note: data.note,
+        description: data.description,
       };
 
       // Create transfer
@@ -165,13 +165,13 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
 
         <FormField
           control={form.control}
-          name="note"
+          name="description"
           render={({ field }) => (
             <FormItem className="border-t border-gray-200">
               <div className="payment-transfer_form-item pb-6 pt-5">
                 <div className="payment-transfer_form-content">
                   <FormLabel className="text-14 font-medium text-gray-700">
-                    Transfer Note (Optional)
+                    Description (Optional)
                   </FormLabel>
                   <FormDescription className="text-12 font-normal text-gray-600">
                     Provide additional information or instructions (optional)
@@ -180,7 +180,7 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
                 <div className="flex w-full flex-col">
                   <FormControl>
                     <Textarea
-                      placeholder="Write a short note here"
+                      placeholder="Write a short description here"
                       className="input-class"
                       {...field}
                     />
