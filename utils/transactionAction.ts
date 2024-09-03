@@ -1,6 +1,4 @@
 import { createClient } from "./supabase/client";
-import { Transaction } from "@/types/Transaction";
-import { Account } from "@/types/Account";
 
 export const transactionAction = {
     createTransaction: (fromAccount: Account, toAccount: Account, amount: number, description:string): void => {
@@ -16,11 +14,25 @@ export const transactionAction = {
             to_account: toAccount.id
         };
         const supabase = createClient();
-        supabase.from('transaction').insert([newTransaction]);
-        
+        supabase.from('transaction').insert(newTransaction)
     },
     updateAccounts:(account:Account, newBalance:number):void => {
         const supabase = createClient();
-        supabase.from('account').update({balance:newBalance}).eq('id',account.id);
-    }
+        supabase.from('account').update({balance:newBalance}).eq('id',account.id)
+    },
+    getTransactionsByAccountId: async (accountId: string): Promise<Transaction[]> => {
+        const supabase = createClient();
+        
+        const { data, error } = await supabase
+          .from('transaction')
+          .select('*')
+          .or(`from_account.eq.${accountId},to_account.eq.${accountId}`);
+          
+        if (error) {
+          console.error('Error fetching transactions:', error);
+          throw error;
+        }
+    
+        return data as Transaction[];
+      },
 };

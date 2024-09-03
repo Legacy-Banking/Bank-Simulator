@@ -3,31 +3,17 @@ import HeaderBox from '@/components/HeaderBox'
 import AnimatedCounter from '@/components/AnimatedCounter';
 import React, { useEffect, useState } from 'react'
 import AccountBox from '@/components/AccountBox';
-import { Account } from '@/types/Account';
 import { useAppSelector } from '@/app/store/hooks';
 import { createClient } from '@/utils/supabase/client';
+import { accountAction } from '@/utils/accountAction';
+
 
 const Dashboard = () => {
     const user_id = useAppSelector((state) => state.user.user_id)?.toString();
-    const [accounts, setAccounts] = useState<Partial<Account>[]>([]);
-
-    const fetchAccounts = async (user_id: string) => {
-        const supabase = createClient();
-        const { data, error } = await supabase
-            .from('account')
-            .select('*')
-            .eq('owner', user_id);
-
-        if (error) {
-            throw new Error(error.message);
-        }
-
-        return data;
-    };
-
+    const [accounts, setAccounts] = useState<Account[]>([]);
     useEffect(() => {
         if (user_id) {
-            fetchAccounts(user_id).then((data) => {
+            accountAction.fetchAccountsbyUserId(user_id).then((data) => {
                 setAccounts(data);
             }).catch((error) => {
                 console.error('Error fetching accounts:', error);

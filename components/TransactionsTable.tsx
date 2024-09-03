@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import TransactionDetailSheet from './TransactionDetailSheet'; // Import the sheet component
-import {cn, formatAmount, formatDateTime} from "@/lib/utils"
+import { cn, formatAmount, formatDateTime } from "@/lib/utils"
 
 
 
@@ -48,41 +48,35 @@ export const TransactionsTable = ({ transactions = [] }: TransactionTableProps) 
             return (
               <TableRow
                 key={t.id}
-                className={`${
-                  isSignificantChange
+                className={`${isSignificantChange
                     ? amount < 0
                       ? 'bg-red-150'
                       : 'bg-green-50'
                     : ''
-                } !over:bg-none !border-b-DEFAULT cursor-pointer`}
+                  } !over:bg-none !border-b-DEFAULT cursor-pointer`}
                 onClick={() => openTransactionDetails(t)} // Open the sheet on row click
               >
                 <TableCell className="max-w-[250px] pl-8 pr-10">
                   <div className="flex items-center gap-3">
                     <h1 className="text-14 truncate font-semibold text-[#344054]">
-                      {t.name}
+                      {t.description}
                     </h1>
                   </div>
                 </TableCell>
 
                 <TableCell className="min-w-32 pl-2 pr-10">
-                  {formatDateTime(t.date)}
+                  {formatDateTime(t.paid_on)}
                 </TableCell>
 
                 <TableCell
-                  className={`pl-2 pr-10 font-semibold ${
-                    isSignificantChange
+                  className={`pl-2 pr-10 font-semibold ${isSignificantChange
                       ? amount < 0
                         ? 'text-red-200'
                         : 'text-green-100'
                       : ''
-                  }`}
+                    }`}
                 >
                   {formatAmount(amount)}
-                </TableCell>
-
-                <TableCell className="pl-2 pr-10 capitalize min-w-24">
-                  {formatAmount(t.totalBalance)}
                 </TableCell>
               </TableRow>
             );
