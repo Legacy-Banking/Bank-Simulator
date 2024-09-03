@@ -93,11 +93,13 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
                 </div>
                 <div className="flex w-full flex-col">
                   <FormControl>
-                    <BankDropdown
-                      accounts={accounts}
-                      setValue={form.setValue}
-                      otherStyles="!w-full"
-                    />
+                  <BankDropdown
+                    accounts={accounts}
+                    onChange={(id) => form.setValue("fromBank", id || "")}  // This will set "fromBank" to null if nothing is selected
+                    initialSelected={form.getValues("fromBank")}  // Starts blank if "fromBank" is not set
+                    label="From Bank Account"
+                    otherStyles="!w-full"
+                  />
                   </FormControl>
                   <FormMessage className="text-12 text-red-500" />
                 </div>
@@ -122,11 +124,13 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
                 </div>
                 <div className="flex w-full flex-col">
                   <FormControl>
-                    <BankDropdown
-                      accounts={accounts}
-                      setValue={form.setValue}
-                      otherStyles="!w-full"
-                    />
+                  <BankDropdown
+                    accounts={accounts}
+                    onChange={(id) => form.setValue("toBank", id || "")}  // Replace setValue with onChange
+                    initialSelected={form.getValues("toBank")}  // Set the initial selected bank
+                    label="To Bank Account"  // Provide a descriptive label for the dropdown
+                    otherStyles="!w-full"
+                  />
                   </FormControl>
                   <FormMessage className="text-12 text-red-500" />
                 </div>

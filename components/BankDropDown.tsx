@@ -1,13 +1,7 @@
 "use client";
 
-import React from 'react';
-import { useAppSelector, useAppDispatch } from '@/app/store/hooks';
-import { selectAccount } from '@/app/store/bankSlice';
-
+import React, { useState } from 'react';
 import Image from "next/image";
-import { useSearchParams, useRouter } from "next/navigation";
-import { useState } from "react";
-
 import {
   Select,
   SelectContent,
@@ -17,13 +11,7 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 
-// Utility to update the URL query parameters
-const updateUrlQuery = (params: URLSearchParams, key: string, value: string) => {
-  params.set(key, value);
-  return `${window.location.pathname}?${params.toString()}`;
-};
-
-// Utility to format currency amounts (example implementation)
+// Utility to format currency amounts
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -33,28 +21,30 @@ const formatCurrency = (amount: number) => {
 
 export const BankDropdown = ({
   accounts = [],
-  setValue,
+  onChange,
+  initialSelected,
+  label,
   otherStyles,
-}: BankDropdownProps) => {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const [selected, setSelected] = useState(accounts[0]);
+}: {
+  accounts: Account[],
+  onChange: (id: string | null) => void,  // id can now be null
+  initialSelected?: string,
+  label: string,
+  otherStyles?: string,
+}) => {
+  const [selected, setSelected] = useState<Account | null>(
+    initialSelected ? accounts.find(acc => acc.id === initialSelected) || null : null
+  );
 
   const handleBankChange = (id: string) => {
-    const account = accounts.find((account) => account.id === id)!;
-
+    const account = accounts.find((account) => account.id === id) || null;
     setSelected(account);
-    const newUrl = updateUrlQuery(new URLSearchParams(searchParams), "id", id);
-    router.push(newUrl, { scroll: false });
-
-    if (setValue) {
-      setValue("senderBank", id);
-    }
+    onChange(account ? account.id : null);  // Pass null if no account is selected
   };
 
   return (
     <Select
-      defaultValue={selected.id}
+      defaultValue={selected?.id || ""}
       onValueChange={(value) => handleBankChange(value)}
     >
       <SelectTrigger
@@ -66,7 +56,9 @@ export const BankDropdown = ({
           height={20}
           alt="account"
         />
-        <p className="line-clamp-1 w-full text-left">{selected.name}</p>
+        <p className="line-clamp-1 w-full text-left">
+          {selected ? selected.name : ""}
+        </p>
       </SelectTrigger>
       <SelectContent
         className={`w-full bg-white-100 md:w-[300px] ${otherStyles}`}
@@ -74,7 +66,7 @@ export const BankDropdown = ({
       >
         <SelectGroup>
           <SelectLabel className="py-2 font-normal text-gray-500">
-            Select a bank to display
+            {label}
           </SelectLabel>
           {accounts.map((account: Account) => (
             <SelectItem
