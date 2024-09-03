@@ -83,8 +83,3 @@ const Home = () => {
 }
 
 export default Home
-
-
-
-
-{/* <div className="flex flex-wrap justify-center items-start w-full max-w-screen-lg px-10 gap-10 mx-auto"> */ }
