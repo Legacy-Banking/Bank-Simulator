@@ -35,21 +35,33 @@ declare type SearchParamProps = {
     supabaseItemId?: string;
     type: "full" | "card";
   }
-
-interface Account {
-  id: string;
-  name: string;
-  currentBalance: number;
+  
+  declare enum AccountType {
+    SAVINGS = 'savings',
+    PERSONAL = 'personal',
+    CREDIT = 'credit',
+    DEBIT = 'debit',
+    OTHER = 'other'
 }
 
-declare type Transaction = {
-  id: string;
-  name: string;
-  date: string | Date;
-  amount: number;
-  totalBalance: number;
-  description?: string; // Optional if it might not exist
-};
+
+  declare interface Account {
+    id: string;
+    type: AccountType;
+    balance: number;
+    owner: string; 
+    bsb: string;
+    acc: string;
+    opening_balance: number;
+  }
+  declare interface Transaction {
+    id: string;
+    description: string;
+    amount: number;
+    paid_on: Date;
+    from_account: string;
+    to_account: string;
+}
 
   // declare type Transaction = {
   //   id: string;

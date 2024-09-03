@@ -4,21 +4,25 @@ import React, { useState } from 'react';
 import { Account, AccountType } from '@/types/Account';
 import { createClient } from '@/utils/supabase/client';
 import { useAppSelector } from '@/app/store/hooks';
+import { accbsbGenerator } from '@/utils/accbsbGenerator';
 
 const handleFormSubmit = async (account: Partial<Account>, user_id: string) => {
     const supabase = createClient();
+    const { bsb, acc } = accbsbGenerator();
     try {
         const { data, error } = await supabase
             .from('account')
             .insert([
                 {
                     owner: user_id,
-                    accountType: account.type,
+                    type: account.type,
                     balance: account.balance,
+                    bsb: bsb,
+                    acc: acc,
+                    opening_balance: account.balance,
                 },
             ])
             .select();
-
         if (error) {
             throw new Error(error.message);
         }
@@ -33,7 +37,7 @@ const TestAccountForm: React.FC = () => {
     const [account, setAccount] = useState<Partial<Account>>({
         type: AccountType.SAVINGS,
         balance: 0,
-        user_id,
+        owner: user_id,
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
