@@ -6,6 +6,7 @@ import Link from 'next/link'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+
 const BankNavbar = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const session = null; // Placeholder session object
@@ -16,6 +17,13 @@ const BankNavbar = () => {
     const handleLinkClick = () => {
         setIsDropdownOpen(false);
         setIsMobileMenuOpen(false);
+    };
+
+    // Function to redirect to the transaction history of the user's personal account
+    const handleTransactionHistoryClick = () => {
+        const personalAccountId = account.id; // Replace with the actual logic to get the user's personal account ID
+        router.push(`/transaction-history?accountid=${personalAccountId}`);
+        handleLinkClick(); // Close any open menus
     };
 
     // Placeholder logout function
@@ -30,7 +38,7 @@ const BankNavbar = () => {
     return (
         <nav className="flexBetween navbar relative z-10">
             <div className='flex-1 flexStart gap-12'>
-                <Link href="/dashboard" className="flex items-center gap-0.5" onClick={handleLinkClick}>
+                <Link href="/" className="flex items-center gap-0.5" onClick={handleLinkClick}>
                     <Image
                         src="/logo.png"
                         width={44}
@@ -55,9 +63,12 @@ const BankNavbar = () => {
 
                     {/* Transaction History */}
                     <li key="/transaction-history" className='font-inter'>
-                        <Link href="/transaction-history" className='hover:text-blue-25 hover:underline underline-blue-25' onClick={handleLinkClick}>
+                        <button 
+                            className='hover:text-blue-25 hover:underline underline-blue-25'
+                            onClick={handleTransactionHistoryClick} // Updated to use the click handler
+                        >
                             Transaction History
-                        </Link>
+                        </button>
                     </li>
 
                     {/* Transfer & Pay Dropdown */}

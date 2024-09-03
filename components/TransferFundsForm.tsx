@@ -152,7 +152,7 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
                   <FormControl>
                     <Input
                       placeholder="ex: 100.00"
-                      className="input-class"
+                      className="input-class bg-white-100"
                       {...field}
                     />
                   </FormControl>
@@ -181,7 +181,7 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
                   <FormControl>
                     <Textarea
                       placeholder="Write a short description here"
-                      className="input-class"
+                      className="input-class bg-white-100"
                       {...field}
                     />
                   </FormControl>

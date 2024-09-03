@@ -57,7 +57,7 @@ export const BankDropdown = ({
           alt="account"
         />
         <p className="line-clamp-1 w-full text-left">
-          {selected ? selected.name : "Choose Account"}
+          {selected ? selected.id : "Choose Account"}
         </p>
       </SelectTrigger>
       <SelectContent
@@ -75,9 +75,9 @@ export const BankDropdown = ({
               className="cursor-pointer border-t"
             >
               <div className="flex flex-col">
-                <p className="text-16 font-medium">{account.name}</p>
+                <p className="text-16 font-medium">{account.id}</p>
                 <p className="text-14 font-medium text-blue-600">
-                  {formatCurrency(account.currentBalance)}
+                  {formatCurrency(account.balance)}
                 </p>
               </div>
             </SelectItem>
@@ -87,7 +87,7 @@ export const BankDropdown = ({
             {/* Display the balance below the dropdown */}
             {selected && (
         <p className="mt-4 text-14 font-medium text-blue-25">
-          Balance: {formatCurrency(selected.currentBalance)}
+          Balance: {formatCurrency(selected.balance)}
         </p>
       )}
     </Select>

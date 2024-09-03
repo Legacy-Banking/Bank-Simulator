@@ -1,7 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import BalanceBox from './BalanceBox';
-import { Account } from '@/types/Account';
 
 type AccountBoxProps = {
     account: Partial<Account>;

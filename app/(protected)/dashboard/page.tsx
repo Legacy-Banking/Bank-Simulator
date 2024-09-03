@@ -42,6 +42,7 @@ const Dashboard = () => {
                 <div className="subheader mt-2 sm:mt-4 mb-4 sm:mb-6">
                     <h2 className="text-20 lg:text-24 font-semibold text-blackText-50">Accounts:</h2>
                 </div>
+                
                 {/* Personal Account */}
                 {accounts.map((account) => (
                     <AccountBox key={account.id} account={account} />

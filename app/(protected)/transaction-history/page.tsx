@@ -51,7 +51,7 @@ const TransactionHistory = () => {
         {/* Account Select Dropdown */}
         <div className="flex justify-end">
           <Select onValueChange={handleAccountChange} defaultValue="data1">
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-48 bg-white-200">
               <span>{account.owner}</span>
             </SelectTrigger>
             <SelectContent className="bg-white-200">
@@ -60,6 +60,7 @@ const TransactionHistory = () => {
             </SelectContent>
           </Select>
         </div>
+        
         <AccountBox account={account} />
 
         {/* Recent Transactions Title and Download Button */}
