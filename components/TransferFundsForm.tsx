@@ -96,7 +96,7 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
                   <BankDropdown
                     accounts={accounts}
                     onChange={(id) => form.setValue("fromBank", id || "")}  // This will set "fromBank" to null if nothing is selected
-                    initialSelected={form.getValues("fromBank")}  // Starts blank if "fromBank" is not set
+                    initialSelected={form.getValues("fromBank") || undefined}  // Starts blank if "fromBank" is not set
                     label="From Bank Account"
                     otherStyles="!w-full"
                   />
@@ -127,7 +127,7 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
                   <BankDropdown
                     accounts={accounts}
                     onChange={(id) => form.setValue("toBank", id || "")}  // Replace setValue with onChange
-                    initialSelected={form.getValues("toBank")}  // Set the initial selected bank
+                    initialSelected={form.getValues("toBank") || undefined}  // Set the initial selected bank
                     label="To Bank Account"  // Provide a descriptive label for the dropdown
                     otherStyles="!w-full"
                   />

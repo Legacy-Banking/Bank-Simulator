@@ -57,7 +57,7 @@ export const BankDropdown = ({
           alt="account"
         />
         <p className="line-clamp-1 w-full text-left">
-          {selected ? selected.name : ""}
+          {selected ? selected.name : "Choose Account"}
         </p>
       </SelectTrigger>
       <SelectContent
@@ -84,6 +84,12 @@ export const BankDropdown = ({
           ))}
         </SelectGroup>
       </SelectContent>
+            {/* Display the balance below the dropdown */}
+            {selected && (
+        <p className="mt-4 text-14 font-medium text-blue-25">
+          Balance: {formatCurrency(selected.currentBalance)}
+        </p>
+      )}
     </Select>
   );
 };
