@@ -1,14 +1,10 @@
 "use client";
 
-import React from 'react';
-import { useAppSelector } from '@/app/store/hooks'; // Using the custom hook
-
-
+import React, { useState } from 'react';
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { BankDropdown } from "./BankDropDown";
@@ -25,109 +21,51 @@ import {
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 
-// Example placeholder function to replace `decryptId`
-const decryptId = (id: string) => {
-  // Implement your logic to decrypt the ID
-  return id; // For now, returning the same ID
-};
-
-// Example placeholder function to get bank details by account ID
-const getBankByAccountId = async ({ accountId }: { accountId: string }) => {
-  // Replace with your logic to fetch the bank details by account ID
-  return {
-    userId: { $id: "receiverUserId" },
-    fundingSourceUrl: "https://example.com/receiver-funding-source",
-  };
-};
-
-// Example placeholder function to get bank details by document ID
-const getBank = async ({ documentId }: { documentId: string }) => {
-  // Replace with your logic to fetch the bank details by document ID
-  return {
-    userId: { $id: "senderUserId" },
-    fundingSourceUrl: "https://example.com/sender-funding-source",
-  };
-};
-
-// Example placeholder function to create a transfer
-const createTransfer = async (params: any) => {
-  // Replace with your logic to create a transfer
+// Placeholder function to create a transfer
+const createTransfer = async (params: { fromBank: string; toBank: string; amount: string; note?: string }) => {
+  // Implement your logic to create a transfer
   return true; // Assuming the transfer is successful
 };
 
-// Example placeholder function to create a transaction
-const createTransaction = async (transaction: any) => {
-  // Replace with your logic to create a transaction
-  return true; // Assuming the transaction is successful
-};
-
+// Zod schema for form validation
 const formSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  name: z.string().min(0, "Transfer note is too short"),
-  amount: z.string().min(4, "Amount is too short"),
-  senderBank: z.string().min(4, "Please select a valid bank account"),
-  sharableId: z.string().min(8, "Please select a valid sharable Id"),
+  fromBank: z.string().min(1, "Please select a valid bank account"),
+  toBank: z.string().min(1, "Please select a valid bank account"),
+  amount: z.string().min(1, "Amount is required").regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"),
+  note: z.string().optional(),
 });
 
-const PaymentTransferForm = ({ accounts }: { accounts: Account[] }) => {
+const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedAccount, setSelectedAccount] = useState<Account | null>(accounts[0] || null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-        name: "",
-        email: "",
-        amount: "",
-        senderBank: selectedAccount?.id || "",
-        sharableId: "",
+      fromBank: "",
+      toBank: "",
+      amount: "",
+      note: "",
     },
   });
-
-  const handleBankChange = (selectedBankId: string) => {
-    const account = accounts.find((acc) => acc.id === selectedBankId);
-    setSelectedAccount(account || null);
-    form.setValue("senderBank", selectedBankId);
-  };
 
   const submit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
 
     try {
-      const receiverAccountId = decryptId(data.sharableId);
-      const receiverBank = await getBankByAccountId({
-        accountId: receiverAccountId,
-      });
-      const senderBank = await getBank({ documentId: data.senderBank });
-
       const transferParams = {
-        sourceFundingSourceUrl: senderBank.fundingSourceUrl,
-        destinationFundingSourceUrl: receiverBank.fundingSourceUrl,
+        fromBank: data.fromBank,
+        toBank: data.toBank,
         amount: data.amount,
+        note: data.note,
       };
 
       // Create transfer
       const transfer = await createTransfer(transferParams);
 
-      // Create transfer transaction
       if (transfer) {
-        const transaction = {
-          name: data.name,
-          amount: data.amount,
-          senderId: senderBank.userId.$id,
-          senderBankId: senderBank.userId.$id, // Adjusted to match available data
-          receiverId: receiverBank.userId.$id,
-          receiverBankId: receiverBank.userId.$id, // Adjusted to match available data
-          email: data.email,
-        };
-
-        const newTransaction = await createTransaction(transaction);
-
-        if (newTransaction) {
-          form.reset();
-          router.push("/");
-        }
+        form.reset();
+        router.push("/");
       }
     } catch (error) {
       console.error("Submitting create transfer request failed: ", error);
@@ -141,8 +79,8 @@ const PaymentTransferForm = ({ accounts }: { accounts: Account[] }) => {
       <form onSubmit={form.handleSubmit(submit)} className="flex flex-col">
         <FormField
           control={form.control}
-          name="senderBank"
-          render={() => (
+          name="fromBank"
+          render={({ field }) => (
             <FormItem className="border-t border-gray-200">
               <div className="payment-transfer_form-item pb-6 pt-5">
                 <div className="payment-transfer_form-content">
@@ -161,11 +99,6 @@ const PaymentTransferForm = ({ accounts }: { accounts: Account[] }) => {
                       otherStyles="!w-full"
                     />
                   </FormControl>
-                  {selectedAccount && (
-                    <p className="mt-2 text-12 font-medium text-gray-700">
-                      Balance: {selectedAccount.currentBalance.toFixed(2)}
-                    </p>
-                  )}
                   <FormMessage className="text-12 text-red-500" />
                 </div>
               </div>
@@ -173,21 +106,10 @@ const PaymentTransferForm = ({ accounts }: { accounts: Account[] }) => {
           )}
         />
 
-
-
-        <div className="payment-transfer_form-details">
-          <h2 className="py-2 text-18 font-semibold text-gray-900">
-            Bank account details
-          </h2>
-          {/* <p className="text-16 font-normal text-gray-600">
-            Enter the bank account details of the recipient
-          </p> */}
-        </div>
-
         <FormField
           control={form.control}
-          name="senderBank"
-          render={() => (
+          name="toBank"
+          render={({ field }) => (
             <FormItem className="border-t border-gray-200">
               <div className="payment-transfer_form-item pb-6 pt-5">
                 <div className="payment-transfer_form-content">
@@ -204,41 +126,6 @@ const PaymentTransferForm = ({ accounts }: { accounts: Account[] }) => {
                       accounts={accounts}
                       setValue={form.setValue}
                       otherStyles="!w-full"
-                    />
-                  </FormControl>
-                  {selectedAccount && (
-                    <p className="mt-2 text-12 font-medium text-gray-700">
-                      Balance: {selectedAccount.currentBalance.toFixed(2)}
-                    </p>
-                  )}
-                  <FormMessage className="text-12 text-red-500" />
-                </div>
-              </div>
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem className="border-t border-gray-200">
-              <div className="payment-transfer_form-item pb-6 pt-5">
-                <div className="payment-transfer_form-content">
-                  <FormLabel className="text-14 font-medium text-gray-700">
-                    Transfer Note (Optional)
-                  </FormLabel>
-                  <FormDescription className="text-12 font-normal text-gray-600">
-                    Please provide any additional information or instructions
-                    related to the transfer
-                  </FormDescription>
-                </div>
-                <div className="flex w-full flex-col">
-                  <FormControl>
-                    <Textarea
-                      placeholder="Write a short note here"
-                      className="input-class"
-                      {...field}
                     />
                   </FormControl>
                   <FormMessage className="text-12 text-red-500" />
@@ -260,7 +147,36 @@ const PaymentTransferForm = ({ accounts }: { accounts: Account[] }) => {
                 <div className="flex w-full flex-col">
                   <FormControl>
                     <Input
-                      placeholder="ex: 5.00"
+                      placeholder="ex: 100.00"
+                      className="input-class"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage className="text-12 text-red-500" />
+                </div>
+              </div>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="note"
+          render={({ field }) => (
+            <FormItem className="border-t border-gray-200">
+              <div className="payment-transfer_form-item pb-6 pt-5">
+                <div className="payment-transfer_form-content">
+                  <FormLabel className="text-14 font-medium text-gray-700">
+                    Transfer Note (Optional)
+                  </FormLabel>
+                  <FormDescription className="text-12 font-normal text-gray-600">
+                    Provide additional information or instructions (optional)
+                  </FormDescription>
+                </div>
+                <div className="flex w-full flex-col">
+                  <FormControl>
+                    <Textarea
+                      placeholder="Write a short note here"
                       className="input-class"
                       {...field}
                     />
@@ -288,4 +204,4 @@ const PaymentTransferForm = ({ accounts }: { accounts: Account[] }) => {
   );
 };
 
-export default PaymentTransferForm;
+export default TransferFundsForm;
