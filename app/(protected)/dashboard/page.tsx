@@ -4,8 +4,8 @@ import AnimatedCounter from '@/components/AnimatedCounter';
 import React, { useEffect, useState } from 'react'
 import AccountBox from '@/components/AccountBox';
 import { useAppSelector } from '@/app/store/hooks';
-import { createClient } from '@/utils/supabase/client';
 import { accountAction } from '@/utils/accountAction';
+import TransactionForm from '@/components/dev/TransactionForm';
 
 
 const Dashboard = () => {
@@ -46,6 +46,8 @@ const Dashboard = () => {
                 {accounts.map((account) => (
                     <AccountBox key={account.id} account={account} />
                 ))}
+                {/* Transaction Form */}
+                <TransactionForm fromAccount={accounts[1]} toAccount={accounts[0]} amount={20} description="Meeting" />
 
                 {/* Divider */}
                 <div className="border-t-2 border-blackText-100 my-2 sm:my-4"></div>
