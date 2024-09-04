@@ -23,13 +23,13 @@ const RootNavbar = () => {
         console.log("User logged out");
 
         // Redirect to the home page after logout
-        router.push('/home');
+        router.push('/');
     };
 
     return (
         <nav className="flexBetween py-3 px-6 gap-10 relative z-10">
             <div className='flex-1 flexStart gap-12'>
-                <Link href="/home" className="flex items-center gap-0.5" onClick={handleLinkClick}>
+                <Link href="/" className="flex items-center gap-0.5" onClick={handleLinkClick}>
                     <Image
                         src="/logo.png"
                         width={56}
@@ -59,7 +59,7 @@ const RootNavbar = () => {
                 </ul>
 
                 <div className='flexCenter gap-12'>
-                    <Link href="/log-in">
+                    <Link href="/login">
                         <button
                             onClick={handleLogout}
                             className="bg-yellow-gradient text-blackText-100 font-inter font-bold py-2 px-7 rounded-2xl items-center justify-center shadow-md hover:text-blue-25 hover:underline underline-blue-25 hidden xl:block "
