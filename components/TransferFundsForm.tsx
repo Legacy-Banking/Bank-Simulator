@@ -24,6 +24,7 @@ const formSchema = z.object({
 const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null); // State to manage error messages
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -36,6 +37,7 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
   });
 
   const submit = async (data: z.infer<typeof formSchema>) => {
+    setError(null); // Clear previous error
     setIsLoading(true);
 
     try {
@@ -47,16 +49,31 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
         throw new Error("Invalid bank accounts selected.");
       }
 
+      // Check if the same account is selected for both from and to
+      if (fromAccount.id === toAccount.id) {
+        setError("You cannot transfer funds between the same account.");
+        setIsLoading(false);
+        return;
+      }
+
       const amount = parseFloat(data.amount);
 
       // Call the transactionAction to create the transaction
-      await transactionAction.createTransaction(fromAccount, toAccount, amount, data.description);
+      await transactionAction.createTransaction(fromAccount, toAccount, amount, data.description || "");
 
       form.reset();
       router.push("/dashboard");
     } catch (error) {
       console.error("Submitting create transfer request failed: ", error);
+    
+      // Check if the error is an instance of Error and has a message property
+      if (error instanceof Error) {
+        setError(error.message || "An error occurred during the transfer.");
+      } else {
+        setError("An unexpected error occurred during the transfer.");
+      }
     }
+    
 
     setIsLoading(false);
   };
@@ -180,6 +197,8 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
             </FormItem>
           )}
         />
+
+        {error && <p className="text-red-500 mt-4">{error}</p>} {/* Display error message if any */}
 
         <div className="payment-transfer_btn-box">
           <Button type="submit" className="text-14 w-full bg-blue-gradient font-semibold text-white-100 shadow-form">

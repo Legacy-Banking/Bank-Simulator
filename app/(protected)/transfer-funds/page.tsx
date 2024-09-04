@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
 import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '@/app/store/hooks'; // To get the user's ID
 import HeaderBox from '@/components/HeaderBox';
 import TransferFundForm from '@/components/TransferFundsForm';
-import { createClient } from '@/utils/supabase/client';
+import { accountAction } from '@/utils/accountAction'; // Import your account actions
 
 const TransferFunds = () => {
   const user_id = useAppSelector((state) => state.user.user_id); // Assuming user ID is stored in Redux
@@ -15,23 +15,14 @@ const TransferFunds = () => {
   // Fetch accounts data
   useEffect(() => {
     const fetchAccounts = async () => {
-      const supabase = createClient();
-
       try {
         console.log("Fetching accounts for user ID:", user_id); // Debug: Check user ID
 
-        const { data, error } = await supabase
-          .from('account')
-          .select('*')
-          .eq('owner', user_id); // Assuming 'owner' is the user's ID
-
-        if (error) {
-          throw new Error(error.message);
-        }
+        const data = await accountAction.fetchAccountsbyUserId(user_id); // Use fetchAccountsbyUserId method
 
         console.log("Fetched accounts data:", data); // Debug: Check fetched accounts
 
-        setAccountsData(data as Account[]); // Store fetched accounts
+        setAccountsData(data); // Store fetched accounts
       } catch (err) {
         console.error("Error fetching accounts:", err);
         setError("Unable to fetch accounts");
