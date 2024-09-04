@@ -29,7 +29,7 @@ const Home = () => {
 
             {/* Buttons for Login & Signup*/}
             <div className="flex flex-col md:flex-row place-items-start space-x-0 space-y-4 md:space-x-10 md:space-y-0">
-              <Link href="/login">
+              <Link href="/log-in">
                 <button className="w-full md:w-auto px-6 md:px-8 py-2 md:py-3 text-base md:text-lg font-medium text-[#FFFFFF] bg-gradient-to-r from-[#468DC6] to-[#1A70B8] rounded-lg hover:text-gray-600 shadow-2xl">
                   → Login
                 </button>
@@ -56,7 +56,9 @@ const Home = () => {
               {/* Column 1 */}
               <Link href="/resources">
                 <div className="flex flex-col items-start space-y-2 w-[280px]">
-                  <div className="w-full h-[148px] bg-[#D9D9D9]"></div>
+                  <div className="w-full h-[148px] relative">
+                    <Image src="/demo.png" alt="Learn How to Use this Website" layout="fill" objectFit="cover" />
+                  </div>
                   <h3 className="text-[20px] font-bold text-[#17181A] hover:underline">Learn How to Use this Website</h3>
                   <p className="text-[14px] text-[#5F5F64]">Watch this video demo to learn how to use the website</p>
                 </div>
@@ -64,7 +66,9 @@ const Home = () => {
               {/* Column 2 */}
               <Link href="https://www.sonicwall.com/phishing-iq-test" target="_blank" rel="noreferrer">
                 <div className="flex flex-col items-start space-y-2 w-[280px]">
-                  <div className="w-full h-[148px] bg-[#D9D9D9]"></div>
+                  <div className="w-full h-[148px] relative">
+                    <Image src="/phishing.png" alt="Scam Phishing Quiz" layout="fill" objectFit="cover" />
+                  </div>
                   <h3 className="text-[20px] font-bold text-[#17181A] hover:underline">Scam Phishing Quiz</h3>
                   <p className="text-[14px] text-[#5F5F64]">Take this quiz to test your ability to identify fraudulent emails and websites</p>
                 </div>
@@ -72,7 +76,9 @@ const Home = () => {
               {/* Column 3 */}
               <Link href="https://www.seniorsit.com.au/" target="_blank" rel="noreferrer">
                 <div className="flex flex-col items-start space-y-2 w-[280px]">
-                  <div className="w-full h-[148px] bg-[#D9D9D9]"></div>
+                  <div className="w-full h-[148px] relative">
+                    <Image src="/seniorit.png" alt="SeniorIT Program" layout="fill" objectFit="cover" />
+                  </div>
                   <h3 className="text-[20px] font-bold text-[#17181A] hover:underline">SeniorIT Program</h3>
                   <p className="text-[14px] text-[#5F5F64]">Learn more about other resources that are available to aid in your online learning</p>
                 </div>
