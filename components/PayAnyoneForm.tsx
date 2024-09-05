@@ -52,6 +52,16 @@ const PayAnyoneForm = ({ accounts }: { accounts: Account[] }) => {
         throw new Error("Invalid bank account selected.");
       }
 
+      const amountF = parseFloat(data.amount);
+
+      // Check for insufficient funds
+      if (fromAccount.balance < amountF) {
+        setError("Insufficient funds in selected account.");
+        setIsLoading(false);
+        return;
+      }
+  
+
       const { bsb, accountNum, amount, description } = data;
 
       // Simulate transaction logic
