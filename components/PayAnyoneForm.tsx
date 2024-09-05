@@ -88,7 +88,7 @@ const PayAnyoneForm = ({ accounts }: { accounts: Account[] }) => {
       <form onSubmit={form.handleSubmit(submit)} className="flex flex-col">
         <div className="payment-transfer_form-details">
           <h2 className="text-18 font-semibold text-gray-900">Step 1 - Select Your Account</h2>
-          <p className="text-16 font-normal text-gray-600">Select the bank account you want to pay from</p>
+          <p className="text-14 font-normal text-gray-600">Select the bank account you want to pay from</p>
         </div>
 
         <FormField
@@ -127,7 +127,7 @@ const PayAnyoneForm = ({ accounts }: { accounts: Account[] }) => {
 
         <div className="payment-transfer_form-details">
           <h2 className="text-18 font-semibold text-gray-900">Step 2 - Bank account details</h2>
-          <p className="text-16 font-normal text-gray-600">Enter the bank account details of the recipient</p>
+          <p className="text-14 font-normal text-gray-600">Enter the bank account details of the recipient</p>
         </div>
 
         <FormField

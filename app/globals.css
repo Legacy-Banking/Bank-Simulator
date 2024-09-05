@@ -20,6 +20,13 @@
   scrollbar-width: none; /* Firefox */
 }
 
+.custom-checkbox {
+  width: 16px;
+  height: 16px;
+  transform: scale(1.5); /* Makes the checkbox bigger */
+}
+
+
 @layer utilities {
 
   .text14_padding10 {

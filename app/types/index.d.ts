@@ -63,6 +63,14 @@ declare type SearchParamProps = {
     to_account: string;
 }
 
+declare interface BillerAccount {
+  id: string;
+  balance: number;
+  billerName: string; 
+  billerCode: string;
+  refNum: string;
+}
+
   // declare type Transaction = {
   //   id: string;
   //   $id: string;
