@@ -8,27 +8,27 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import {cn, formatAmount, formatDateTime} from "@/lib/utils"
+import { cn, formatAmount, formatDateTime } from "@/lib/utils"
 
 // Define the props type for the component
 type TransactionDetailSheetProps = {
-    transaction: Transaction | null;
-    onClose: () => void;
-  };
-  
-  const TransactionDetailSheet: React.FC<TransactionDetailSheetProps> = ({ transaction, onClose }) => {
-    if (!transaction) return null;
+  transaction: Transaction | null;
+  onClose: () => void;
+};
+
+const TransactionDetailSheet: React.FC<TransactionDetailSheetProps> = ({ transaction, onClose }) => {
+  if (!transaction) return null;
 
   return (
     <Dialog open={!!transaction} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="bg-white-100">
         <DialogHeader>
           <DialogTitle>Transaction Details</DialogTitle>
           <DialogDescription>
             Detailed information about the selected transaction.
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-2">
+        <div >
           <p><strong>Name:</strong> {transaction.name}</p>
           <p><strong>Date:</strong> {formatDateTime(transaction.date)}</p>
           <p><strong>Amount:</strong> {formatAmount(transaction.amount)}</p>

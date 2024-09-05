@@ -27,7 +27,7 @@ const RootNavbar = () => {
     };
 
     return (
-        <nav className="flexBetween py-3 px-6 gap-10 relative z-10">
+        <nav className="flexBetween py-3 px-6 gap-10 relative z-10 bg-white-200 text-black shadow-md">
             <div className='flex-1 flexStart gap-12'>
                 <Link href="/" className="flex items-center gap-0.5" onClick={handleLinkClick}>
                     <Image

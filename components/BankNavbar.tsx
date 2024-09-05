@@ -32,7 +32,7 @@ const BankNavbar = () => {
         console.log("User logged out");
 
         // Redirect to the home page after logout
-        router.push('/home');
+        router.push('/');
     };
 
     return (
@@ -63,7 +63,7 @@ const BankNavbar = () => {
 
                     {/* Transaction History */}
                     <li key="/transaction-history" className='font-inter'>
-                        <button 
+                        <button
                             className='hover:text-blue-25 hover:underline underline-blue-25'
                             onClick={handleTransactionHistoryClick} // Updated to use the click handler
                         >
@@ -125,8 +125,8 @@ const BankNavbar = () => {
                         </Link>
                     ) : null}
 
-                    <button 
-                        onClick={handleLogout} 
+                    <button
+                        onClick={handleLogout}
                         className="bg-yellow-gradient text-blackText-100 font-inter font-bold py-2 px-7 rounded-2xl items-center justify-center shadow-md hover:text-blue-25 hover:underline underline-blue-25 hidden xl:block "
                     >
                         Log Out

@@ -35,7 +35,7 @@ const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children
     return (
         <div>
             <BankNavbar />
-            <UserState />
+            {/* <UserState /> */}
             {children}
         </div>
     );
