@@ -11,6 +11,8 @@ import { Button } from "./ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
+import { transactionAction } from '@/utils/transactionAction'; // Import the transaction action
+import { accountAction } from '@/utils/accountAction'; // Import the transaction action
 
 // Zod schema for form validation with BSB and account number
 const formSchema = z.object({
@@ -52,20 +54,33 @@ const PayAnyoneForm = ({ accounts }: { accounts: Account[] }) => {
         throw new Error("Invalid bank account selected.");
       }
 
-      const amountF = parseFloat(data.amount);
+      const amount = parseFloat(data.amount);
 
       // Check for insufficient funds
-      if (fromAccount.balance < amountF) {
+      if (fromAccount.balance < amount) {
         setError("Insufficient funds in selected account.");
         setIsLoading(false);
         return;
       }
-  
+      
+      // Fetch the recipient's account using the BSB and Account Number
+      const toAccount = await accountAction.fetchAccountByBSBAndAccountNumber(data.bsb, data.accountNum);
 
-      const { bsb, accountNum, amount, description } = data;
+      if (!toAccount) {
+        setError("Recipient account not found. Please check the BSB and Account Number.");
+        setIsLoading(false);
+        return;
+      }
 
-      // Simulate transaction logic
-      console.log(`Paying ${amount} to BSB ${bsb}, Account ${accountNum}`);
+      // Check if the same account is selected for both from and to
+      if (fromAccount.id === toAccount.id) {
+        setError("You cannot transfer funds between the same account.");
+        setIsLoading(false);
+        return;
+      }
+
+      // Call the transactionAction to create the transaction
+      await transactionAction.createTransaction(fromAccount, toAccount, amount, data.description || "");
 
       form.reset();
       router.push("/dashboard");
