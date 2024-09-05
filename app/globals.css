@@ -2,6 +2,185 @@
 @tailwind components;
 @tailwind utilities;
 
+
+@layer utilities {
+
+  .text14_padding10 {
+    @apply text-14 px-4 py-2.5 font-semibold;
+  }
+
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+
+  .header-2 {
+    @apply text-18 font-semibold text-gray-900;
+  }
+
+  .text-10 {
+    @apply text-[10px] leading-[14px];
+  }
+
+  .text-12 {
+    @apply text-[12px] leading-[16px];
+  }
+
+  .text-14 {
+    @apply text-[14px] leading-[20px];
+  }
+
+  .text-16 {
+    @apply text-[16px] leading-[24px];
+  }
+
+  .text-18 {
+    @apply text-[18px] leading-[22px];
+  }
+
+  .text-20 {
+    @apply text-[20px] leading-[24px];
+  }
+
+  .text-24 {
+    @apply text-[24px] leading-[30px];
+  }
+
+  .text-26 {
+    @apply text-[26px] leading-[32px];
+  }
+
+  .text-30 {
+    @apply text-[30px] leading-[38px];
+  }
+
+  .text-36 {
+    @apply text-[36px] leading-[44px];
+  }
+
+
+  .flexCenter {
+    @apply flex justify-center items-center;
+  }
+
+  .flexBetween {
+    @apply flex justify-between items-center;
+  }
+
+  .flexStart {
+    @apply flex items-center justify-start;
+  }
+
+
+  /* Navbar */
+  .navbar {
+    @apply py-3 px-8 border-b border-blue-25 gap-4;
+  }
+
+  /* Dashboard */
+  .home {
+    @apply flex w-full flex-row max-xl:max-h-screen max-xl:overflow-y-scroll;
+  }
+
+  .home-content {
+    @apply flex w-full flex-1 flex-col gap-8 px-5 sm:px-8 py-7 lg:py-12 xl:max-h-screen xl:overflow-y-scroll;
+  }
+
+  .home-header {
+    @apply flex flex-col justify-between gap-8;
+  }
+
+  .total-balance {
+    @apply flex w-full items-center gap-4 rounded-xl border border-gray-200 p-4 sm:gap-6 sm:p-6;
+  }
+
+  .total-balance-label {
+    @apply text-14 font-medium text-gray-600;
+  }
+
+  .total-balance-amount {
+    @apply text-24 lg:text-30 flex-1 font-semibold text-gray-900;
+  }
+
+  .recent-transactions {
+    @apply flex w-full flex-col gap-6;
+  }
+
+  .view-all-btn {
+    @apply text-14 rounded-lg border border-gray-300 px-4 py-2.5 font-semibold text-gray-700;
+  }
+
+  .recent-transactions {
+    @apply flex w-full flex-col gap-6;
+  }
+
+  .recent-transactions-label {
+    @apply text-20 md:text-24 font-semibold text-gray-900;
+  }
+
+  .recent-transactions-tablist {
+    @apply custom-scrollbar mb-8 flex w-full flex-nowrap;
+  }
+
+  /* My Banks */
+  .my-banks {
+    @apply flex h-screen max-h-screen w-full flex-col gap-8 bg-gray-25 p-8 xl:py-12;
+  }
+
+  .transactions-header {
+    @apply flex w-full flex-col items-start justify-between gap-8 md:flex-row;
+  }
+
+  .transactions-account {
+    @apply flex flex-col justify-between gap-4 rounded-lg border-y bg-blue-600 px-4 py-5 md:flex-row;
+  }
+
+  .transactions-account-balance {
+    @apply flex-center flex-col  gap-2 rounded-md bg-blue-25/20 px-4 py-2 text-white-100;
+  }
+
+  .header-box {
+    @apply flex flex-col gap-1;
+  }
+
+  .header-box-title {
+    @apply text-24 lg:text-30 font-semibold text-blackText-100;
+  }
+
+  .header-box-subtext {
+    @apply text-14 lg:text-16 font-normal text-blackText-300;
+  }
+
+  /* Payment Transfer */
+  .payment-transfer {
+    @apply no-scrollbar flex flex-col overflow-y-scroll bg-gray-25 p-8 md:max-h-screen xl:py-12;
+  }
+
+  .payment-transfer_form-item {
+    @apply flex w-full max-w-[850px] flex-col gap-3 md:flex-row lg:gap-8;
+  }
+
+  .payment-transfer_form-content {
+    @apply flex w-full max-w-[280px] flex-col gap-2;
+  }
+
+  .payment-transfer_form-details {
+    @apply flex flex-col gap-1 border-t border-gray-200 pb-5 pt-6;
+  }
+
+  .payment-transfer_btn-box {
+    @apply mt-5 flex w-full max-w-[850px] gap-3 border-gray-200 py-5;
+  }
+
+}
+
+.bg-yellow-gradient {
+  background: linear-gradient(90deg, #F6CA4D 0%, #FFE18D 100%);
+}
+
+.bg-blue-gradient {
+  background: linear-gradient(90deg, #1A70B8 0%, #468DC6 100%);
+}
+
 @layer base {
   :root {
     --background: 200 20% 98%;
