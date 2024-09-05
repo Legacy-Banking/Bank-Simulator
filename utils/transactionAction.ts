@@ -80,6 +80,16 @@ export const transactionAction = {
             throw error;
         }
 
-        return data as Transaction[];
+        const transactions = data as Transaction[];
+        transactionAction.processTransactionsForAccount(transactions, accountId);
+        return transactions;
+    },
+
+    processTransactionsForAccount: (transactions: Transaction[], accountId: string): void => {
+        transactions.forEach((t) => {
+            t.amount = t.from_account.toString() === accountId ? -t.amount : t.amount;
+        });
     },
 };
+
+
