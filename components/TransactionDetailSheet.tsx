@@ -8,16 +8,16 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import {cn, formatAmount, formatDateTime} from "@/lib/utils"
+import { cn, formatAmount, formatDateTime } from "@/lib/utils"
 
 // Define the props type for the component
 type TransactionDetailSheetProps = {
-    transaction: Transaction | null;
-    onClose: () => void;
-  };
-  
-  const TransactionDetailSheet: React.FC<TransactionDetailSheetProps> = ({ transaction, onClose }) => {
-    if (!transaction) return null;
+  transaction: Transaction | null;
+  onClose: () => void;
+};
+
+const TransactionDetailSheet: React.FC<TransactionDetailSheetProps> = ({ transaction, onClose }) => {
+  if (!transaction) return null;
 
   return (
     <Dialog open={!!transaction} onOpenChange={onClose}>
@@ -29,10 +29,9 @@ type TransactionDetailSheetProps = {
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-2">
-          <p><strong>Name:</strong> {transaction.name}</p>
-          <p><strong>Date:</strong> {formatDateTime(transaction.date)}</p>
+          <p><strong>Name:</strong> PlaceholderUserName</p>
+          <p><strong>Date:</strong> {formatDateTime(transaction.paid_on)}</p>
           <p><strong>Amount:</strong> {formatAmount(transaction.amount)}</p>
-          <p><strong>Total Balance:</strong> {formatAmount(transaction.totalBalance)}</p>
           <p><strong>Description:</strong> {transaction.description || 'No description available'}</p>
         </div>
         <DialogFooter>
