@@ -1,4 +1,16 @@
 import { createClient } from "./supabase/client";
+import { accbsbGenerator } from "./accbsbGenerator";
+import { transactionAction } from "./transactionAction";
+
+ enum AccountType {
+    SAVINGS = 'savings',
+    PERSONAL = 'personal',
+    CREDIT = 'credit',
+    DEBIT = 'debit',
+    OTHER = 'other'
+}
+
+
 
 export const accountAction = {
     fetchAccountsbyUserId: async (user_id: string): Promise<Account[]> => {
@@ -42,5 +54,42 @@ export const accountAction = {
         }
         return data || null;
     }
+
+    createAccount: async (account: Account): Promise<void> => {
+        const supabase = createClient();
+        const { error } = await supabase
+            .from('account')
+            .insert(account);
+
+        if (error) {
+            throw new Error(error.message);
+        }
+    },
+    signUpInitialization: async (user_id: string): Promise<void> => {
+        const { bsb:perbsb, acc:peracc } = accbsbGenerator();
+        const { bsb:savbsb, acc:savacc } = accbsbGenerator();
+
+        const accounts: Partial<Account>[] = [
+            {
+                type: AccountType.SAVINGS,
+                balance: 1000,
+                owner: user_id,
+                bsb: savbsb,
+                acc: savacc,
+                opening_balance: 1000,
+            },
+            {
+                type: AccountType.PERSONAL,
+                balance: 1000,
+                owner: user_id,
+                bsb: perbsb,
+                acc: peracc,
+                opening_balance: 1000,
+            }
+        ];
+        accounts.forEach(async (account) => {
+            await accountAction.createAccount(account as Account);
+        });
+    },
 
 }

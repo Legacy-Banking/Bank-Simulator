@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { SubmitButton } from "@/components/submit-button";
+import { accountAction } from "@/utils/accountAction";
 
 export default function Login({
   searchParams,
@@ -17,7 +18,7 @@ export default function Login({
     const password = formData.get("password") as string;
     const supabase = createClient();
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -25,11 +26,14 @@ export default function Login({
       },
     });
 
-    if (error) {
-      return redirect("/sign-up?message=Could not Create user");
-    }
 
-    return redirect("/log-in?message=Registration successful.");
+    if (error) {
+      return redirect(`/sign-up?message=${error}`);
+    }
+    const user_id = data.user?.id || '';
+    await accountAction.signUpInitialization(user_id);
+
+    return redirect("/dashboard");
   };
 
   return (
