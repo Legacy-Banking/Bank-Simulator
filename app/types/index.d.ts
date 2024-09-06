@@ -63,6 +63,14 @@ declare type SearchParamProps = {
     to_account: string;
 }
 
+  declare interface Message {
+    id: string;
+    description: string;
+    date_received: Date;
+    from_account: string;
+    to_account: string;
+  }
+
   // declare type Transaction = {
   //   id: string;
   //   $id: string;
@@ -84,6 +92,10 @@ declare type SearchParamProps = {
 
   type TransactionTableProps = {
     transactions: Transaction[];
+  };
+
+  type InboxTableProps = {
+    messages: Message[];
   };
   
 
