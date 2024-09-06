@@ -73,7 +73,8 @@ export const transactionAction = {
         const { data, error } = await supabase
             .from('transaction')
             .select('*')
-            .or(`from_account.eq.${accountId},to_account.eq.${accountId}`);
+            .or(`from_account.eq.${accountId},to_account.eq.${accountId}`)
+            .order('paid_on', { ascending: false });
 
         if (error) {
             console.error('Error fetching transactions:', error);

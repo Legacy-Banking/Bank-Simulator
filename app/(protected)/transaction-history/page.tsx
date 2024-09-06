@@ -9,11 +9,14 @@ import { accountAction } from '@/utils/accountAction';
 import { transactionAction } from '@/utils/transactionAction';
 import { useSearchParams } from 'next/navigation';
 import AccountBox from '@/components/AccountBox';
+import { Pagination } from '@/components/Pagination';
 
 const TransactionHistory = () => {
   const accountId = useSearchParams().get('accountid');
   const [account, setAccount] = useState<Account>({} as Account);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+
+
   useEffect(() => {
     if (accountId) {
       accountAction.fetchAccountById(accountId).then((data) => {
@@ -35,6 +38,13 @@ const TransactionHistory = () => {
   const handleDownloadStatement = () => {
     console.log('Downloading statement for');
   };
+
+  const [page, setPage] = useState(1); // Manage page state here
+  const rowsPerPage = 10;
+  const totalPages = Math.ceil(transactions.length /rowsPerPage)
+  const indexOfLastTransaction = page * rowsPerPage;
+  const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
+  const currentTransactions = transactions.slice(indexOfFirstTransaction,indexOfLastTransaction);
 
   return (
     <section className="flex w-full flex-row max-xl:max-h-screen max-xl:overflow-y-scroll font-inter">
@@ -75,7 +85,15 @@ const TransactionHistory = () => {
 
         {/* Transaction History Table */}
         <section className="flex w-full flex-col gap-6">
-          <TransactionsTable transactions={transactions} />
+          <TransactionsTable transactions={currentTransactions} />
+
+          {totalPages > 1 && (
+            <div className="my-4 w-full">
+              <Pagination totalPages={totalPages} page={page} setPage={setPage}/>
+            </div>
+          )}
+
+
         </section>
 
       </div>
