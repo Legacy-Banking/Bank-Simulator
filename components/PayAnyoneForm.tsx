@@ -154,7 +154,7 @@ const PayAnyoneForm = ({ accounts }: { accounts: Account[] }) => {
                 <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Receiver's BSB</FormLabel>
                 <div className="flex w-full flex-col">
                   <FormControl>
-                    <Input placeholder="Enter BSB" className="input-class" {...field} />
+                    <Input placeholder="Enter BSB" className="input-class bg-white-100" {...field} />
                   </FormControl>
                   <FormMessage className="text-12 text-red-500" />
                 </div>
@@ -172,7 +172,7 @@ const PayAnyoneForm = ({ accounts }: { accounts: Account[] }) => {
                 <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Receiver's Account Number</FormLabel>
                 <div className="flex w-full flex-col">
                   <FormControl>
-                    <Input placeholder="Enter account number" className="input-class" {...field} />
+                    <Input placeholder="Enter account number" className="input-class bg-white-100" {...field} />
                   </FormControl>
                   <FormMessage className="text-12 text-red-500" />
                 </div>

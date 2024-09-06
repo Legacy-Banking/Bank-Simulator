@@ -53,7 +53,7 @@ export const accountAction = {
             return null;  // Return null if there's an error or no account is found
         }
         return data || null;
-    }
+    },
 
     createAccount: async (account: Account): Promise<void> => {
         const supabase = createClient();
