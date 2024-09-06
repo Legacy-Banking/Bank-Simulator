@@ -10,6 +10,10 @@ import { transactionAction } from '@/utils/transactionAction';
 import { useSearchParams } from 'next/navigation';
 import AccountBox from '@/components/AccountBox';
 import DebitCard from '@/components/DebitCard';
+import DebitCard2 from '@/components/DebitCard2';
+import { CreditCard } from 'lucide-react';
+import CreditCardModel from '@/components/CreditCardModel';
+import DebitCardBack from '@/components/DebitCardBack';
 
 const Cards = () => {
   const accountId = useSearchParams().get('accountid');
@@ -61,12 +65,12 @@ const Cards = () => {
         "spending" : 2840.40,
     }
   ]
-  const type = "Mastercard";
-  const name = "Karen Clark";
-  const cardNumber = 1234123412341234;
-  const expirationDate: Date = new Date("2027-06-01");
-  const maxSpending = 5000;
-  const spending = 2840.40;
+  const type = "Mastercard"
+  const name = "Karen Clark"
+  const cardNumber = 1234123412341234
+  const expirationDate: Date = new Date("2027-06-01")
+  const maxSpending = 5000
+  const spending = 2840.40
 
   return (
     <section className="flex w-full flex-row max-xl:max-h-screen max-xl:overflow-y-scroll font-inter">
@@ -84,7 +88,8 @@ const Cards = () => {
             <div className="subheader mt-2 sm:mt-4 mb-4 sm:mb-6">
                 <h2 className="text-20 lg:text-24 font-semibold text-blackText-50">Cards:</h2>
             </div>
-            <div className='flex flex-row gap-14'>
+
+            <div className='flex flex-row gap-14 flex-wrap'>
             <DebitCard 
                 type={type}
                 name={name} 
@@ -92,27 +97,30 @@ const Cards = () => {
                 expirationDate={expirationDate}
                 maxSpending={maxSpending}
                 spending={spending}></DebitCard>
-            <DebitCard 
+            <DebitCardBack 
+                cvc={123}></DebitCardBack>
+            <DebitCard2 
                 type={type}
                 name={name} 
                 cardNumber={cardNumber}
                 expirationDate={expirationDate}
                 maxSpending={maxSpending}
-                spending={spending}></DebitCard>
-            <DebitCard 
+                spending={spending}></DebitCard2>
+                
+            <CreditCardModel
                 type={type}
                 name={name} 
                 cardNumber={cardNumber}
                 expirationDate={expirationDate}
                 maxSpending={maxSpending}
-                spending={spending}></DebitCard>
+                spending={spending}></CreditCardModel>
 
             </div>
             
         </div>
     
     </section>
-  );
+  )
 }
 
-export default Cards;
+export default Cards
