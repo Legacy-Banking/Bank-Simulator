@@ -34,6 +34,33 @@ const Cards = () => {
   };
 
 //   Static data
+  const cards = [
+    {
+        "id" : 1,
+        "type" : "Mastercard",
+        "name" : "Karen Clark",
+        "cardNumber" : 1234123412341234,
+        "expirationDate": new Date("2027-06-01"),
+        "maxSpending" : 5000,
+        "spending" : 2840.40,
+    }, {
+        "id" : 2,
+        "type" : "Mastercard",
+        "name" : "Karen Clark",
+        "cardNumber" : 1234123412341234,
+        "expirationDate": new Date("2027-06-01"),
+        "maxSpending" : 5000,
+        "spending" : 2840.40,
+    }, {
+        "id" : 3,
+        "type" : "Mastercard",
+        "name" : "Karen Clark",
+        "cardNumber" : 1234123412341234,
+        "expirationDate": new Date("2027-06-01"),
+        "maxSpending" : 5000,
+        "spending" : 2840.40,
+    }
+  ]
   const type = "Mastercard";
   const name = "Karen Clark";
   const cardNumber = 1234123412341234;
@@ -57,14 +84,31 @@ const Cards = () => {
             <div className="subheader mt-2 sm:mt-4 mb-4 sm:mb-6">
                 <h2 className="text-20 lg:text-24 font-semibold text-blackText-50">Cards:</h2>
             </div>
-
+            <div className='flex flex-row gap-14'>
             <DebitCard 
-            type={type}
-            name={name} 
-            cardNumber={cardNumber}
-            expirationDate={expirationDate}
-            maxSpending={maxSpending}
-            spending={spending}></DebitCard>
+                type={type}
+                name={name} 
+                cardNumber={cardNumber}
+                expirationDate={expirationDate}
+                maxSpending={maxSpending}
+                spending={spending}></DebitCard>
+            <DebitCard 
+                type={type}
+                name={name} 
+                cardNumber={cardNumber}
+                expirationDate={expirationDate}
+                maxSpending={maxSpending}
+                spending={spending}></DebitCard>
+            <DebitCard 
+                type={type}
+                name={name} 
+                cardNumber={cardNumber}
+                expirationDate={expirationDate}
+                maxSpending={maxSpending}
+                spending={spending}></DebitCard>
+
+            </div>
+            
         </div>
     
     </section>
