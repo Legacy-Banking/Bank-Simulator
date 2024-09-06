@@ -55,6 +55,28 @@ export const accountAction = {
         return data || null;
     },
 
+    fetchPersonalAccountByUserId: async (user_id: string) => {
+        const supabase = createClient();
+      
+        const { data, error } = await supabase
+          .from('account')
+          .select('*')
+          .eq('owner', user_id)
+          .eq('type', 'personal'); // Fetch only personal accounts
+      
+        if (error) {
+          console.error('Error fetching personal account:', error);
+          throw error;
+        }
+      
+        if (data && data.length > 0) {
+            return data[0]; // Return the first personal account found
+        } else {
+            console.error('No personal account found for the user.');
+            return null;
+        }
+    },
+
     createAccount: async (account: Account): Promise<void> => {
         const supabase = createClient();
         const { error } = await supabase

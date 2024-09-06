@@ -7,16 +7,37 @@ import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { accountAction } from '@/utils/accountAction';
 import { transactionAction } from '@/utils/transactionAction';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import AccountBox from '@/components/AccountBox';
 import { Pagination } from '@/components/Pagination';
+import { useAppSelector } from '@/app/store/hooks';
+import { capitalizeFirstLetter } from '@/lib/utils';
+
 
 const TransactionHistory = () => {
-  const accountId = useSearchParams().get('accountid');
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const accountId = searchParams.get('accountid');
+  const user_id = useAppSelector((state) => state.user.user_id)?.toString();
+
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const [account, setAccount] = useState<Account>({} as Account);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 10;
 
+  // Fetch accounts by user_id
+  useEffect(() => {
+    if (user_id) {
+      accountAction.fetchAccountsbyUserId(user_id).then((data) => {
+        setAccounts(data);
+      }).catch((error) => {
+        console.error('Error fetching accounts:', error);
+      });
+    }
+  }, [user_id]);
 
+  // Fetch account and transactions when accountId changes
   useEffect(() => {
     if (accountId) {
       accountAction.fetchAccountById(accountId).then((data) => {
@@ -30,21 +51,21 @@ const TransactionHistory = () => {
         console.error('Error fetching transactions:', error);
       });
     }
-
   }, [accountId]);
-  const handleAccountChange = (value: 'data1' | 'data2') => {
+
+  // Handle account change in dropdown
+  const handleAccountChange = (value: string) => {
+    router.push(`/transaction-history?accountid=${value}`); // Navigate to the selected account's transaction history
   };
 
   const handleDownloadStatement = () => {
     console.log('Downloading statement for');
   };
 
-  const [page, setPage] = useState(1); // Manage page state here
-  const rowsPerPage = 10;
-  const totalPages = Math.ceil(transactions.length /rowsPerPage)
+  const totalPages = Math.ceil(transactions.length / rowsPerPage);
   const indexOfLastTransaction = page * rowsPerPage;
   const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
-  const currentTransactions = transactions.slice(indexOfFirstTransaction,indexOfLastTransaction);
+  const currentTransactions = transactions.slice(indexOfFirstTransaction, indexOfLastTransaction);
 
   return (
     <section className="flex w-full flex-row max-xl:max-h-screen max-xl:overflow-y-scroll font-inter">
@@ -60,17 +81,20 @@ const TransactionHistory = () => {
 
         {/* Account Select Dropdown */}
         <div className="flex justify-end">
-          <Select onValueChange={handleAccountChange} defaultValue="data1">
+          <Select onValueChange={handleAccountChange} value={accountId ?? accounts[0]?.id}>
             <SelectTrigger className="w-48 bg-white-200">
-              <span>{account.owner}</span>
+              <span>{`${capitalizeFirstLetter(String(account.type))} Account`}</span> {/* Capitalizing the first letter */}
             </SelectTrigger>
             <SelectContent className="bg-white-200">
-              <SelectItem value="data1">Personal Account</SelectItem>
-              <SelectItem value="data2">Savings Account</SelectItem>
+              {accounts.map((acc) => (
+                <SelectItem key={acc.id} value={acc.id}>
+                  {`${capitalizeFirstLetter(String(acc.type))} Account`} {/* Capitalizing the first letter */}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
-        
+
         <AccountBox account={account} />
 
         {/* Recent Transactions Title and Download Button */}
@@ -89,15 +113,12 @@ const TransactionHistory = () => {
 
           {totalPages > 1 && (
             <div className="my-4 w-full">
-              <Pagination totalPages={totalPages} page={page} setPage={setPage}/>
+              <Pagination totalPages={totalPages} page={page} setPage={setPage} />
             </div>
           )}
-
-
         </section>
 
       </div>
-
     </section>
   );
 }

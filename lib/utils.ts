@@ -4,7 +4,7 @@ import qs from "query-string";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
-}
+};
 // Utility functions for formatting
 
 export const formatAmount = (amount: number): string => {
@@ -26,7 +26,7 @@ interface UrlQueryParams {
   params: string;
   key: string;
   value: string;
-}
+};
 
 export function formUrlQuery({ params, key, value }: UrlQueryParams) {
   const currentUrl = qs.parse(params);
@@ -40,4 +40,11 @@ export function formUrlQuery({ params, key, value }: UrlQueryParams) {
     },
     { skipNull: true }
   );
-}
+};
+
+
+export const capitalizeFirstLetter = (string: string) => {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
+
