@@ -13,7 +13,7 @@ type User = {
   opening_balance: number;
 };
 
-const Accounts = () => {
+const AccountsPage = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -73,4 +73,4 @@ if (error) return <p>Error: {error}</p>;
   )
 }
 
-export default Accounts
+export default AccountsPage
