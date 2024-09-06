@@ -20,6 +20,14 @@ const Dashboard = () => {
             });
         }
     }, [user_id]);
+
+    // Sort the accounts by account.id (numerically)
+    const sortedAccounts = [...accounts].sort((a, b) => {
+        const idA = Number(a.id); // Ensure id is treated as a number
+        const idB = Number(b.id);
+        return idA - idB; // Sort from lowest to highest
+    });
+
     const totalBalance = accounts.reduce((acc, account) => acc + (account.balance || 0), 0);
     const loggedIn = { userName: 'Karen' };
 
@@ -43,8 +51,8 @@ const Dashboard = () => {
                     <h2 className="text-20 lg:text-24 font-semibold text-blackText-50">Accounts:</h2>
                 </div>
                 
-                {/* Personal Account */}
-                {accounts.map((account) => (
+                {/* Accounts */}
+                {sortedAccounts.map((account) => (
                     <AccountBox key={account.id} account={account} />
                 ))}
 
