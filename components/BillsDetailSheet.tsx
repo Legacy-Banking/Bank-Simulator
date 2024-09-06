@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { cn, formatAmount, formatDateTime } from "@/lib/utils"
+import SheetDetails from './SheetDetails';
 
 // Define the props type for the component
 type BillSheetProps = {
@@ -28,12 +29,7 @@ const BillSheet: React.FC<BillSheetProps> = ({ bills, onClose }) => {
             Detailed information about the selected bill.
           </DialogDescription>
         </DialogHeader>
-        <div >
-          <p><strong>Name:</strong> {bills.name}</p>
-          <p><strong>Date:</strong> {formatDateTime(bills.date)}</p>
-          <p><strong>Amount:</strong> {formatAmount(bills.amount)}</p>
-          <p><strong>Description:</strong> {bills.description || 'No description available'}</p>
-        </div>
+          <SheetDetails bills={bills}></SheetDetails>
         <DialogFooter>
           <Button onClick={onClose} className="bg-slate-100">Close</Button>
         </DialogFooter>

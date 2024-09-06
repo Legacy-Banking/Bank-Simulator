@@ -64,7 +64,7 @@ declare type SearchParamProps = {
 }
   declare interface Bill {
     id: string;
-    account: number;
+    billed_user: string;
     from: string;
     description: string;
     amount: number;

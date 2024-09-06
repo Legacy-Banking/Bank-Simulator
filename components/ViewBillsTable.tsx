@@ -10,7 +10,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import TransactionDetailSheet from './TransactionDetailSheet'; // Import the sheet component
 import { cn, formatAmount, formatDateTime } from "@/lib/utils"
 import StatusLabel from './StatusLabel';
 import BillSheet from './BillsDetailSheet';
@@ -18,14 +17,14 @@ import BillSheet from './BillsDetailSheet';
 
 // ViewBillsTable component
 export const ViewBillsTable = ({ bills = [] }: BillProps) => {
-  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [selectedBill, setBill] = useState<Bill | null>(null);
 
-  const openTransactionDetails = (bills: Transaction) => {
-    setSelectedTransaction(bills);
+  const openBillDetails = (bills: Bill) => {
+    setBill(bills);
   };
 
-  const closeTransactionDetails = () => {
-    setSelectedTransaction(null);
+  const closeBillDetails = () => {
+    setBill(null);
   };
 
   return (
@@ -48,12 +47,12 @@ export const ViewBillsTable = ({ bills = [] }: BillProps) => {
               <TableRow
                 key={t.id}
                 className={`!over:bg-none !border-b-DEFAULT cursor-pointer border-b-2 border-gray-100 bg-white-200`}
-                onClick={() => openTransactionDetails(t)} // Open the sheet on row click
+                onClick={() => openBillDetails(t)} // Open the sheet on row click
               >
                 <TableCell className="max-w-[150px] pl-8">
                   <div className="flex items-center">
                     <h1 className="text-14 truncate font-semibold text-[#344054]">
-                      {t.description}
+                      {t.from}
                     </h1>
                   </div>
                 </TableCell>
@@ -69,7 +68,7 @@ export const ViewBillsTable = ({ bills = [] }: BillProps) => {
                 </TableCell>
 
                 <TableCell className="pl-2 text-gray-500">
-                  <StatusLabel status="Pending"></StatusLabel>
+                  <StatusLabel status={t.status}></StatusLabel>
                 </TableCell>
 
               </TableRow>
@@ -79,8 +78,8 @@ export const ViewBillsTable = ({ bills = [] }: BillProps) => {
       </Table>
 
       <BillSheet
-        bills={selectedTransaction}
-        onClose={closeTransactionDetails}
+        bills={selectedBill}
+        onClose={closeBillDetails}
       />
     </>
   );

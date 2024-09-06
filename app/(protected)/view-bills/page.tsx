@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import HeaderBox from '@/components/HeaderBox';
 import { ViewBillsTable } from '@/components/ViewBillsTable';
 import { useAppSelector } from '@/app/store/hooks';
-import { accountBill } from '@/utils/accountBill';
+import { billAction } from '@/utils/billAction';
 
 // Define the Transaction type
 type Transaction = {
@@ -22,10 +22,10 @@ const ViewBills = () => {
     const [bills, setBills] = useState<Bill[]>([]);
     useEffect(() => {
         if (user_id) {
-            accountBill.fetchBillsbyUserId(user_id).then((data) => {
+            billAction.fetchBillsbyUserId(user_id).then((data) => {
                 setBills(data);
             }).catch((error) => {
-                console.error('Error fetching accounts:', error);
+                console.error('Error fetching bills:', error);
             });
         }
     }, [user_id]);
@@ -41,111 +41,62 @@ const ViewBills = () => {
       bills: [
         {
           id: '1',
-          name: 'Grocery Shopping',
-          date: '2024-08-25T10:00:00Z',
-          amount: -75.50,
-          totalBalance: 400.00,
-          description: 'Debit Card',
+          billed_user: '1231231',
+          from: "Spotify",
+          description: "",
+          amount: 50,
+          paid_on: '2024-08-25T10:00:00Z',
+          status: 'Pending',
         },
         {
           id: '2',
-          name: 'Salary Credit',
-          date: '2024-08-24T08:00:00Z',
-          amount: 800.00,
-          totalBalance: 475.50,
-          description: 'Direct Deposit',
+          billed_user: '1231231',
+          from: "Youtube Music",
+          description: "",
+          amount: 50,
+          paid_on: '2024-08-25T10:00:00Z',
+          status: 'Pending',
         },
         {
           id: '3',
-          name: 'Utility Bill Payment',
-          date: '2024-08-22T18:30:00Z',
-          amount: -150.00,
-          totalBalance: 325.50,
-          description: 'BPAY',
+          billed_user: '1231231',
+          from: "Soundcloud",
+          description: "",
+          amount: 150,
+          paid_on: '2024-08-25T10:00:00Z',
+          status: 'Pending',
         },
         {
           id: '4',
-          name: 'Coffee Shop',
-          date: '2024-08-20T09:15:00Z',
-          amount: -4.50,
-          totalBalance: 329.50,
-          description: 'Credit Card',
+          billed_user: '1231231',
+          from: "Steam",
+          description: "",
+          amount: 500,
+          paid_on: '2024-08-25T10:00:00Z',
+          status: 'Paid',
         },
         {
           id: '5',
-          name: 'Dinner at Restaurant',
-          date: '2024-08-18T19:00:00Z',
-          amount: -60.00,
-          totalBalance: 389.50,
-          description: 'Debit Card',
+          billed_user: '1231231',
+          from: "Kindle",
+          description: "",
+          amount: 20,
+          paid_on: '2024-08-25T10:00:00Z',
+          status: 'Overdue',
         },
         {
           id: '6',
-          name: 'Online Shopping',
-          date: '2024-08-17T15:45:00Z',
-          amount: -120.00,
-          totalBalance: 509.50,
-          description: 'Credit Card',
+          billed_user: '1231231',
+          from: "META",
+          description: "",
+          amount: 150,
+          paid_on: '2024-08-25T10:00:00Z',
+          status: 'Pending',
         },
-        {
-          id: '7',
-          name: 'Friend',
-          date: '2024-08-13T12:00:00Z',
-          amount: 40.00,
-          totalBalance: 629.50,
-          description: 'Online Transfer',
-        },
+        
       ],
     },
-    data2: {
-      name: 'Savings Account',
-      officialName: "Karen's Savings Account",
-      bsb: '654321',
-      accNum: '987654321',
-      balance: 2245.50,
-      bills: [
-        {
-          id: '8',
-          name: 'Interest Credit',
-          date: '2024-08-24T00:00:00Z',
-          amount: 20.00,
-          totalBalance: 2245.50,
-          description: 'Interest',
-        },
-        {
-          id: '9',
-          name: 'Utility Bill Payment',
-          date: '2024-08-22T18:30:00Z',
-          amount: -150.00,
-          totalBalance: 2225.50,
-          description: 'BPAY',
-        },
-        {
-          id: '10',
-          name: 'Deposit from Personal Account',
-          date: '2024-08-20T10:00:00Z',
-          amount: 200.00,
-          totalBalance: 2245.50,
-          description: 'Direct Deposit',
-        },
-        {
-          id: '11',
-          name: 'Vacation Fund Transfer',
-          date: '2024-08-18T08:00:00Z',
-          amount: -300.00,
-          totalBalance: 2045.50,
-          description: 'Online Transfer',
-        },
-        {
-          id: '12',
-          name: 'Bonus Credit',
-          date: '2024-08-15T09:00:00Z',
-          amount: 150.00,
-          totalBalance: 2345.50,
-          description: 'Direct Deposit',
-        },
-      ],
-    },
+    
   };
   
 
