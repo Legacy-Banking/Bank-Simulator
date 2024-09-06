@@ -55,7 +55,8 @@ const TransactionHistory = () => {
 
   // Handle account change in dropdown
   const handleAccountChange = (value: string) => {
-    router.push(`/transaction-history?accountid=${value}`); // Navigate to the selected account's transaction history
+    setPage(1);
+    router.push(`/transaction-history?accountid=${value}&page=1`); // Navigate to the selected account's transaction history
   };
 
   const handleDownloadStatement = () => {
