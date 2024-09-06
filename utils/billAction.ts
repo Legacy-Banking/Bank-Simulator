@@ -13,5 +13,19 @@ export const billAction = {
         }
         return data || [];
     },
+    
+    createBill:async (user_id:string, biller:Biller, amount:number):Promise<void>=>{
+        const supabase = createClient();
+        const newBill = {
+            billed_user: user_id,
+            from: biller.id,
+            description: biller.name,
+            amount: amount,
+            paid_on: new Date(),
+            status: 'unpaid',
+        };
+        supabase.from('bills').insert(newBill);
+    }
+
 
 }

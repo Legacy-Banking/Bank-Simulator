@@ -71,6 +71,11 @@ declare type SearchParamProps = {
     paid_on: Date;
     status: string;
   }
+  declare interface Biller{
+    id: string;
+    name: string;
+    biller_code: string;
+  }
 
   // declare type Transaction = {
   //   id: string;

@@ -24,6 +24,17 @@ export const accountAction = {
             throw new Error(error.message);
         }
         return data[0];
-    }
+    },
+    //This should be admin only
+    fetchAllAccounts: async (): Promise<Account[]> => {
+        const supabase = createClient();
+        const { data, error } = await supabase
+            .from('account')
+            .select('*');
+        if (error) {
+            throw new Error(error.message);
+        }
+        return data || [];
+    },
 
 }
