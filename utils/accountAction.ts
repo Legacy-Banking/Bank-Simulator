@@ -18,7 +18,8 @@ export const accountAction = {
         const { data, error } = await supabase
             .from('account')
             .select('*')
-            .eq('owner', user_id);
+            .eq('owner', user_id)
+            .order('id', { ascending: true }); // Sort by 'id' in ascending order
 
         if (error) {
             throw new Error(error.message);
@@ -38,7 +39,7 @@ export const accountAction = {
         return data[0];
     },
 
-    // New method to fetch an account by BSB and account number
+    // Fetch an account by BSB and account number
     fetchAccountByBSBAndAccountNumber: async (bsb: string, accountNum: string): Promise<Account | null> => {
         const supabase = createClient();
         const { data, error } = await supabase
