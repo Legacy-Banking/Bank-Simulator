@@ -13,50 +13,65 @@ import { Pagination } from '@/components/Pagination';
 import { useAppSelector } from '@/app/store/hooks';
 import { capitalizeFirstLetter } from '@/lib/utils';
 
-
 const TransactionHistory = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const accountId = searchParams.get('accountid');
+  const pageFromUrl = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1; // Get page from URL or default to 1
   const user_id = useAppSelector((state) => state.user.user_id)?.toString();
 
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [account, setAccount] = useState<Account>({} as Account);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(pageFromUrl); // Set initial page from URL
+  const [loading, setLoading] = useState(false); // Add loading state
   const rowsPerPage = 10;
 
   // Fetch accounts by user_id
   useEffect(() => {
     if (user_id) {
+      setLoading(true); // Set loading to true when data is being fetched
       accountAction.fetchAccountsbyUserId(user_id).then((data) => {
         setAccounts(data);
+        setLoading(false); // Set loading to false after fetching data
       }).catch((error) => {
         console.error('Error fetching accounts:', error);
+        setLoading(false); // Set loading to false if there's an error
       });
     }
   }, [user_id]);
 
-  // Fetch account and transactions when accountId changes
+  // Fetch account and transactions when accountId or page changes
   useEffect(() => {
     if (accountId) {
+
+      // Fetch account details
       accountAction.fetchAccountById(accountId).then((data) => {
         setAccount(data);
       }).catch((error) => {
         console.error('Error fetching account:', error);
       });
+
+      // Fetch transaction history for the selected account
       transactionAction.getTransactionsByAccountId(accountId).then((data) => {
         setTransactions(data);
+        setLoading(false); // Set loading to false after fetching data
       }).catch((error) => {
         console.error('Error fetching transactions:', error);
+        setLoading(false); // Set loading to false if there's an error
       });
+
+      // Set page from URL
+      setPage(pageFromUrl);
     }
-  }, [accountId]);
+  }, [accountId, pageFromUrl]); // Add pageFromUrl as a dependency
 
   // Handle account change in dropdown
   const handleAccountChange = (value: string) => {
-    setPage(1);
-    router.push(`/transaction-history?accountid=${value}&page=1`); // Navigate to the selected account's transaction history
+    // Set loading to true before navigating
+    setLoading(true);
+    // Update URL with both accountId and page=1 in one step, avoiding intermediate renders
+    router.push(`/transaction-history?accountid=${value}&page=1`);
   };
 
   const handleDownloadStatement = () => {
@@ -71,54 +86,62 @@ const TransactionHistory = () => {
   return (
     <section className="flex w-full flex-row max-xl:max-h-screen max-xl:overflow-y-scroll font-inter">
       <div className="flex w-full flex-1 flex-col gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen xl:overflow-y-scroll">
+        
+        {/* Show loading spinner when loading */}
+        {loading ? (
+          <div className="flex items-center justify-center">
+            <div className="spinner"></div> {/* Spinner shown while loading */}
+          </div>
+        ) : (
+          <>
+            <header className="home-header">
+              <HeaderBox
+                type="title"
+                title="Transaction History"
+                subtext="View and or Download all of your recent transactions"
+              />
+            </header>
 
-        <header className="home-header">
-          <HeaderBox
-            type="title"
-            title="Transaction History"
-            subtext="View and or Download all of your recent transactions"
-          />
-        </header>
-
-        {/* Account Select Dropdown */}
-        <div className="flex justify-end">
-          <Select onValueChange={handleAccountChange} value={accountId ?? accounts[0]?.id}>
-            <SelectTrigger className="w-48 bg-white-200">
-              <span>{`${capitalizeFirstLetter(String(account.type))} Account`}</span> {/* Capitalizing the first letter */}
-            </SelectTrigger>
-            <SelectContent className="bg-white-200">
-              {accounts.map((acc) => (
-                <SelectItem key={acc.id} value={acc.id}>
-                  {`${capitalizeFirstLetter(String(acc.type))} Account`} {/* Capitalizing the first letter */}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <AccountBox account={account} />
-
-        {/* Recent Transactions Title and Download Button */}
-        <div className="flex justify-between items-center">
-          <h2 className="py-2 text-18 font-semibold text-gray-900">
-            Recent Transactions
-          </h2>
-          <Button onClick={handleDownloadStatement} className="ml-auto border border-gray-500 px-8">
-            Download Statement
-          </Button>
-        </div>
-
-        {/* Transaction History Table */}
-        <section className="flex w-full flex-col gap-6">
-          <TransactionsTable transactions={currentTransactions} />
-
-          {totalPages > 1 && (
-            <div className="my-4 w-full">
-              <Pagination totalPages={totalPages} page={page} setPage={setPage} />
+            {/* Account Select Dropdown */}
+            <div className="flex justify-end">
+              <Select onValueChange={handleAccountChange} value={accountId ?? accounts[0]?.id}>
+                <SelectTrigger className="w-48 bg-white-200">
+                  <span>{`${capitalizeFirstLetter(String(account.type))} Account`}</span> {/* Capitalizing the first letter */}
+                </SelectTrigger>
+                <SelectContent className="bg-white-200">
+                  {accounts.map((acc) => (
+                    <SelectItem key={acc.id} value={acc.id}>
+                      {`${capitalizeFirstLetter(String(acc.type))} Account`} {/* Capitalizing the first letter */}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          )}
-        </section>
 
+            <AccountBox account={account} />
+
+            {/* Recent Transactions Title and Download Button */}
+            <div className="flex justify-between items-center">
+              <h2 className="py-2 text-18 font-semibold text-gray-900">
+                Recent Transactions
+              </h2>
+              <Button onClick={handleDownloadStatement} className="ml-auto border border-gray-500 px-8">
+                Download Statement
+              </Button>
+            </div>
+
+            {/* Transaction History Table */}
+            <section className="flex w-full flex-col gap-6">
+              <TransactionsTable transactions={currentTransactions} />
+
+              {totalPages > 1 && (
+                <div className="my-4 w-full">
+                  <Pagination totalPages={totalPages} page={page} setPage={setPage} />
+                </div>
+              )}
+            </section>
+          </>
+        )}
       </div>
     </section>
   );
