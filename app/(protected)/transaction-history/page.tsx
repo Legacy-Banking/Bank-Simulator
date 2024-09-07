@@ -11,7 +11,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import AccountBox from '@/components/AccountBox';
 import { Pagination } from '@/components/Pagination';
 import { useAppSelector } from '@/app/store/hooks';
-import { capitalizeFirstLetter } from '@/lib/utils';
+import { capitalizeFirstLetter, formatAmount } from '@/lib/utils';
 
 // Import jsPDF and autoTable
 import jsPDF from 'jspdf';
@@ -85,6 +85,36 @@ const TransactionHistory = () => {
     // Add title
     doc.text('Transaction History', 14, 20);
 
+    // Set smaller font size for the account details
+    doc.setFontSize(12);
+
+    // Add Account Information
+    const accountType = capitalizeFirstLetter(account.type);
+    const openingBalance = formatAmount(account.opening_balance);
+    const currentBalance = formatAmount(account.balance);
+
+    // Add account details to the PDF
+    doc.text(`Account: ${accountType} Account`, 14, 30);
+    doc.text(`Opening Balance: ${openingBalance}`, 14, 40);
+    doc.text(`Current Balance: ${currentBalance}`, 14, 50);
+
+    doc.setFontSize(10);
+
+    // Get current date and time for the download timestamp
+    const currentDate = new Date();
+    const formattedDate = currentDate.toLocaleDateString('en-GB');
+    const formattedTime = currentDate.toLocaleTimeString();
+
+
+    // Add the timestamp, right-aligned
+    const pageWidth = 210; // A4 page width in mm
+    const marginRight = 14; // Right margin
+    const textWidth = doc.getTextWidth(`Downloaded on: ${formattedDate} at ${formattedTime}`);
+    const xPosition = pageWidth - textWidth - marginRight;
+
+    doc.text(`Downloaded on: ${formattedDate} at ${formattedTime}`, xPosition,55);
+
+
     // Add table with transactions
     const tableColumn = ['Transaction', 'Date', 'Amount'];
     const tableRows: any[] = [];
@@ -93,7 +123,7 @@ const TransactionHistory = () => {
     transactions.forEach((transaction) => {
       const transactionData = [
         transaction.from_account,
-        new Date(transaction.paid_on).toLocaleDateString(),
+        new Date(transaction.paid_on).toLocaleDateString('en-GB'),
           `${transaction.amount > 0 ? '+' : ''}${(transaction.amount || 0).toFixed(2)}`,
       ];
       tableRows.push(transactionData);
@@ -103,7 +133,7 @@ const TransactionHistory = () => {
     (doc as any).autoTable({
       head: [tableColumn],
       body: tableRows,
-      startY: 30,
+      startY: 60,
     });
 
     // Save the PDF
