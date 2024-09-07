@@ -36,7 +36,7 @@ const AccountBox: React.FC<AccountBoxProps> = ({ account }) => {
                     >
                         {accountType} Account
                     </h2>
-                    <p className={`text-14 ${textColor}`}>
+                    <p className={`text-14`}>
                         Karen's {account?.type} Account
                     </p>
                     <p className="text-14 font-medium tracking-[1.1px] text-blackText-100">

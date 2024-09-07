@@ -28,7 +28,6 @@ export const TransactionsTable = ({ transactions = [] }: TransactionTableProps) 
   return (
     <>
       <Table>
-        <TableCaption>A list of your recent transactions.</TableCaption>
         <TableHeader>
           <TableRow className="bg-blue-200 text-white-200">
             <TableHead className="px-8 rounded-tl-2xl">Transaction</TableHead>

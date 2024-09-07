@@ -108,4 +108,10 @@ declare type SearchParamProps = {
     otherStyles?: string;
   }
 
+  declare interface PaginationProps {
+    page: number;
+    totalPages: number;
+    setPage: (page: number) => void; // Function to update the page state
+  }
+  
   
