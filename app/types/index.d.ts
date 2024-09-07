@@ -104,4 +104,7 @@ declare interface BillerAccount {
     otherStyles?: string;
   }
 
+  // declare interface PaymentWhenOptionsProps {
+  //   showScheduleDate: boolean;
+  // }
   

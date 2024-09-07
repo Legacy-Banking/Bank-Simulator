@@ -10,8 +10,8 @@ import { BankDropdown } from "./BankDropDown";
 import { Button } from "./ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
-import { Textarea } from "./ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox"; // Import Checkbox from shadcn
+import { PaymentWhenOptions } from "./PaymentWhenOptions";
 
 // Zod schema for form validation with biller details and checkboxes
 const formSchema = z.object({
@@ -90,6 +90,8 @@ const BPAYForm = ({ accounts }: { accounts: Account[] }) => {
 
     setIsLoading(false);
   };
+
+  const selectedPaymentOption = form.watch("paymentOption");
 
   return (
     <Form {...form}>
@@ -260,32 +262,7 @@ const BPAYForm = ({ accounts }: { accounts: Account[] }) => {
         />
 
         {/* Payment Options (Pay Now, Schedule Payment, Recurring Payment) */}
-        <div className="border-t border-gray-200 flex w-full max-w-[850px] flex-col gap-12 md:flex-row lg:gap-20 pb-5 pt-6">
-          <label className="flex justify-between items-center space-x-6">
-            <span className="text-14 w-full max-w-[280px] font-medium text-gray-700">Pay Now</span>
-            <Checkbox
-              checked={form.watch("paymentOption") === "payNow"}
-              onCheckedChange={() => form.setValue("paymentOption", "payNow")} // Set the value to "payNow"
-              className="custom-checkbox" // Make checkbox bigger
-            />
-          </label>
-          <label className="flex justify-between items-center space-x-6">
-            <span className="text-14 w-full max-w-[280px] font-medium text-gray-700">Schedule Payment</span>
-            <Checkbox
-              checked={form.watch("paymentOption") === "schedule"}
-              onCheckedChange={() => form.setValue("paymentOption", "schedule")} // Set the value to "schedule"
-              className="custom-checkbox" // Make checkbox bigger
-            />
-          </label>
-          <label className="flex justify-between items-center space-x-6">
-            <span className="text-14 w-full max-w-[280px] font-medium text-gray-700">Recurring Payment</span>
-            <Checkbox
-              checked={form.watch("paymentOption") === "recurring"}
-              onCheckedChange={() => form.setValue("paymentOption", "recurring")} // Set the value to "recurring"
-              className="custom-checkbox" // Make checkbox bigger
-            />
-          </label>
-        </div>
+        <PaymentWhenOptions showScheduleDate={true} />
 
 
 
