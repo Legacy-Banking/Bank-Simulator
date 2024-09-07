@@ -38,7 +38,7 @@ const TransactionDetailSheet: React.FC<TransactionDetailSheetProps> = ({ transac
             <strong>From:</strong> Account {transaction.to_account}
           </p>
           <p className="text-sm">
-            <strong>Date:</strong> {formatDateTime(transaction.date)}
+            <strong>Date:</strong> {formatDateTime(transaction.paid_on)}
           </p>
           <p className="text-sm">
             <strong>Amount:</strong> {formatAmount(transaction.amount)}
