@@ -13,6 +13,10 @@ import { Pagination } from '@/components/Pagination';
 import { useAppSelector } from '@/app/store/hooks';
 import { capitalizeFirstLetter } from '@/lib/utils';
 
+// Import jsPDF and autoTable
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+
 const TransactionHistory = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -75,7 +79,35 @@ const TransactionHistory = () => {
   };
 
   const handleDownloadStatement = () => {
-    console.log('Downloading statement for');
+    // Create a new jsPDF document
+    const doc = new jsPDF();
+
+    // Add title
+    doc.text('Transaction History', 14, 20);
+
+    // Add table with transactions
+    const tableColumn = ['Transaction', 'Date', 'Amount'];
+    const tableRows: any[] = [];
+
+    // Loop through the transactions and add to tableRows
+    transactions.forEach((transaction) => {
+      const transactionData = [
+        transaction.from_account,
+        new Date(transaction.paid_on).toLocaleDateString(),
+          `${transaction.amount > 0 ? '+' : ''}${(transaction.amount || 0).toFixed(2)}`,
+      ];
+      tableRows.push(transactionData);
+    });
+
+    // Create the table in the PDF
+    (doc as any).autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 30,
+    });
+
+    // Save the PDF
+    doc.save('transaction_history.pdf');
   };
 
   const totalPages = Math.ceil(transactions.length / rowsPerPage);
@@ -105,8 +137,8 @@ const TransactionHistory = () => {
             {/* Account Select Dropdown */}
             <div className="flex justify-end">
               <Select onValueChange={handleAccountChange} value={accountId ?? accounts[0]?.id}>
-                <SelectTrigger className="w-48 bg-white-200">
-                  <span>{`${capitalizeFirstLetter(String(account.type))} Account`}</span> {/* Capitalizing the first letter */}
+                <SelectTrigger className="w-52 bg-white-200 ">
+                  <span className="mx-auto text-center">{`${capitalizeFirstLetter(String(account.type))} Account`}</span> {/* Capitalizing the first letter */}
                 </SelectTrigger>
                 <SelectContent className="bg-white-200">
                   {accounts.map((acc) => (
@@ -125,7 +157,7 @@ const TransactionHistory = () => {
               <h2 className="py-2 text-18 font-semibold text-gray-900">
                 Recent Transactions
               </h2>
-              <Button onClick={handleDownloadStatement} className="ml-auto border border-gray-500 px-8">
+              <Button onClick={handleDownloadStatement} className="ml-auto border text-14 font-normal border-gray-300 px-8 bg-white-200">
                 Download Statement
               </Button>
             </div>

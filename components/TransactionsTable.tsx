@@ -56,7 +56,8 @@ export const TransactionsTable = ({ transactions = [] }: TransactionTableProps) 
                 <TableCell className="max-w-[250px] pl-8 pr-10">
                   <div className="flex items-center gap-3">
                     <h1 className="text-14 truncate font-semibold text-[#344054]">
-                      {t.description}
+                      {/* Show from_account for positive amounts and to_account for negative */}
+                      Account {isPositive ? t.from_account : t.to_account}
                     </h1>
                   </div>
                 </TableCell>
