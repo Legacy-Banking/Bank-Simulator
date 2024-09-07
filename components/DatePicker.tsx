@@ -37,7 +37,7 @@ export const DatePicker = ({ name }: DatePickerProps) => {
                     ) : (
                       <span>Pick a date</span>
                     )}
-                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                    <CalendarIcon className="ml-auto h-4 w-4 text-blue-500 " />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0 bg-white-100" align="start">
