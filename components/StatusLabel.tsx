@@ -1,30 +1,18 @@
 import React from 'react';
 import './css/StatusLabel.css'; // External CSS for styling
 
+interface StatusLabelProps {
+    status: string;
+}
 
-
-const StatusLabel = ({ status }) => {
-    let className = '';
-
-    switch (status) {
-        case 'Paid':
-            className = 'status-paid';
-            break;
-        case 'Pending':
-            className = 'status-pending';
-            break;
-        case 'Overdue':
-            className = 'status-overdue';
-            break;
-        default:
-            className = '';
-    }
-
+const StatusLabel: React.FC<StatusLabelProps> = ({ status }) => {
     return (
-        <div className={`status-label ${className}`}>
+        <div className={`status-label status-${status}`}>
             {status}
         </div>
     );
-};
+}
 
 export default StatusLabel;
+
+

@@ -69,6 +69,8 @@ declare type SearchParamProps = {
     description: string;
     amount: number;
     paid_on: Date;
+    created_on: Date;
+    due_date: Date
     status: string;
   }
   declare interface Biller{

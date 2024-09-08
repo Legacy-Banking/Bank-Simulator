@@ -6,7 +6,7 @@ export const billAction = {
         const { data, error } = await supabase
             .from('bills')
             .select('*')
-            .eq('account', user_id);
+            .eq('billed_user', user_id);
 
         if (error) {
             throw new Error(error.message);
@@ -23,6 +23,8 @@ export const billAction = {
             amount: amount,
             paid_on: new Date(),
             status: 'unpaid',
+            created_on: new Date(),
+            due_date: new Date()
         };
         supabase.from('bills').insert(newBill).then((data) => {
             console.log('Bill created:', data);

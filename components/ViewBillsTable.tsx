@@ -64,7 +64,7 @@ export const ViewBillsTable = ({ bills = [] }: BillProps) => {
                 </TableCell>
 
                 <TableCell className="min-w-32 pl-2 text-gray-500">
-                  {formatDateTime(t.paid_on)}
+                  {formatDateTime(t.due_date)}
                 </TableCell>
 
                 <TableCell className="pl-2 text-gray-500">
