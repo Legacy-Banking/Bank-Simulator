@@ -1,0 +1,28 @@
+.status-label {
+    display: inline-block;
+    padding: 0.4rem;
+    border-radius: 20px;
+    font-size: 14px;
+    text-align: center;
+    width: 100px;
+}
+
+.status-paid {
+    background-color: #E1FFDC;
+    color: #07A104;
+}
+
+.status-pending {
+    background-color: #FFF5DC;
+    color: #E2B102;
+}
+
+.status-overdue {
+    background-color: #f8d7da;
+    color: #B55252;
+}
+
+.status-unpaid {
+    background-color: #c4e3f1;
+    color: #005A9C;
+}

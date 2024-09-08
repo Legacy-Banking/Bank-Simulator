@@ -37,9 +37,9 @@ const PayAnyone = () => {
     }
   }, [user_id]);
 
-  if (loading) {
-    return <div>Loading...</div>; // Display a loading message while fetching accounts
-  }
+  // if (loading) {
+  //   return <div>Loading...</div>; // Display a loading message while fetching accounts
+  // }
 
   if (error) {
     console.error("Error fetching accounts:", error); // Debug: Error state

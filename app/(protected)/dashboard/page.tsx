@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react'
 import AccountBox from '@/components/AccountBox';
 import { useAppSelector } from '@/app/store/hooks';
 import { accountAction } from '@/utils/accountAction';
-import TransactionForm from '@/components/dev/TransactionForm';
+
 
 
 const Dashboard = () => {
@@ -20,6 +20,7 @@ const Dashboard = () => {
             });
         }
     }, [user_id]);
+
     const totalBalance = accounts.reduce((acc, account) => acc + (account.balance || 0), 0);
     const loggedIn = { userName: 'Karen' };
 
@@ -42,11 +43,14 @@ const Dashboard = () => {
                 <div className="subheader mt-2 sm:mt-4 mb-4 sm:mb-6">
                     <h2 className="text-20 lg:text-24 font-semibold text-blackText-50">Accounts:</h2>
                 </div>
-                
-                {/* Personal Account */}
+
+                {/* Accounts */}
+
                 {accounts.map((account) => (
                     <AccountBox key={account.id} account={account} />
                 ))}
+
+
 
                 {/* Divider */}
                 <div className="border-t-2 border-blackText-100 my-2 sm:my-4"></div>

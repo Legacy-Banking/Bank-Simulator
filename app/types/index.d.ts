@@ -62,6 +62,34 @@ declare type SearchParamProps = {
     from_account: string;
     to_account: string;
 }
+  declare interface Bill {
+    id: string;
+    billed_user: string;
+    from: string;
+    description: string;
+    amount: number;
+    paid_on: Date;
+    created_on: Date;
+    due_date: Date
+    status: string;
+  }
+  declare interface Biller{
+    id: string;
+    name: string;
+    biller_code: string;
+  }
+
+  declare interface User{
+    user_id: string;
+  }
+
+  declare interface Message {
+    id: string;
+    description: string;
+    date_received: Date;
+    from_account: string;
+    to_account: string;
+  }
 
 declare interface BillerAccount {
   id: string;
@@ -93,8 +121,15 @@ declare interface BillerAccount {
   type TransactionTableProps = {
     transactions: Transaction[];
   };
-  
 
+  type InboxTableProps = {
+    messages: Message[];
+  };
+  
+  type BillProps = {
+    bills: Bill[]
+  }
+  
   declare type Category = "Food and Drink" | "Travel" | "Transfer";
 
 
@@ -103,6 +138,13 @@ declare interface BillerAccount {
     setValue?: UseFormSetValue<any>;
     otherStyles?: string;
   }
+
+  declare interface PaginationProps {
+    page: number;
+    totalPages: number;
+    setPage: (page: number) => void; // Function to update the page state
+  }
+  
 
   // declare interface PaymentWhenOptionsProps {
   //   showScheduleDate: boolean;

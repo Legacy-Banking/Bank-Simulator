@@ -8,4 +8,9 @@ function accbsbGenerator(): { bsb: string, acc: string } {
     return { bsb, acc };
 }
 
-export { accbsbGenerator };
+function billerCodeGenerator():string{
+    //return a 4-6 digit biller code
+    return `${Math.floor(1000 + Math.random() * 9000)}`;
+}
+
+export { accbsbGenerator, billerCodeGenerator };
