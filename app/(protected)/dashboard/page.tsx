@@ -6,6 +6,7 @@ import AccountBox from '@/components/AccountBox';
 import { useAppSelector } from '@/app/store/hooks';
 import { accountAction } from '@/utils/accountAction';
 import TransactionForm from '@/components/dev/TransactionForm';
+import BillForm from '@/components/dev/BillForm';
 
 
 const Dashboard = () => {
@@ -45,12 +46,17 @@ const Dashboard = () => {
                 </div>
                 
                 {/* Accounts */}
+              
                 {accounts.map((account) => (
                     <AccountBox key={account.id} account={account} />
                 ))}
 
+
+
                 {/* Divider */}
                 <div className="border-t-2 border-blackText-100 my-2 sm:my-4"></div>
+
+                <BillForm />
 
                 {/* Total Balance Section */}
                 <div className="flex w-full justify-between items-center gap-4 p-4 sm:gap-6 sm:p-6">

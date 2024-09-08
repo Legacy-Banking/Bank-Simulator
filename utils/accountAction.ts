@@ -38,6 +38,17 @@ export const accountAction = {
         }
         return data[0];
     },
+    //This should be admin only
+    fetchAllAccounts: async (): Promise<Account[]> => {
+        const supabase = createClient();
+        const { data, error } = await supabase
+            .from('account')
+            .select('*');
+        if (error) {
+            throw new Error(error.message);
+        }
+        return data || [];
+    },
 
     // Fetch an account by BSB and account number
     fetchAccountByBSBAndAccountNumber: async (bsb: string, accountNum: string): Promise<Account | null> => {

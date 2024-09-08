@@ -62,6 +62,26 @@ declare type SearchParamProps = {
     from_account: string;
     to_account: string;
 }
+  declare interface Bill {
+    id: string;
+    billed_user: string;
+    from: string;
+    description: string;
+    amount: number;
+    paid_on: Date;
+    created_on: Date;
+    due_date: Date
+    status: string;
+  }
+  declare interface Biller{
+    id: string;
+    name: string;
+    biller_code: string;
+  }
+
+  declare interface User{
+    user_id: string;
+  }
 
   declare interface Message {
     id: string;
@@ -98,7 +118,10 @@ declare type SearchParamProps = {
     messages: Message[];
   };
   
-
+  type BillProps = {
+    bills: Bill[]
+  }
+  
   declare type Category = "Food and Drink" | "Travel" | "Transfer";
 
 
