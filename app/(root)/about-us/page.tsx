@@ -5,9 +5,9 @@ const AboutUs = () => {
   return (
     <section className="flex w-full flex-col items-center max-xl:max-h-screen max-xl:overflow-y-scroll font-inter">
       {/* Header with Background Gradient */}
-      <div className="flex w-full flex-1 flex-col gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen xl:overflow-y-scroll bg-gradient-to-b from-[#1A70B8] to-[#FFFFFF] text-center">
-        <h1 className="text-6xl font-bold text-white-100 mb-4 font-bai-jamjuree">About Us</h1>
-        <p className="text-xl font-semibold text-white-100 max-w-6xl mx-auto">
+      <div className="flex w-full flex-1 flex-col gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen xl:overflow-y-scroll bg-gradient-to-b from-[#1A70B8] via-[#4C97D1] to-[#FFFFFF] text-center">
+        <h1 className="text-6xl font-bold text-[#FFFFFF] mb-4 font-bai-jamjuree">About Us</h1>
+        <p className="text-xl font-semibold text-[#FFFFFF] max-w-6xl mx-auto">
           The LearntoBank online banking simulator has been created as part of the Seniors IT project funded by the Victorian
           government through the Adult, Community and Further Education board.
         </p>
@@ -40,7 +40,7 @@ const AboutUs = () => {
           {/* Header Text */}
           <h3 className="text-3xl font-semibold text-gray-900">Cheryl Ewin</h3>
           {/* Subtext and description */}
-          <p className="text-xl text-start text-gray-700 leading-8">
+          <p className="text-lg text-start text-gray-700 leading-8">
             Cheryl is an IT tutor who specializes in delivering programs targeted towards the needs of seniors. She teaches at numerous community centers throughout South-East Melbourne and holds a Bachelor in Education, a Graduate Diploma of Professional Development, and a Certificate IV in Information Technology (Networking).
           </p>
         </div>
