@@ -11,7 +11,11 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import AccountBox from '@/components/AccountBox';
 import { Pagination } from '@/components/Pagination';
 import { useAppSelector } from '@/app/store/hooks';
-import { capitalizeFirstLetter } from '@/lib/utils';
+import { capitalizeFirstLetter, formatAmount } from '@/lib/utils';
+
+// Import jsPDF and autoTable
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const TransactionHistory = () => {
   const searchParams = useSearchParams();
@@ -75,7 +79,65 @@ const TransactionHistory = () => {
   };
 
   const handleDownloadStatement = () => {
-    console.log('Downloading statement for');
+    // Create a new jsPDF document
+    const doc = new jsPDF();
+
+    // Add title
+    doc.text('Transaction History', 14, 20);
+
+    // Set smaller font size for the account details
+    doc.setFontSize(12);
+
+    // Add Account Information
+    const accountType = capitalizeFirstLetter(account.type);
+    const openingBalance = formatAmount(account.opening_balance);
+    const currentBalance = formatAmount(account.balance);
+
+    // Add account details to the PDF
+    doc.text(`Account: ${accountType} Account`, 14, 30);
+    doc.text(`Opening Balance: ${openingBalance}`, 14, 40);
+    doc.text(`Current Balance: ${currentBalance}`, 14, 50);
+
+    doc.setFontSize(10);
+
+    // Get current date and time for the download timestamp
+    const currentDate = new Date();
+    const formattedDate = currentDate.toLocaleDateString('en-GB');
+    const formattedTime = currentDate.toLocaleTimeString();
+
+
+    // Add the timestamp, right-aligned
+    const pageWidth = 210; // A4 page width in mm
+    const marginRight = 14; // Right margin
+    const textWidth = doc.getTextWidth(`Downloaded on: ${formattedDate} at ${formattedTime}`);
+    const xPosition = pageWidth - textWidth - marginRight;
+
+    doc.text(`Downloaded on: ${formattedDate} at ${formattedTime}`, xPosition,55);
+
+
+    // Add table with transactions
+    const tableColumn = ['Transaction', 'Date', 'Amount'];
+    const tableRows: any[] = [];
+
+    // Loop through the transactions and add to tableRows
+    transactions.forEach((transaction) => {
+      const transactionData = [
+        transaction.from_account,
+        new Date(transaction.paid_on).toLocaleDateString('en-GB'),
+          `${transaction.amount > 0 ? '+' : ''}${(transaction.amount || 0).toFixed(2)}`,
+      ];
+      tableRows.push(transactionData);
+    });
+
+    // Create the table in the PDF
+    (doc as any).autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 60,
+    });
+
+    // Save the PDF
+    doc.save('transaction_history.pdf');
   };
 
   const totalPages = Math.ceil(transactions.length / rowsPerPage);
@@ -105,10 +167,10 @@ const TransactionHistory = () => {
             {/* Account Select Dropdown */}
             <div className="flex justify-end">
               <Select onValueChange={handleAccountChange} value={accountId ?? accounts[0]?.id}>
-                <SelectTrigger className="w-48 bg-white-200">
-                  <span>{`${capitalizeFirstLetter(String(account.type))} Account`}</span> {/* Capitalizing the first letter */}
+                <SelectTrigger className="w-52 bg-white-100 ">
+                  <span className="mx-auto text-center">{`${capitalizeFirstLetter(String(account.type))} Account`}</span> {/* Capitalizing the first letter */}
                 </SelectTrigger>
-                <SelectContent className="bg-white-200">
+                <SelectContent className="bg-white-100">
                   {accounts.map((acc) => (
                     <SelectItem key={acc.id} value={acc.id}>
                       {`${capitalizeFirstLetter(String(acc.type))} Account`} {/* Capitalizing the first letter */}
@@ -125,7 +187,7 @@ const TransactionHistory = () => {
               <h2 className="py-2 text-18 font-semibold text-gray-900">
                 Recent Transactions
               </h2>
-              <Button onClick={handleDownloadStatement} className="ml-auto border border-gray-500 px-8">
+              <Button onClick={handleDownloadStatement} className="ml-auto border text-14 font-normal border-gray-300 px-8 bg-white-100">
                 Download Statement
               </Button>
             </div>
