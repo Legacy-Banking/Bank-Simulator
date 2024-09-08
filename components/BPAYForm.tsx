@@ -13,18 +13,82 @@ import { Input } from "./ui/input";
 import { Checkbox } from "@/components/ui/checkbox"; // Import Checkbox from shadcn
 import { PaymentWhenOptions } from "./PaymentWhenOptions";
 
-// Zod schema for form validation with biller details and checkboxes
 const formSchema = z.object({
-  toBiller: z.number().min(1, "Please select a valid biller"), // Validates the 'fromBank' selection
-  fromBank: z.number().min(1, "Please select a valid bank account"), // Validates the 'fromBank' selection
-  billerCode: z.string().regex(/^\d{4}$/, "Biller Code must be a 4-digit number"), // 4-digit Biller Code
-  billerName: z.string().min(1, "Biller Name is required"), // Biller name
-  referenceNum: z.string().regex(/^\d{12}$/, "Reference Number must be a 12-digit number"), // 12-digit Reference Number
-  amount: z.string().min(1, "Amount is required").regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"), // Amount validation
-  description: z.string().optional(), // Optional description
-  saveBiller: z.boolean().optional(), // Checkbox for saving biller
-  paymentOption: z.enum(["payNow", "schedule", "recurring"]).default("payNow"), // Payment options (Pay Now, Schedule, Recurring)
+  toBiller: z.number().min(1, "Please select a valid biller"),
+  fromBank: z.number().min(1, "Please select a valid bank account"),
+  billerCode: z.string().regex(/^\d{4}$/, "Biller Code must be a 4-digit number"),
+  billerName: z.string().min(1, "Biller Name is required"),
+  referenceNum: z.string().regex(/^\d{12}$/, "Reference Number must be a 12-digit number"),
+  amount: z.string().min(1, "Amount is required").regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"),
+  description: z.string().optional(),
+  saveBiller: z.boolean().optional(),
+  paymentOption: z.enum(["payNow", "schedule", "recurring"]).default("payNow"), // Payment options
+  scheduleDate: z.date().optional(),
+  frequency: z.string().optional(),
+  recurringStartDate: z.date().optional(),
+  endCondition: z.string().optional(),
+  endDate: z.date().optional(),
+  numberOfPayments: z.string().regex(/^\d+$/, "Please enter a valid number of payments").optional(),
+})
+.superRefine((data, ctx) => {
+  // Schedule Payment validation
+  if (data.paymentOption === "schedule" && !data.scheduleDate) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["scheduleDate"],
+      message: "Please select a date for scheduled payment",
+    });
+  }
+
+  // Recurring Payment validation
+  if (data.paymentOption === "recurring") {
+    // Frequency is required
+    if (!data.frequency) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["frequency"],
+        message: "Please select a frequency for recurring payment",
+      });
+    }
+
+    // Start Date is required
+    if (!data.recurringStartDate) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["recurringStartDate"],
+        message: "Please select a start date for recurring payment",
+      });
+    }
+
+    // End condition is required
+    if (!data.endCondition) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["endCondition"],
+        message: "Please select an end condition for recurring payment",
+      });
+    }
+
+    // End Date is required if "setEndDate" is selected
+    if (data.endCondition === "setEndDate" && !data.endDate) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["endDate"],
+        message: "Please select an end date",
+      });
+    }
+
+    // Number of Payments is required if "numberOfPayments" is selected
+    if (data.endCondition === "numberOfPayments" && !data.numberOfPayments) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["numberOfPayments"],
+        message: "Please enter the number of payments",
+      });
+    }
+  }
 });
+
 
 const BPAYForm = ({ accounts }: { accounts: Account[] }) => {
   const router = useRouter();
@@ -43,6 +107,12 @@ const BPAYForm = ({ accounts }: { accounts: Account[] }) => {
       description: "",
       saveBiller: false,
       paymentOption: "payNow", // Default to "Pay Now"
+      scheduleDate: undefined,
+      frequency: "",
+      recurringStartDate: undefined,
+      endCondition: "",
+      endDate: undefined,
+      numberOfPayments: "",
     },
   });
 
@@ -262,7 +332,7 @@ const BPAYForm = ({ accounts }: { accounts: Account[] }) => {
         />
 
         {/* Payment Options (Pay Now, Schedule Payment, Recurring Payment) */}
-        <PaymentWhenOptions showScheduleDate={true} />
+        <PaymentWhenOptions/>
 
 
 

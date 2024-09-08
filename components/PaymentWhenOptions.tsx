@@ -44,7 +44,7 @@ export const PaymentWhenOptions = () => {
 
       {/* Conditionally render date picker for scheduled payment */}
       {selectedPaymentOption === "schedule" && (
-        <div className="flex flex-col space-y-2 mt-4">
+        <div className="flex flex-col space-y-2 mt-4 ">
           <label className="text-14 w-full max-w-[280px] font-medium text-gray-700">Select Payment Date</label>
           <DatePicker name="scheduleDate" />
         </div>
@@ -52,11 +52,14 @@ export const PaymentWhenOptions = () => {
 
       {/* Show Frequency Dropdown and DatePicker if Recurring is selected */}
         {selectedPaymentOption === "recurring" && (
-        <div className="w-full flex flex-col space-y-4 mt-4">
+        <div className="w-full flex flex-col space-y-4 mt-4 ">
+
           {/* Frequency Dropdown */}
-          <label className="text-14 w-full max-w-[280px] font-medium text-gray-700">Frequency</label>
+          <div className="flex flex-col">
+          <label className="text-14 w-full max-w-[280px] font-medium text-gray-700 mb-4">Frequency</label>
           <Select
-            onValueChange={(value) => form.setValue("frequency", value)}
+            value={form.watch("frequency")} // Ensure react-hook-form is watching the value
+            onValueChange={(value) => form.setValue("frequency", value, { shouldValidate: true })} // Set the value with validation
           >
             <SelectTrigger className="w-[240px] bg-white-100">
               <SelectValue placeholder="Select frequency" />
@@ -70,6 +73,8 @@ export const PaymentWhenOptions = () => {
               </SelectGroup>
             </SelectContent>
           </Select>
+          <p className="text-14 font-semibold text-red-500 mt-1">{form.formState.errors.frequency?.message as string}</p> {/* Error message */}
+          </div>
 
         {/* Recurring Payment Start Date */}
         <div className="flex flex-col space-y-2">
@@ -123,12 +128,23 @@ export const PaymentWhenOptions = () => {
             />
           </label>
           {recurringOption === "numberOfPayments" && (
-            <Input
-              placeholder="Enter number of payments"
-              className="w-[240px] input-class bg-white-100"
-              {...form.register("numberOfPayments")}
-            />
+            <div className="flex flex-col">
+              <Input
+                placeholder="Enter number of payments"
+                className="w-[240px] input-class bg-white-100"
+                {...form.register("numberOfPayments", { required: true })}
+              />
+              
+              {/* Display the error message with consistent styling */}
+              {form.formState.errors.numberOfPayments && (
+                <p className="text-14 font-semibold text-red-500 mt-1">
+                  {form.formState.errors.numberOfPayments?.message as string}
+                </p>
+              )}
+            </div>
           )}
+
+          
           </div>
 
         </div>
