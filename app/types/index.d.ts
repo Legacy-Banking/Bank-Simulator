@@ -77,6 +77,10 @@ declare type SearchParamProps = {
     biller_code: string;
   }
 
+  declare interface User{
+    user_id: string;
+  }
+
   // declare type Transaction = {
   //   id: string;
   //   $id: string;
