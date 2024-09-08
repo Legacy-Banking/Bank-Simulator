@@ -40,7 +40,7 @@ const AboutUs = () => {
           {/* Header Text */}
           <h3 className="text-3xl font-semibold text-gray-900">Cheryl Ewin</h3>
           {/* Subtext and description */}
-          <p className="text-xl text-justify text-gray-700 leading-8">
+          <p className="text-xl text-start text-gray-700 leading-8">
             Cheryl is an IT tutor who specializes in delivering programs targeted towards the needs of seniors. She teaches at numerous community centers throughout South-East Melbourne and holds a Bachelor in Education, a Graduate Diploma of Professional Development, and a Certificate IV in Information Technology (Networking).
           </p>
         </div>
