@@ -83,6 +83,14 @@ declare type SearchParamProps = {
     user_id: string;
   }
 
+  declare interface Message {
+    id: string;
+    description: string;
+    date_received: Date;
+    from_account: string;
+    to_account: string;
+  }
+
   // declare type Transaction = {
   //   id: string;
   //   $id: string;
@@ -105,6 +113,10 @@ declare type SearchParamProps = {
   type TransactionTableProps = {
     transactions: Transaction[];
   };
+
+  type InboxTableProps = {
+    messages: Message[];
+  };
   
   type BillProps = {
     bills: Bill[]
@@ -119,4 +131,10 @@ declare type SearchParamProps = {
     otherStyles?: string;
   }
 
+  declare interface PaginationProps {
+    page: number;
+    totalPages: number;
+    setPage: (page: number) => void; // Function to update the page state
+  }
+  
   

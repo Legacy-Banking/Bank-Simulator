@@ -21,6 +21,7 @@ const Dashboard = () => {
             });
         }
     }, [user_id]);
+
     const totalBalance = accounts.reduce((acc, account) => acc + (account.balance || 0), 0);
     const loggedIn = { userName: 'Karen' };
 
@@ -43,8 +44,9 @@ const Dashboard = () => {
                 <div className="subheader mt-2 sm:mt-4 mb-4 sm:mb-6">
                     <h2 className="text-20 lg:text-24 font-semibold text-blackText-50">Accounts:</h2>
                 </div>
-
-                {/* Personal Account */}
+                
+                {/* Accounts */}
+              
                 {accounts.map((account) => (
                     <AccountBox key={account.id} account={account} />
                 ))}

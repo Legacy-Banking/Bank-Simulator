@@ -12,16 +12,22 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { transactionAction } from '@/utils/transactionAction'; // Import the transaction action
+import { accountAction } from '@/utils/accountAction'; // Import the transaction action
 
-// Zod schema for form validation, now using number for IDs
+// Zod schema for form validation with BSB and account number
 const formSchema = z.object({
-  fromBank: z.number().min(1, "Please select a valid bank account"),
-  toBank: z.number().min(1, "Please select a valid bank account"),
-  amount: z.string().min(1, "Amount is required").regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"),
-  description: z.string().optional(),
+  fromBank: z.number().min(1, "Please select a valid bank account"), // Validates the 'fromBank' selection
+  bsb: z
+    .string()
+    .regex(/^\d{6}$/, "BSB must be a 6-digit number"), // Validates BSB
+  accountNum: z
+    .string()
+    .regex(/^\d{9}$/, "Account number must be a 9-digit number"), // Validates account number
+  amount: z.string().min(1, "Amount is required").regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"), // Validates amount
+  description: z.string().optional(), // Optional description
 });
 
-const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
+const PayAnyoneForm = ({ accounts }: { accounts: Account[] }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null); // State to manage error messages
@@ -30,7 +36,8 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       fromBank: 0, // Set default value as 0 for numeric IDs
-      toBank: 0,   // Set default value as 0 for numeric IDs
+      bsb: "",
+      accountNum: "",
       amount: "",
       description: "",
     },
@@ -41,12 +48,28 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
     setIsLoading(true);
 
     try {
-      // Retrieve the selected accounts from the dropdowns using the numeric IDs
       const fromAccount = accounts.find(account => Number(account.id) === data.fromBank);
-      const toAccount = accounts.find(account => Number(account.id) === data.toBank);
 
-      if (!fromAccount || !toAccount) {
-        throw new Error("Invalid bank accounts selected.");
+      if (!fromAccount) {
+        throw new Error("Invalid bank account selected.");
+      }
+
+      const amount = parseFloat(data.amount);
+
+      // Check for insufficient funds
+      if (fromAccount.balance < amount) {
+        setError("Insufficient funds in selected account.");
+        setIsLoading(false);
+        return;
+      }
+      
+      // Fetch the recipient's account using the BSB and Account Number
+      const toAccount = await accountAction.fetchAccountByBSBAndAccountNumber(data.bsb, data.accountNum);
+
+      if (!toAccount) {
+        setError("Recipient account not found. Please check the BSB and Account Number.");
+        setIsLoading(false);
+        return;
       }
 
       // Check if the same account is selected for both from and to
@@ -56,8 +79,6 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
         return;
       }
 
-      const amount = parseFloat(data.amount);
-
       // Call the transactionAction to create the transaction
       await transactionAction.createTransaction(fromAccount, toAccount, amount, data.description || "");
 
@@ -65,15 +86,14 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
       router.push("/dashboard");
     } catch (error) {
       console.error("Submitting create transfer request failed: ", error);
-    
-      // Check if the error is an instance of Error and has a message property
+
+      // Handle error properly
       if (error instanceof Error) {
         setError(error.message || "An error occurred during the transfer.");
       } else {
         setError("An unexpected error occurred during the transfer.");
       }
     }
-    
 
     setIsLoading(false);
   };
@@ -81,6 +101,11 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(submit)} className="flex flex-col">
+        <div className="payment-transfer_form-details">
+          <h2 className="text-18 font-semibold text-gray-900">Step 1 - Select Your Account</h2>
+          <p className="text-16 font-normal text-gray-600">Select the bank account you want to pay from</p>
+        </div>
+
         <FormField
           control={form.control}
           name="fromBank"
@@ -103,7 +128,7 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
                           console.log("From Bank Changed: ", id);
                         }
                       }}
-                      initialSelected={form.getValues("fromBank") || undefined}
+                      initialSelected={(form.getValues("fromBank")) || undefined}
                       label="From Bank Account"
                       otherStyles="!w-full"
                     />
@@ -115,32 +140,39 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
           )}
         />
 
+        <div className="payment-transfer_form-details">
+          <h2 className="text-18 font-semibold text-gray-900">Step 2 - Bank account details</h2>
+          <p className="text-16 font-normal text-gray-600">Enter the bank account details of the recipient</p>
+        </div>
+
         <FormField
           control={form.control}
-          name="toBank"
+          name="bsb"
           render={({ field }) => (
             <FormItem className="border-t border-gray-200">
-              <div className="payment-transfer_form-item pb-6 pt-5">
-                <div className="payment-transfer_form-content">
-                  <FormLabel className="text-14 font-medium text-gray-700">To Bank Account</FormLabel>
-                  <FormDescription className="text-12 font-normal text-gray-600">
-                    Select the bank account you want to transfer funds to
-                  </FormDescription>
-                </div>
+              <div className="payment-transfer_form-item pb-5 pt-6">
+                <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Receiver's BSB</FormLabel>
                 <div className="flex w-full flex-col">
                   <FormControl>
-                    <BankDropdown
-                      accounts={accounts}
-                      onChange={(id) => {
-                        if (id) {
-                          form.setValue("toBank", Number(id));  // Ensure the ID is treated as a number
-                          console.log("To Bank Changed: ", id);
-                        }
-                      }}
-                      initialSelected={form.getValues("toBank") || undefined}
-                      label="To Bank Account"
-                      otherStyles="!w-full"
-                    />
+                    <Input placeholder="Enter BSB" className="input-class bg-white-100" {...field} />
+                  </FormControl>
+                  <FormMessage className="text-12 text-red-500" />
+                </div>
+              </div>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="accountNum"
+          render={({ field }) => (
+            <FormItem className="border-t border-gray-200">
+              <div className="payment-transfer_form-item pb-5 pt-6">
+                <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Receiver's Account Number</FormLabel>
+                <div className="flex w-full flex-col">
+                  <FormControl>
+                    <Input placeholder="Enter account number" className="input-class bg-white-100" {...field} />
                   </FormControl>
                   <FormMessage className="text-12 text-red-500" />
                 </div>
@@ -158,11 +190,7 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
                 <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Amount</FormLabel>
                 <div className="flex w-full flex-col">
                   <FormControl>
-                    <Input
-                      placeholder="ex: 100.00"
-                      className="input-class bg-white-100"
-                      {...field}
-                    />
+                    <Input placeholder="ex: 100.00" className="input-class bg-white-100" {...field} />
                   </FormControl>
                   <FormMessage className="text-12 text-red-500" />
                 </div>
@@ -185,11 +213,7 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
                 </div>
                 <div className="flex w-full flex-col">
                   <FormControl>
-                    <Textarea
-                      placeholder="Write a short description here"
-                      className="input-class bg-white-100"
-                      {...field}
-                    />
+                    <Textarea placeholder="Write a short description here" className="input-class bg-white-100" {...field} />
                   </FormControl>
                   <FormMessage className="text-12 text-red-500" />
                 </div>
@@ -207,7 +231,7 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
                 <Loader2 size={20} className="animate-spin" /> &nbsp; Sending...
               </>
             ) : (
-              "Transfer Funds"
+              "Pay"
             )}
           </Button>
         </div>
@@ -216,4 +240,4 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
   );
 };
 
-export default TransferFundsForm;
+export default PayAnyoneForm;
