@@ -75,7 +75,6 @@ module.exports = {
       fontFamily: {
         inter: "var(--font-inter)",
         "poppins": "var(--font-poppins)",
-        "bai-jamjuree": "var(--font-bai-jamjuree)",
       },
 
     },
