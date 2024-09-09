@@ -1,6 +1,6 @@
 'use client'
 import { createClient } from "@/utils/supabase/client";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation"; // Use useRouter for client-side navigation
 import { useEffect, useState } from "react";
 import { useAppDispatch, updateUserId } from "../store/userSlice";
 import { useAppSelector } from '@/app/store/hooks'
@@ -12,6 +12,7 @@ const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children
     const user_id = user.user_id;
     const dispatch = useAppDispatch();
     const [personalAccount, setPersonalAccount] = useState(null); // Store personal account
+    const router = useRouter(); // Router for navigation
 
     // Fetch the personal account using the utility function
     const fetchUserPersonalAccount = async () => {
@@ -29,7 +30,7 @@ const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children
             const { data, error } = await supabase.auth.getUser();
             if (error) {
                 console.log(error);
-                return redirect("/login");
+                router.push('/login'); // Use router.push for client-side navigation
             } else {
                 dispatch(updateUserId(data?.user?.id));
             }
@@ -48,7 +49,7 @@ const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children
 
     return (
         <div>
-            <BankNavbar personalAccount={personalAccount}/>
+            <BankNavbar personalAccount={personalAccount} />
             {children}
         </div>
     );
