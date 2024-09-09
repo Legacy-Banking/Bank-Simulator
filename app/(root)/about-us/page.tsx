@@ -5,7 +5,7 @@ const AboutUs = () => {
   return (
     <section className="flex w-full flex-col items-center max-xl:max-h-screen max-xl:overflow-y-scroll font-inter">
       {/* Header with Background Gradient */}
-      <div className="flex w-full flex-1 flex-col gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen bg-gradient-to-b from-[#1A70B8] to-[#4C97D1] text-center">
+      <div className="flex w-full flex-1 flex-col gap-8 px-5 sm:px-8 py-20 lg:py-40 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen bg-gradient-to-b from-[#1A70B8] via-[#4C97D1] to-[#FFFFFF] text-center">
         <h1 className="text-6xl font-bold text-[#FFFFFF] mb-4">About Us</h1>
         <p className="text-xl font-medium text-[#FFFFFF] max-w-6xl mx-auto">
           The LearntoBank online banking simulator has been created as part of the Seniors IT project funded by the Victorian
@@ -14,7 +14,7 @@ const AboutUs = () => {
       </div>
 
       {/* First Content Section */}
-      <div className="flex w-full flex-col md:flex-row items-center gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen bg-gradient-to-b from-[#4C97D1] via-[#FFFFFF] to-[#FFFFFF]">
+      <div className="flex w-full flex-col md:flex-row items-center gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen">
         <div className="flex w-full flex-col md:w-1/2 py-8">
           <p className="text-lg text-gray-700 leading-8">
             It is designed to help seniors learn how to use an online banking system. The application provides a safe and user-friendly environment to practice essential banking tasks such as paying bills, transferring funds, logging in and
