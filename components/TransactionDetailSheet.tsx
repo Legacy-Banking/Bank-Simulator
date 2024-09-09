@@ -28,31 +28,11 @@ const TransactionDetailSheet: React.FC<TransactionDetailSheetProps> = ({ transac
             Detailed information about the selected transaction.
           </DialogDescription>
         </DialogHeader>
-
-        {/* Transaction details */}
-        <div className="space-y-4">
-          <p className="text-sm">
-            <strong>To:</strong> Account {transaction.from_account}
-          </p>
-          <p className="text-sm">
-            <strong>From:</strong> Account {transaction.to_account}
-          </p>
-          <p className="text-sm">
-            <strong>Date:</strong> {formatDateTime(transaction.paid_on)}
-          </p>
-          <p className="text-sm">
-            <strong>Amount:</strong> {formatAmount(transaction.amount)}
-          </p>
-          <p
-            className="text-sm break-words"
-            style={{
-              wordBreak: 'break-word', // Ensures long words break into the next line
-              overflowWrap: 'break-word', // Alternative support for breaking long words
-            }}
-          >
-            <strong>Description:</strong>{' '}
-            {transaction.description || 'No description available'}
-          </p>
+        <div className="space-y-2">
+          <p><strong>Name:</strong> PlaceholderUserName</p>
+          <p><strong>Date:</strong> {formatDateTime(transaction.paid_on)}</p>
+          <p><strong>Amount:</strong> {formatAmount(transaction.amount)}</p>
+          <p><strong>Description:</strong> {transaction.description || 'No description available'}</p>
         </div>
 
         {/* Footer with Close button */}
