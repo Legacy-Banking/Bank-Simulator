@@ -146,8 +146,8 @@ const TransactionHistory = () => {
   const currentTransactions = transactions.slice(indexOfFirstTransaction, indexOfLastTransaction);
 
   return (
-    <section className="flex w-full flex-row max-xl:max-h-screen max-xl:overflow-y-scroll font-inter">
-      <div className="flex w-full flex-1 flex-col gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen xl:overflow-y-scroll">
+    <section className="flex w-full flex-col max-xl:max-h-screen font-inter">
+      <div className="flex w-full flex-1 flex-col gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen">
         
         {/* Show loading spinner when loading */}
         {loading ? (
@@ -191,13 +191,13 @@ const TransactionHistory = () => {
                 Download Statement
               </Button>
             </div>
-
+            
             {/* Transaction History Table */}
             <section className="flex w-full flex-col gap-6">
               <TransactionsTable transactions={currentTransactions} />
 
               {totalPages > 1 && (
-                <div className="my-4 w-full">
+                <div className="my-4 w-full pb-2">
                   <Pagination totalPages={totalPages} page={page} setPage={setPage} />
                 </div>
               )}
@@ -206,6 +206,7 @@ const TransactionHistory = () => {
         )}
       </div>
     </section>
+
   );
 }
 

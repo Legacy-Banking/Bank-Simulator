@@ -49,7 +49,9 @@ const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children
     return (
         <div>
             <BankNavbar personalAccount={personalAccount}/>
+            <main>
             {children}
+            </main>
         </div>
     );
 };

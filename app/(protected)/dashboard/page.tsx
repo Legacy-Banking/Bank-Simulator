@@ -25,8 +25,8 @@ const Dashboard = () => {
     const loggedIn = { userName: 'Karen' };
 
     return (
-        <section className="flex w-full flex-row max-xl:max-h-screen max-xl:overflow-y-scroll font-inter">
-            <div className="flex w-full flex-1 flex-col gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen xl:overflow-y-scroll">
+        <section className="flex w-full flex-row max-xl:max-h-screen font-inter">
+            <div className="flex w-full flex-1 flex-col gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen">
                 {/* Header */}
                 <header className="home-header">
                     <HeaderBox
@@ -56,7 +56,7 @@ const Dashboard = () => {
                 <div className="border-t-2 border-blackText-100 my-2 sm:my-4"></div>
 
                 {/* Total Balance Section */}
-                <div className="flex w-full justify-between items-center gap-4 p-4 sm:gap-6 sm:p-6">
+                <div className="flex w-full justify-between items-center gap-4 p-4 sm:gap-6 sm:pt-6 pb-16">
                     <h2 className="text-24 lg:text-26 font-bold text-blackText-50">Total Balance</h2>
                     <div className="total-balance-amount text-right text-bold">
                         <AnimatedCounter amount={totalBalance} />
