@@ -124,6 +124,10 @@ export const accountAction = {
         accounts.forEach(async (account) => {
             await accountAction.createAccount(account as Account);
         });
+
+        //Need to also generate Cards with their number and CSV
+        //Generate their bills/and billers
+        //Generate default transaction history
     },
 
 }
