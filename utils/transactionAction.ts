@@ -55,6 +55,57 @@ export const transactionAction = {
         }
     },
 
+    createBPAYTransaction: async (
+        fromAccount: Account,
+        billerName: string,
+        referenceNum: string,
+        amount: number,
+        description: string,
+        cardDetails: { cardNumber: string; expiryDate: string; cvv: string } | null
+    ): Promise<void> => {
+        const supabase = createClient();
+
+        const fromNewBalance = fromAccount.balance - amount;
+
+        if (fromNewBalance < 0) {
+            throw new Error('Insufficient funds');
+        }
+
+        try {
+            // Update the 'from' account balance
+            await transactionAction.updateAccounts(fromAccount, fromNewBalance);
+
+            // Insert the new BPAY transaction
+            const newTransaction: Partial<Transaction> = {
+                description: description,
+                amount: amount,
+                paid_on: new Date(),
+                from_account: fromAccount.id,
+                to_biller: billerName,
+                //reference_number: referenceNum,
+                //card_number: cardDetails?.cardNumber || null,  // Optional card details
+                //expiry_date: cardDetails?.expiryDate || null,
+                //cvv: cardDetails?.cvv || null,
+            };
+
+            const { error: insertError } = await supabase
+                .from('transaction')
+                .insert(newTransaction);
+
+            if (insertError) {
+                await transactionAction.updateAccounts(fromAccount, fromAccount.balance);
+
+                console.error('Failed to insert the BPAY transaction:', insertError);
+                throw new Error('Transaction failed, reverting operations.');
+            }
+        } catch (error) {
+            console.error('Transaction error:', error);
+            await transactionAction.updateAccounts(fromAccount, fromAccount.balance);
+            throw error;
+        }
+    },
+
+
     updateAccounts: async (account: Account, newBalance: number): Promise<void> => {
         const supabase = createClient();
         const { error } = await supabase

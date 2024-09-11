@@ -13,31 +13,31 @@ import {
 
 
 export const BillerDropdown = ({
-  accounts = [],
+  billerAccounts = [],
   onChange,
   initialSelected,
   label,
   otherStyles,
 }: {
-  accounts: BillerAccount[],
+  billerAccounts: BillerAccount[],
   onChange: (id: string | null) => void,
   initialSelected?: string,
   label: string,
   otherStyles?: string,
 }) => {
   const [selected, setSelected] = useState<BillerAccount | null>(
-    initialSelected ? accounts.find(acc => acc.id === initialSelected) || null : null
+    initialSelected ? billerAccounts.find(acc => acc.id === initialSelected) || null : null
   );
 
   useEffect(() => {
     if (initialSelected) {
-      const account = accounts.find(acc => acc.id === initialSelected) || null;
+      const account = billerAccounts.find(acc => acc.id === initialSelected) || null;
       setSelected(account);
     }
-  }, [initialSelected, accounts]);
+  }, [initialSelected, billerAccounts]);
 
   const handleBillerChange = (id: string) => {
-    const account = accounts.find((account) => account.id === id) || null;
+    const account = billerAccounts.find((account) => account.id === id) || null;
     setSelected(account);
     onChange(account ? account.id : null);
   };
@@ -51,14 +51,14 @@ export const BillerDropdown = ({
         <SelectTrigger
           className={`flex w-full bg-white-100 gap-3 md:w-[300px] ${otherStyles}`}
         >
-          <Image
-            src="/biller-icon.svg" // Replace this with an appropriate icon for billers
-            width={20}
-            height={20}
+          <Image className='filter-blue-500'
+            src="/biller-icon.svg"
+            width={24}
+            height={24}
             alt="biller"
           />
           <p className="line-clamp-1 w-full text-left">
-            {selected ? `${selected.billerName} - ${selected.billerCode}` : "Choose Biller"}
+            {selected ? `${selected.name}` : "Choose Biller"}
           </p>
         </SelectTrigger>
         <SelectContent
@@ -69,18 +69,17 @@ export const BillerDropdown = ({
             <SelectLabel className="py-2 font-normal text-gray-500">
               {label}
             </SelectLabel>
-            {accounts.map((account: BillerAccount) => (
+            {billerAccounts.map((account: BillerAccount) => (
               <SelectItem
                 key={account.id}
                 value={account.id}
                 className="cursor-pointer border-t"
               >
                 <div className="flex flex-col">
-                  <p className="text-16 font-medium">{`${account.billerName}`}</p>
-                  <p className="text-14 font-medium text-gray-600">
-                    Biller Code: {account.billerCode}
+                  <p className="text-16 font-medium">{`${account.name}`}</p>
+                  <p className="text-12 font-medium text-blue-500">
+                    Biller Code: {account.biller_code}
                   </p>
-                  <p className="text-14 text-blue-600">Reference: {account.refNum}</p>
                 </div>
               </SelectItem>
             ))}

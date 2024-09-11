@@ -13,28 +13,70 @@ import { Input } from "./ui/input";
 import { Checkbox } from "@/components/ui/checkbox"; // Import Checkbox from shadcn
 import { PaymentWhenOptions } from "./PaymentWhenOptions";
 import { BillerDropdown } from './BillerDropDown';
+import { transactionAction } from '@/utils/transactionAction'; // Import the transaction action
 
 const formSchema = z.object({
-  toBiller: z.number().min(1, "Please select a valid biller").optional(),
+  toBiller: z.number().nullable().optional(),
   fromBank: z.number().min(1, "Please select a valid bank account"),
-  billerCode: z.string().regex(/^\d{4}$/, "Biller Code must be a 4-digit number").optional(),
-  billerName: z.string().min(1, "Biller Name is required").optional(),
-  referenceNum: z.string().regex(/^\d{12}$/, "Reference Number must be a 12-digit number").optional(),
+  billerCode: z.string().optional(),
+  billerName: z.string().optional(),
+  referenceNum: z.string().optional(),
   amount: z.string().min(1, "Amount is required").regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"),
   description: z.string().optional(),
   saveBiller: z.boolean().optional(),
   paymentOption: z.enum(["payNow", "schedule", "recurring"]).default("payNow"), // Payment options
+  fromBankType: z.enum(["debit", "credit", "personal", "savings"]), // Payment options
   scheduleDate: z.date().optional(),
   frequency: z.string().optional(),
   recurringStartDate: z.date().optional(),
   endCondition: z.string().optional(),
   endDate: z.date().optional(),
-  numberOfPayments: z.string().regex(/^\d+$/, "Please enter a valid number of payments").optional(),
-  cardNumber: z.string().regex(/^\d{16}$/, "Card Number must be 16 digits").optional(),
-  expiryDate: z.string().regex(/^(0[1-9]|1[0-2])\/?([0-9]{2})$/, "Expiry Date must be in MM/YY format").optional(),
-  cvv: z.string().regex(/^\d{3,4}$/, "CVV must be 3").optional(),
+  numberOfPayments: z.string().optional(),
+  cardNumber: z.string().optional(),
+  expiryDate: z.string().optional(),
+  cvv: z.string().optional(),
 })
 .superRefine((data, ctx) => {
+
+  // If `billerCode`, `billerName`, and `referenceNum` are all filled, skip `toBiller` validation
+  const hasManualBillerInfo =
+    data.billerCode && data.billerName && data.referenceNum;
+
+  // Only validate `toBiller` if manual biller fields are not filled
+  if (!hasManualBillerInfo && data.toBiller === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["toBiller"],
+      message: "Please select a valid biller or fill in manual biller information",
+    });
+  }
+
+  // Only require billerCode, billerName, and referenceNum when `toBiller` is null
+  if (data.toBiller === 0) {
+    if (!data.billerCode || !/^\d{4}$/.test(data.billerCode)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["billerCode"],
+        message: "Biller Code must be a 4-digit number",
+      });
+    }
+    if (!data.billerName) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["billerName"],
+        message: "Biller Name is required if no biller is selected",
+      });
+    }
+    if (!data.referenceNum || !/^\d{12}$/.test(data.referenceNum)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["referenceNum"],
+        message: "Reference Number must be a 12-digit number",
+      });
+    }
+  }
+
+
   // Schedule Payment validation
   if (data.paymentOption === "schedule" && !data.scheduleDate) {
     ctx.addIssue({
@@ -83,12 +125,39 @@ const formSchema = z.object({
     }
 
     // Number of Payments is required if "numberOfPayments" is selected
-    if (data.endCondition === "numberOfPayments" && !data.numberOfPayments) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["numberOfPayments"],
-        message: "Please enter the number of payments",
-      });
+    if (data.endCondition === "numberOfPayments"){
+      if (isNaN(Number(data.numberOfPayments)) || Number(data.numberOfPayments) <= 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["numberOfPayments"],
+          message: "Please enter the number of payments",
+        });
+    }
+
+      // Validation for debit card details
+    if (data.fromBankType === "debit") {  // Check if the selected account type is 'debit'
+      if (!data.cardNumber || !/^\d{16}$/.test(data.cardNumber)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["cardNumber"],
+          message: "Card Number must be 16 digits",
+        });
+      }
+      if (!data.expiryDate || !/^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test(data.expiryDate)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["expiryDate"],
+          message: "Expiry Date must be in MM/YY format",
+        });
+      }
+      if (!data.cvv || !/^\d{3}$/.test(data.cvv)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["cvv"],
+          message: "CVV must be 3 digits",
+        });
+      }
+    }
     }
   }
 });
@@ -134,17 +203,28 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
     useEffect(() => {
       // Find the selected account type and show card details if it's a personal account
       const selectedAccount = accounts.find(account => Number(account.id) === fromBank);
+      form.setValue("fromBankType", selectedAccount?.type);
       setShowCardDetails(selectedAccount?.type === 'debit');
     }, [fromBank, accounts]);
 
-  useEffect(() => {
-    if (billerCode || billerName || referenceNum) {
-      // Reset selected biller if any manual field is filled
-      form.setValue("toBiller", 0);
-    }
-  }, [billerCode, billerName, referenceNum]);
+    // Clear manual biller fields if a toBiller is selected
+    useEffect(() => {
+      if (toBiller && toBiller !== 0) {
+        form.setValue("billerCode", "");
+        form.setValue("billerName", "");
+        form.setValue("referenceNum", "");
+      }
+    }, [toBiller, form]);
+
+    useEffect(() => {
+      if (billerCode || billerName || referenceNum) {
+        // Reset selected biller if any manual field is filled
+        form.setValue("toBiller", 0);
+      }
+    }, [billerCode, billerName, referenceNum]);
 
   const submit = async (data: z.infer<typeof formSchema>) => {
+
     setError(null); // Clear previous error
     setIsLoading(true);
 
@@ -164,12 +244,32 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
         return;
       }
 
-      const { billerCode, billerName, referenceNum, amount, description, saveBiller, paymentOption } = data;
+      // Prepare card details if required
+      const cardDetails = showCardDetails
+      ? {
+        cardNumber: data.cardNumber,
+        expiryDate: data.expiryDate,
+        cvv: data.cvv,
+        }
+      : null;
 
-      // Simulate transaction logic
-      console.log(`Paying ${amount} to ${billerName} (BSB: ${billerCode}, Ref: ${referenceNum}) with option: ${paymentOption}`);
+      //const billerDetail = `Biller ${data.toBiller}`;
 
-      if (saveBiller) {
+      const billerDetail = String(data.toBiller);
+
+
+      console.log("Creating transaction with the following details:")
+      // Call the createBPAYTransaction action
+      await transactionAction.createBPAYTransaction(
+        fromAccount,
+        billerDetail,
+        data.referenceNum,
+        amountF,
+        data.description || '',
+        cardDetails
+      );
+
+      if (data.saveBiller) {
         console.log("Biller will be saved for future transactions.");
       }
 
@@ -214,7 +314,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
                 <div className="flex w-full flex-col">
                   <FormControl>
                     <BillerDropdown
-                      accounts={billers} // Pass billers array here
+                      billerAccounts={billers} // Pass billers array here
                       onChange={(id) => {
                         if (id) {
                           form.setValue("toBiller", Number(id));  // Ensure the ID is treated as a number
@@ -424,10 +524,8 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
         {/* Payment Options (Pay Now, Schedule Payment, Recurring Payment) */}
         <PaymentWhenOptions/>
 
-
-
         {error && <p className="text-red-500 mt-4">{error}</p>} {/* Display error message if any */}
-
+          
         <div className="payment-transfer_btn-box mt-6">
           <Button type="submit" className="text-14 w-full bg-blue-gradient font-semibold text-white-100 shadow-form">
             {isLoading ? (
@@ -435,7 +533,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
                 <Loader2 size={20} className="animate-spin" /> &nbsp; Sending...
               </>
             ) : (
-              "Pay"
+              "Pay Bill"
             )}
           </Button>
         </div>

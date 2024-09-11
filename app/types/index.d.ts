@@ -61,7 +61,9 @@ declare type SearchParamProps = {
     paid_on: Date;
     from_account: string;
     to_account: string;
+    to_biller: string;
 }
+
   declare interface Bill {
     id: string;
     billed_user: string;
@@ -93,10 +95,8 @@ declare type SearchParamProps = {
 
 declare interface BillerAccount {
   id: string;
-  balance: number;
-  billerName: string; 
-  billerCode: string;
-  refNum: string;
+  name: string; 
+  biller_code: string;
 }
 
   // declare type Transaction = {
