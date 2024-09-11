@@ -4,35 +4,42 @@ import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '@/app/store/hooks'; // To get the user's ID
 import HeaderBox from '@/components/HeaderBox';
 import { accountAction } from '@/utils/accountAction'; // Import your account actions
+import { billerAction } from '@/utils/billerAction'; // Import your biller actions
 import BPAYForm from '@/components/BPAYForm';
 
 const BPAY = () => {
   const user_id = useAppSelector((state) => state.user.user_id); // Assuming user ID is stored in Redux
   const [accountsData, setAccountsData] = useState<Account[]>([]);
+  const [billersData, setBillersData] = useState<Biller[]>([]); // Add state for billers
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch accounts data
+  // Fetch accounts and billers data
   useEffect(() => {
-    const fetchAccounts = async () => {
+    const fetchData = async () => {
       try {
+        // Fetch accounts
         console.log("Fetching accounts for user ID:", user_id); // Debug: Check user ID
+        const accounts = await accountAction.fetchAccountsbyUserId(user_id);
+        console.log("Fetched accounts data:", accounts); // Debug: Check fetched accounts
+        setAccountsData(accounts);
 
-        const data = await accountAction.fetchAccountsbyUserId(user_id); // Use fetchAccountsbyUserId method
+        // Fetch billers
+        console.log("Fetching billers"); // Debug: Check biller fetch
+        const billers = await billerAction.fetchAllBillers();
+        console.log("Fetched billers data:", billers); // Debug: Check fetched billers
+        setBillersData(billers);
 
-        console.log("Fetched accounts data:", data); // Debug: Check fetched accounts
-
-        setAccountsData(data); // Store fetched accounts
       } catch (err) {
-        console.error("Error fetching accounts:", err);
-        setError("Unable to fetch accounts");
+        console.error("Error fetching data:", err);
+        setError("Unable to fetch data");
       } finally {
         setLoading(false); // Set loading to false after data is fetched
       }
     };
 
     if (user_id) {
-      fetchAccounts();
+      fetchData();
     }
   }, [user_id]);
 
@@ -46,6 +53,7 @@ const BPAY = () => {
   }
 
   console.log("Accounts data passed to TransferFundForm:", accountsData); // Debug: Check passed accounts
+  console.log("Billers data passed to BPAYForm:", billersData); // Debug: Check passed billers
 
 
   return (
@@ -58,7 +66,7 @@ const BPAY = () => {
 
       <section className="size-full pt-5">
         {/* Pass the fetched accounts to the TransferFundForm component */}
-        <BPAYForm accounts={accountsData} />
+        <BPAYForm accounts={accountsData} billers={billersData}/>
       </section>
 
     </section>

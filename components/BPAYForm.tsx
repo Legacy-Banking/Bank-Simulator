@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import * as z from "zod";
@@ -12,13 +12,14 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "./ui/input";
 import { Checkbox } from "@/components/ui/checkbox"; // Import Checkbox from shadcn
 import { PaymentWhenOptions } from "./PaymentWhenOptions";
+import { BillerDropdown } from './BillerDropDown';
 
 const formSchema = z.object({
-  toBiller: z.number().min(1, "Please select a valid biller"),
+  toBiller: z.number().min(1, "Please select a valid biller").optional(),
   fromBank: z.number().min(1, "Please select a valid bank account"),
-  billerCode: z.string().regex(/^\d{4}$/, "Biller Code must be a 4-digit number"),
-  billerName: z.string().min(1, "Biller Name is required"),
-  referenceNum: z.string().regex(/^\d{12}$/, "Reference Number must be a 12-digit number"),
+  billerCode: z.string().regex(/^\d{4}$/, "Biller Code must be a 4-digit number").optional(),
+  billerName: z.string().min(1, "Biller Name is required").optional(),
+  referenceNum: z.string().regex(/^\d{12}$/, "Reference Number must be a 12-digit number").optional(),
   amount: z.string().min(1, "Amount is required").regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"),
   description: z.string().optional(),
   saveBiller: z.boolean().optional(),
@@ -29,6 +30,9 @@ const formSchema = z.object({
   endCondition: z.string().optional(),
   endDate: z.date().optional(),
   numberOfPayments: z.string().regex(/^\d+$/, "Please enter a valid number of payments").optional(),
+  cardNumber: z.string().regex(/^\d{16}$/, "Card Number must be 16 digits").optional(),
+  expiryDate: z.string().regex(/^(0[1-9]|1[0-2])\/?([0-9]{2})$/, "Expiry Date must be in MM/YY format").optional(),
+  cvv: z.string().regex(/^\d{3,4}$/, "CVV must be 3").optional(),
 })
 .superRefine((data, ctx) => {
   // Schedule Payment validation
@@ -90,10 +94,11 @@ const formSchema = z.object({
 });
 
 
-const BPAYForm = ({ accounts }: { accounts: Account[] }) => {
+const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerAccount[] }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null); // State to manage error messages
+  const [showCardDetails, setShowCardDetails] = useState(false); // State to control visibility of card details section
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -113,8 +118,31 @@ const BPAYForm = ({ accounts }: { accounts: Account[] }) => {
       endCondition: "",
       endDate: undefined,
       numberOfPayments: "",
+      cardNumber: "",
+      expiryDate: "",
+      cvv: "",
     },
   });
+
+    // Watch for changes in fields
+    const toBiller = useWatch({ control: form.control, name: "toBiller" });
+    const billerCode = useWatch({ control: form.control, name: "billerCode" });
+    const billerName = useWatch({ control: form.control, name: "billerName" });
+    const referenceNum = useWatch({ control: form.control, name: "referenceNum" });
+
+    const fromBank = useWatch({ control: form.control, name: "fromBank" });
+    useEffect(() => {
+      // Find the selected account type and show card details if it's a personal account
+      const selectedAccount = accounts.find(account => Number(account.id) === fromBank);
+      setShowCardDetails(selectedAccount?.type === 'debit');
+    }, [fromBank, accounts]);
+
+  useEffect(() => {
+    if (billerCode || billerName || referenceNum) {
+      // Reset selected biller if any manual field is filled
+      form.setValue("toBiller", 0);
+    }
+  }, [billerCode, billerName, referenceNum]);
 
   const submit = async (data: z.infer<typeof formSchema>) => {
     setError(null); // Clear previous error
@@ -161,7 +189,7 @@ const BPAYForm = ({ accounts }: { accounts: Account[] }) => {
     setIsLoading(false);
   };
 
-  const selectedPaymentOption = form.watch("paymentOption");
+  //const selectedPaymentOption = form.watch("paymentOption");
 
   return (
     <Form {...form}>
@@ -185,16 +213,16 @@ const BPAYForm = ({ accounts }: { accounts: Account[] }) => {
                 </div>
                 <div className="flex w-full flex-col">
                   <FormControl>
-                    <BankDropdown
-                      accounts={accounts}
+                    <BillerDropdown
+                      accounts={billers} // Pass billers array here
                       onChange={(id) => {
                         if (id) {
                           form.setValue("toBiller", Number(id));  // Ensure the ID is treated as a number
-                          console.log("From Bank Changed: ", id);
+                          console.log("Biller Selected: ", id);
                         }
                       }}
                       initialSelected={(form.getValues("toBiller")) || undefined}
-                      label="From Bank Account"
+                      label="Select Biller"
                       otherStyles="!w-full"
                     />
                   </FormControl>
@@ -312,6 +340,68 @@ const BPAYForm = ({ accounts }: { accounts: Account[] }) => {
             </FormItem>
           )}
         />
+
+        {/* Card Details Section - Render only if the selected account is personal */}
+        {showCardDetails && (
+          <div>
+            {/* Card Number */}
+            <FormField
+              control={form.control}
+              name="cardNumber"
+              render={({ field }) => (
+                <FormItem className="border-t border-gray-200">
+                <div className="payment-transfer_form-item py-5">
+                  <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Card Number</FormLabel>
+                  <div className="flex w-full flex-col">
+                    <FormControl>
+                      <Input placeholder="ex: 1234 1234 1234 1234" className="input-class bg-white-100" {...field} />
+                    </FormControl>
+                    <FormMessage className="text-12 text-red-500" />
+                  </div>
+                </div>
+              </FormItem>
+              )}
+            />
+
+            {/* Expiry Date */}
+            <FormField
+              control={form.control}
+              name="expiryDate"
+              render={({ field }) => (
+                <FormItem>
+                <div className="payment-transfer_form-item py-5">
+                  <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Expiry Date</FormLabel>
+                  <div className="flex w-full flex-col">
+                    <FormControl>
+                      <Input placeholder="MM/YY" className="input-class bg-white-100" {...field} />
+                    </FormControl>
+                    <FormMessage className="text-12 text-red-500" />
+                  </div>
+                </div>
+              </FormItem>
+              )}
+            />
+
+            {/* CVV */}
+            <FormField
+              control={form.control}
+              name="cvv"
+              render={({ field }) => (
+                <FormItem>
+                <div className="payment-transfer_form-item py-5">
+                  <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">CVV</FormLabel>
+                  <div className="flex w-full flex-col">
+                    <FormControl>
+                      <Input placeholder="ex: 987" className="input-class bg-white-100" {...field} />
+                    </FormControl>
+                    <FormMessage className="text-12 text-red-500" />
+                  </div>
+                </div>
+              </FormItem>
+              )}
+            />
+          </div>
+        )}
 
         <FormField
           control={form.control}
