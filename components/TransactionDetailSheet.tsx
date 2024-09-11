@@ -32,10 +32,10 @@ const TransactionDetailSheet: React.FC<TransactionDetailSheetProps> = ({ transac
         {/* Transaction details */}
         <div className="space-y-4">
           <p className="text-sm">
-            <strong>To:</strong> Account {transaction.from_account}
+            <strong>To:</strong> {transaction.from_account_username || 'Banking Simulator Test'}'s Account
           </p>
           <p className="text-sm">
-            <strong>From:</strong> Account {transaction.to_account}
+            <strong>From:</strong> {transaction.to_account_username || 'Banking Simulator Test'}'s Account
           </p>
           <p className="text-sm">
             <strong>Date:</strong> {formatDateTime(transaction.paid_on)}
