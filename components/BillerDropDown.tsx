@@ -37,6 +37,11 @@ export const BillerDropdown = ({
   }, [initialSelected, billerAccounts]);
 
   const handleBillerChange = (id: string) => {
+    if (id === "reset") {
+      // Reset the dropdown selection
+      setSelected(null);
+      onChange("0");
+    }
     const account = billerAccounts.find((account) => account.id === id) || null;
     setSelected(account);
     onChange(account ? account.id : null);
@@ -66,14 +71,14 @@ export const BillerDropdown = ({
           align="end"
         >
           <SelectGroup>
-            <SelectLabel className="py-2 font-normal text-gray-500">
+            <SelectItem value="reset" className="py-2 font-normal text-gray-500">
               {label}
-            </SelectLabel>
+            </SelectItem>
             {billerAccounts.map((account: BillerAccount) => (
               <SelectItem
                 key={account.id}
                 value={account.id}
-                className="cursor-pointer border-t"
+                className="cursor-pointer border-t hover:bg-gray-100"
               >
                 <div className="flex flex-col">
                   <p className="text-16 font-medium">{`${account.name}`}</p>

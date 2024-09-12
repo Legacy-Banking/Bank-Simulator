@@ -17,7 +17,7 @@ import { transactionAction } from '@/utils/transactionAction'; // Import the tra
 
 const formSchema = z.object({
   toBiller: z.number().nullable().optional(),
-  fromBank: z.number().min(1, "Please select a valid bank account"),
+  fromBank: z.union([z.number().min(1, "Please select a valid bank account"), z.literal(-1)]),
   billerCode: z.string().optional(),
   billerName: z.string().optional(),
   referenceNum: z.string().optional(),
@@ -200,12 +200,18 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
   const referenceNum = useWatch({ control: form.control, name: "referenceNum" });
 
   const fromBank = useWatch({ control: form.control, name: "fromBank" });
+  // Show card details if "Use Card" is selected
   useEffect(() => {
-    // Find the selected account type and show card details if it's a personal account
-    const selectedAccount = accounts.find(account => Number(account.id) === fromBank);
-    form.setValue("fromBankType", selectedAccount?.type);
-    setShowCardDetails(selectedAccount?.type === 'debit');
-  }, [fromBank, accounts]);
+    if (fromBank === -1) {
+      // If "Use Card" is selected, show the card details
+      setShowCardDetails(true);
+    } else {
+      // Otherwise, only show card details if the selected account type is "debit"
+      const selectedAccount = accounts.find(account => Number(account.id) === fromBank);
+      form.setValue("fromBankType", selectedAccount?.type);
+      setShowCardDetails(selectedAccount?.type === 'debit');
+    }
+  }, [fromBank, accounts, form]);
 
   // Clear manual biller fields if a toBiller is selected
   useEffect(() => {
@@ -429,10 +435,12 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
                           console.log("From Bank Changed: ", id);
                         }
                       }}
+                      additionalOption={{ id: -1, label: "Use Card" }}  // Add "Use Card" option
                       initialSelected={(form.getValues("fromBank")) || undefined}
                       label="From Bank Account"
                       otherStyles="!w-full"
                     />
+                    
                   </FormControl>
                   <FormMessage className="text-12 text-red-500" />
                 </div>
@@ -441,7 +449,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
           )}
         />
 
-        {/* Card Details Section - Render only if the selected account is personal */}
+        {/* Card Details Section - Render only if the selected account is debit */}
         {showCardDetails && (
           <div>
             {/* Card Number */}
