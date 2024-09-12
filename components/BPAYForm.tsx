@@ -36,131 +36,131 @@ const formSchema = z.object({
   expiryDate: z.string().optional(),
   cvv: z.string().optional(),
 })
-.superRefine((data, ctx) => {
+  .superRefine((data, ctx) => {
 
-  // If `billerCode`, `billerName`, and `referenceNum` are all filled, skip `toBiller` validation
-  const hasManualBillerInfo =
-    data.billerCode && data.billerName && data.referenceNum;
+    // If `billerCode`, `billerName`, and `referenceNum` are all filled, skip `toBiller` validation
+    const hasManualBillerInfo =
+      data.billerCode && data.billerName && data.referenceNum;
 
-  // Only validate `toBiller` if manual biller fields are not filled
-  if (!hasManualBillerInfo && data.toBiller === 0) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ["toBiller"],
-      message: "Please select a valid biller or fill in manual biller information",
-    });
-  }
-
-  // Only require billerCode, billerName, and referenceNum when `toBiller` is null
-  if (data.toBiller === 0) {
-    if (!data.billerCode || !/^\d{4}$/.test(data.billerCode)) {
+    // Only validate `toBiller` if manual biller fields are not filled
+    if (!hasManualBillerInfo && data.toBiller === 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ["billerCode"],
-        message: "Biller Code must be a 4-digit number",
-      });
-    }
-    if (!data.billerName) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["billerName"],
-        message: "Biller Name is required if no biller is selected",
-      });
-    }
-    if (!data.referenceNum || !/^\d{12}$/.test(data.referenceNum)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["referenceNum"],
-        message: "Reference Number must be a 12-digit number",
-      });
-    }
-  }
-
-
-  // Schedule Payment validation
-  if (data.paymentOption === "schedule" && !data.scheduleDate) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ["scheduleDate"],
-      message: "Please select a date for scheduled payment",
-    });
-  }
-
-  // Recurring Payment validation
-  if (data.paymentOption === "recurring") {
-    // Frequency is required
-    if (!data.frequency) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["frequency"],
-        message: "Please select a frequency for recurring payment",
+        path: ["toBiller"],
+        message: "Please select a valid biller or fill in manual biller information",
       });
     }
 
-    // Start Date is required
-    if (!data.recurringStartDate) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["recurringStartDate"],
-        message: "Please select a start date for recurring payment",
-      });
-    }
-
-    // End condition is required
-    if (!data.endCondition) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["endCondition"],
-        message: "Please select an end condition for recurring payment",
-      });
-    }
-
-    // End Date is required if "setEndDate" is selected
-    if (data.endCondition === "setEndDate" && !data.endDate) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["endDate"],
-        message: "Please select an end date",
-      });
-    }
-
-    // Number of Payments is required if "numberOfPayments" is selected
-    if (data.endCondition === "numberOfPayments"){
-      if (isNaN(Number(data.numberOfPayments)) || Number(data.numberOfPayments) <= 0) {
+    // Only require billerCode, billerName, and referenceNum when `toBiller` is null
+    if (data.toBiller === 0) {
+      if (!data.billerCode || !/^\d{4}$/.test(data.billerCode)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: ["numberOfPayments"],
-          message: "Please enter the number of payments",
-        });
-    }
-
-      // Validation for debit card details
-    if (data.fromBankType === "debit") {  // Check if the selected account type is 'debit'
-      if (!data.cardNumber || !/^\d{16}$/.test(data.cardNumber)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["cardNumber"],
-          message: "Card Number must be 16 digits",
+          path: ["billerCode"],
+          message: "Biller Code must be a 4-digit number",
         });
       }
-      if (!data.expiryDate || !/^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test(data.expiryDate)) {
+      if (!data.billerName) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: ["expiryDate"],
-          message: "Expiry Date must be in MM/YY format",
+          path: ["billerName"],
+          message: "Biller Name is required if no biller is selected",
         });
       }
-      if (!data.cvv || !/^\d{3}$/.test(data.cvv)) {
+      if (!data.referenceNum || !/^\d{12}$/.test(data.referenceNum)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: ["cvv"],
-          message: "CVV must be 3 digits",
+          path: ["referenceNum"],
+          message: "Reference Number must be a 12-digit number",
         });
       }
     }
+
+
+    // Schedule Payment validation
+    if (data.paymentOption === "schedule" && !data.scheduleDate) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["scheduleDate"],
+        message: "Please select a date for scheduled payment",
+      });
     }
-  }
-});
+
+    // Recurring Payment validation
+    if (data.paymentOption === "recurring") {
+      // Frequency is required
+      if (!data.frequency) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["frequency"],
+          message: "Please select a frequency for recurring payment",
+        });
+      }
+
+      // Start Date is required
+      if (!data.recurringStartDate) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["recurringStartDate"],
+          message: "Please select a start date for recurring payment",
+        });
+      }
+
+      // End condition is required
+      if (!data.endCondition) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["endCondition"],
+          message: "Please select an end condition for recurring payment",
+        });
+      }
+
+      // End Date is required if "setEndDate" is selected
+      if (data.endCondition === "setEndDate" && !data.endDate) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["endDate"],
+          message: "Please select an end date",
+        });
+      }
+
+      // Number of Payments is required if "numberOfPayments" is selected
+      if (data.endCondition === "numberOfPayments") {
+        if (isNaN(Number(data.numberOfPayments)) || Number(data.numberOfPayments) <= 0) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["numberOfPayments"],
+            message: "Please enter the number of payments",
+          });
+        }
+
+        // Validation for debit card details
+        if (data.fromBankType === "debit") {  // Check if the selected account type is 'debit'
+          if (!data.cardNumber || !/^\d{16}$/.test(data.cardNumber)) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: ["cardNumber"],
+              message: "Card Number must be 16 digits",
+            });
+          }
+          if (!data.expiryDate || !/^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test(data.expiryDate)) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: ["expiryDate"],
+              message: "Expiry Date must be in MM/YY format",
+            });
+          }
+          if (!data.cvv || !/^\d{3}$/.test(data.cvv)) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: ["cvv"],
+              message: "CVV must be 3 digits",
+            });
+          }
+        }
+      }
+    }
+  });
 
 
 const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerAccount[] }) => {
@@ -193,35 +193,35 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
     },
   });
 
-    // Watch for changes in fields
-    const toBiller = useWatch({ control: form.control, name: "toBiller" });
-    const billerCode = useWatch({ control: form.control, name: "billerCode" });
-    const billerName = useWatch({ control: form.control, name: "billerName" });
-    const referenceNum = useWatch({ control: form.control, name: "referenceNum" });
+  // Watch for changes in fields
+  const toBiller = useWatch({ control: form.control, name: "toBiller" });
+  const billerCode = useWatch({ control: form.control, name: "billerCode" });
+  const billerName = useWatch({ control: form.control, name: "billerName" });
+  const referenceNum = useWatch({ control: form.control, name: "referenceNum" });
 
-    const fromBank = useWatch({ control: form.control, name: "fromBank" });
-    useEffect(() => {
-      // Find the selected account type and show card details if it's a personal account
-      const selectedAccount = accounts.find(account => Number(account.id) === fromBank);
-      form.setValue("fromBankType", selectedAccount?.type);
-      setShowCardDetails(selectedAccount?.type === 'debit');
-    }, [fromBank, accounts]);
+  const fromBank = useWatch({ control: form.control, name: "fromBank" });
+  useEffect(() => {
+    // Find the selected account type and show card details if it's a personal account
+    const selectedAccount = accounts.find(account => Number(account.id) === fromBank);
+    form.setValue("fromBankType", selectedAccount?.type);
+    setShowCardDetails(selectedAccount?.type === 'debit');
+  }, [fromBank, accounts]);
 
-    // Clear manual biller fields if a toBiller is selected
-    useEffect(() => {
-      if (toBiller && toBiller !== 0) {
-        form.setValue("billerCode", "");
-        form.setValue("billerName", "");
-        form.setValue("referenceNum", "");
-      }
-    }, [toBiller, form]);
+  // Clear manual biller fields if a toBiller is selected
+  useEffect(() => {
+    if (toBiller && toBiller !== 0) {
+      form.setValue("billerCode", "");
+      form.setValue("billerName", "");
+      form.setValue("referenceNum", "");
+    }
+  }, [toBiller, form]);
 
-    useEffect(() => {
-      if (billerCode || billerName || referenceNum) {
-        // Reset selected biller if any manual field is filled
-        form.setValue("toBiller", 0);
-      }
-    }, [billerCode, billerName, referenceNum]);
+  useEffect(() => {
+    if (billerCode || billerName || referenceNum) {
+      // Reset selected biller if any manual field is filled
+      form.setValue("toBiller", 0);
+    }
+  }, [billerCode, billerName, referenceNum]);
 
   const submit = async (data: z.infer<typeof formSchema>) => {
 
@@ -246,12 +246,12 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
 
       // Prepare card details if required
       const cardDetails = showCardDetails
-      ? {
-        cardNumber: data.cardNumber,
-        expiryDate: data.expiryDate,
-        cvv: data.cvv,
+        ? {
+          cardNumber: data.cardNumber,
+          expiryDate: data.expiryDate,
+          cvv: data.cvv,
         }
-      : null;
+        : null;
 
       //const billerDetail = `Biller ${data.toBiller}`;
 
@@ -333,7 +333,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
           )}
         />
 
-      <div className="payment-transfer_form-details">
+        <div className="payment-transfer_form-details">
           <h2 className="text-18 font-semibold text-gray-900">OR</h2>
         </div>
 
@@ -342,11 +342,11 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
           name="billerCode"
           render={({ field }) => (
             <FormItem className="border-t border-gray-200">
-              <div className="payment-transfer_form-item pb-5 pt-6">
+              <div className="payment-transfer_form-item pb-5 pt-6 ">
                 <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Biller Code</FormLabel>
-                <div className="flex w-full flex-col">
+                <div className="flex w-full flex-col ">
                   <FormControl>
-                    <Input placeholder="Enter 4-digit Biller Code" className="input-class" {...field} />
+                    <Input placeholder="Enter 4-digit Biller Code" className="input-class bg-white-100" {...field} />
                   </FormControl>
                   <FormMessage className="text-12 text-red-500" />
                 </div>
@@ -364,7 +364,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
                 <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Biller Name</FormLabel>
                 <div className="flex w-full flex-col">
                   <FormControl>
-                    <Input placeholder="Enter Biller Name" className="input-class" {...field} />
+                    <Input placeholder="Enter Biller Name" className="input-class bg-white-100" {...field} />
                   </FormControl>
                   <FormMessage className="text-12 text-red-500" />
                 </div>
@@ -382,7 +382,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
                 <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Reference Number</FormLabel>
                 <div className="flex w-full flex-col">
                   <FormControl>
-                    <Input placeholder="Enter 12-digit Reference Number" className="input-class" {...field} />
+                    <Input placeholder="Enter 12-digit Reference Number" className="input-class bg-white-100" {...field} />
                   </FormControl>
                   <FormMessage className="text-12 text-red-500" />
                 </div>
@@ -391,15 +391,15 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
           )}
         />
 
-      <div className="border-t border-gray-200 ">
-        <label className="payment-transfer_form-item pb-5 pt-6">
-          <span className="text-14 w-full max-w-[280px] font-medium text-gray-700">Save to my Billers
-          <p className="text-14 font-normal text-gray-600">Save this Billers details</p>
-          </span>
-          <Checkbox {...form.register("saveBiller")} 
-          className="custom-checkbox"/>
-        </label>
-      </div>
+        <div className="border-t border-gray-200 ">
+          <label className="payment-transfer_form-item pb-5 pt-6">
+            <span className="text-14 w-full max-w-[280px] font-medium text-gray-700">Save to my Billers
+              <p className="text-14 font-normal text-gray-600">Save this Billers details</p>
+            </span>
+            <Checkbox {...form.register("saveBiller")}
+              className="custom-checkbox" />
+          </label>
+        </div>
 
 
         <div className="payment-transfer_form-details">
@@ -450,16 +450,16 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
               name="cardNumber"
               render={({ field }) => (
                 <FormItem className="border-t border-gray-200">
-                <div className="payment-transfer_form-item py-5">
-                  <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Card Number</FormLabel>
-                  <div className="flex w-full flex-col">
-                    <FormControl>
-                      <Input placeholder="ex: 1234 1234 1234 1234" className="input-class bg-white-100" {...field} />
-                    </FormControl>
-                    <FormMessage className="text-12 text-red-500" />
+                  <div className="payment-transfer_form-item py-5">
+                    <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Card Number</FormLabel>
+                    <div className="flex w-full flex-col">
+                      <FormControl>
+                        <Input placeholder="ex: 1234 1234 1234 1234" className="input-class bg-white-100" {...field} />
+                      </FormControl>
+                      <FormMessage className="text-12 text-red-500" />
+                    </div>
                   </div>
-                </div>
-              </FormItem>
+                </FormItem>
               )}
             />
 
@@ -469,16 +469,16 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
               name="expiryDate"
               render={({ field }) => (
                 <FormItem>
-                <div className="payment-transfer_form-item py-5">
-                  <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Expiry Date</FormLabel>
-                  <div className="flex w-full flex-col">
-                    <FormControl>
-                      <Input placeholder="MM/YY" className="input-class bg-white-100" {...field} />
-                    </FormControl>
-                    <FormMessage className="text-12 text-red-500" />
+                  <div className="payment-transfer_form-item py-5">
+                    <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Expiry Date</FormLabel>
+                    <div className="flex w-full flex-col">
+                      <FormControl>
+                        <Input placeholder="MM/YY" className="input-class bg-white-100" {...field} />
+                      </FormControl>
+                      <FormMessage className="text-12 text-red-500" />
+                    </div>
                   </div>
-                </div>
-              </FormItem>
+                </FormItem>
               )}
             />
 
@@ -488,16 +488,16 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
               name="cvv"
               render={({ field }) => (
                 <FormItem>
-                <div className="payment-transfer_form-item py-5">
-                  <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">CVV</FormLabel>
-                  <div className="flex w-full flex-col">
-                    <FormControl>
-                      <Input placeholder="ex: 987" className="input-class bg-white-100" {...field} />
-                    </FormControl>
-                    <FormMessage className="text-12 text-red-500" />
+                  <div className="payment-transfer_form-item py-5">
+                    <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">CVV</FormLabel>
+                    <div className="flex w-full flex-col">
+                      <FormControl>
+                        <Input placeholder="ex: 987" className="input-class bg-white-100" {...field} />
+                      </FormControl>
+                      <FormMessage className="text-12 text-red-500" />
+                    </div>
                   </div>
-                </div>
-              </FormItem>
+                </FormItem>
               )}
             />
           </div>
@@ -522,10 +522,10 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
         />
 
         {/* Payment Options (Pay Now, Schedule Payment, Recurring Payment) */}
-        <PaymentWhenOptions/>
+        <PaymentWhenOptions />
 
         {error && <p className="text-red-500 mt-4">{error}</p>} {/* Display error message if any */}
-          
+
         <div className="payment-transfer_btn-box mt-6">
           <Button type="submit" className="text-14 w-full bg-blue-gradient font-semibold text-white-100 shadow-form">
             {isLoading ? (
