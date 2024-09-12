@@ -47,12 +47,12 @@ const AboutUs = () => {
       </div>
 
       {/* Footer with Background Gradient */}
-      <div className="flex w-full flex-col items- gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen bg-gradient-to-b from-[#FFFFFF] via-yellow-100 to-[#F6CA4D] text-center">
+      <div className="flex w-full flex-col items-center gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen bg-gradient-to-b from-[#FFFFFF] via-yellow-100 to-[#F6CA4D] text-center">
         <div className="flex w-full flex-col">
           {/* Header */}
           <h2 className="text-4xl font-bold text-gray-900 py-8">Our Success Team</h2>
           {/* Members grid */}
-          <div className="grid grid-cols-5 gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-10">
             {/* Individual member card */}
             <div className="flex flex-col items-center space-y-4">
               <img src="/khye.png" alt="Khye Shen Tan" className="w-76 h-76 rounded-3xl" />

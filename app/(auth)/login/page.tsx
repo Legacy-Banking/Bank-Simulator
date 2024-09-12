@@ -12,7 +12,8 @@ export default function Login({
   const signIn = async (formData: FormData) => {
     "use server";
 
-    const email = formData.get("email") as string;
+    const username = formData.get("username") as string;
+    const email = `${username}@gmail.com`;
     const password = formData.get("password") as string;
     const supabase = createClient();
 
@@ -51,7 +52,7 @@ export default function Login({
 
         <form className="flex flex-col w-full rounded-md text-[#344054]">
           <label className="text-sm font-medium" htmlFor="email">Username</label>
-          <input className="rounded-md px-3 py-2 mt-2 border mb-5 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " name="email" placeholder="Enter username" required />
+          <input className="rounded-md px-3 py-2 mt-2 border mb-5 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " name="username" placeholder="Enter username" required />
 
           <label className="text-sm font-medium" htmlFor="password">Password</label>
           <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " type="password" name="password" placeholder="Enter your password" required />
