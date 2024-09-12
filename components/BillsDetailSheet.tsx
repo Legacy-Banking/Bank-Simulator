@@ -13,7 +13,7 @@ import SheetDetails from './SheetDetails';
 
 // Define the props type for the component
 type BillSheetProps = {
-  bills: Bill | null;
+  bills: BillDetails | null;
   onClose: () => void;
 };
 
@@ -22,14 +22,14 @@ const BillSheet: React.FC<BillSheetProps> = ({ bills, onClose }) => {
 
   return (
     <Dialog open={!!bills} onOpenChange={onClose}>
-      <DialogContent className="bg-white-100">
+      <DialogContent className="bg-white-100 w-max">
         <DialogHeader>
           <DialogTitle>Bill Details</DialogTitle>
           <DialogDescription>
             Detailed information about the selected bill.
           </DialogDescription>
         </DialogHeader>
-          <SheetDetails bills={bills}></SheetDetails>
+        <SheetDetails {...bills} />
         <DialogFooter>
           <Button onClick={onClose} className="bg-slate-100">Close</Button>
         </DialogFooter>
