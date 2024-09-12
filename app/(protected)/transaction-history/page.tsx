@@ -112,7 +112,7 @@ const TransactionHistory = () => {
     const textWidth = doc.getTextWidth(`Downloaded on: ${formattedDate} at ${formattedTime}`);
     const xPosition = pageWidth - textWidth - marginRight;
 
-    doc.text(`Downloaded on: ${formattedDate} at ${formattedTime}`, xPosition,55);
+    doc.text(`Downloaded on: ${formattedDate} at ${formattedTime}`, xPosition, 55);
 
 
     // Add table with transactions
@@ -122,9 +122,10 @@ const TransactionHistory = () => {
     // Loop through the transactions and add to tableRows
     transactions.forEach((transaction) => {
       const transactionData = [
-        transaction.from_account,
+        transaction.from_account_username,
         new Date(transaction.paid_on).toLocaleDateString('en-GB'),
-          `${transaction.amount > 0 ? '+' : ''}${(transaction.amount || 0).toFixed(2)}`,
+        `${transaction.amount > 0 ? `+$${transaction.amount.toFixed(2)}` : `-$${Math.abs(transaction.amount).toFixed(2)}`}
+`,
       ];
       tableRows.push(transactionData);
     });
@@ -148,7 +149,7 @@ const TransactionHistory = () => {
   return (
     <section className="flex w-full flex-row max-xl:max-h-screen max-xl:overflow-y-scroll font-inter">
       <div className="flex w-full flex-1 flex-col gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen xl:overflow-y-scroll">
-        
+
         {/* Show loading spinner when loading */}
         {loading ? (
           <div className="flex items-center justify-center">

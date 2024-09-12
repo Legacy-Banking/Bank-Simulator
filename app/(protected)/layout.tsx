@@ -2,7 +2,7 @@
 import { createClient } from "@/utils/supabase/client";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useAppDispatch, updateUserId } from "../store/userSlice";
+import { useAppDispatch, updateUserId, updateUserName } from "../store/userSlice";
 import { useAppSelector } from '@/app/store/hooks'
 import BankNavbar from "@/components/BankNavbar";
 import { accountAction } from "@/utils/accountAction";
@@ -10,6 +10,7 @@ import { accountAction } from "@/utils/accountAction";
 const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const user = useAppSelector(state => state.user);
     const user_id = user.user_id;
+    const user_name = user.user_name;
     const dispatch = useAppDispatch();
     const [personalAccount, setPersonalAccount] = useState(null); // Store personal account
 
@@ -32,6 +33,7 @@ const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children
                 return redirect("/login");
             } else {
                 dispatch(updateUserId(data?.user?.id));
+                dispatch(updateUserName(data?.user?.email!));
             }
         }
     };
@@ -48,7 +50,7 @@ const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children
 
     return (
         <div>
-            <BankNavbar personalAccount={personalAccount}/>
+            <BankNavbar personalAccount={personalAccount} />
             {children}
         </div>
     );
