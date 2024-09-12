@@ -170,7 +170,7 @@ const TransactionHistory = () => {
             {/* Account Select Dropdown */}
             <div className="flex justify-end">
               <Select onValueChange={handleAccountChange} value={accountId ?? accounts[0]?.id}>
-                <SelectTrigger className="w-52 bg-white-100 ">
+                <SelectTrigger className="w-52 bg-white-100 hover:bg-gray-100 ">
                   <span className="mx-auto text-center">{`${capitalizeFirstLetter(String(account.type))} Account`}</span> {/* Capitalizing the first letter */}
                 </SelectTrigger>
                 <SelectContent className="bg-white-100 ">
@@ -190,7 +190,7 @@ const TransactionHistory = () => {
               <h2 className="py-2 text-18 font-semibold text-gray-900">
                 Recent Transactions
               </h2>
-              <Button onClick={handleDownloadStatement} className="ml-auto border text-14 font-normal border-gray-300 px-8 bg-white-100">
+              <Button onClick={handleDownloadStatement} className="ml-auto border text-14 font-normal border-gray-300 px-8 bg-white-100 hover:bg-gray-100">
                 Download Statement
               </Button>
             </div>
