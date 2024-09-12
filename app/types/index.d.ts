@@ -63,6 +63,16 @@ declare type SearchParamProps = {
     to_account: string;
 }
 
+declare interface Card {
+  id: string;
+  card_type: AccountType;
+  credit: number;
+  owner: string; 
+  card_number: string;
+  expiry_date: string;
+  cvv: string;
+}
+
   // declare type Transaction = {
   //   id: string;
   //   $id: string;
