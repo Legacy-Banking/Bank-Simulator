@@ -173,9 +173,9 @@ const TransactionHistory = () => {
                 <SelectTrigger className="w-52 bg-white-100 ">
                   <span className="mx-auto text-center">{`${capitalizeFirstLetter(String(account.type))} Account`}</span> {/* Capitalizing the first letter */}
                 </SelectTrigger>
-                <SelectContent className="bg-white-100">
+                <SelectContent className="bg-white-100 ">
                   {accounts.map((acc) => (
-                    <SelectItem key={acc.id} value={acc.id}>
+                    <SelectItem key={acc.id} value={acc.id} className='hover:bg-gray-100'>
                       {`${capitalizeFirstLetter(String(acc.type))} Account`} {/* Capitalizing the first letter */}
                     </SelectItem>
                   ))}

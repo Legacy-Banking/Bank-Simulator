@@ -96,7 +96,7 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
                                     <li key={link.route} className='font-inter'>
                                         <Link
                                             href={link.route}
-                                            className='block px-5 py-4 hover:text-blue-25 hover:underline underline-blue-25'
+                                            className='block px-5 py-4 hover:text-blue-25 hover:underline underline-blue-25 hover:bg-gray-100'
                                             onClick={handleLinkClick}
                                         >
                                             {link.label}
