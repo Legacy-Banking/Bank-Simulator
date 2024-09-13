@@ -35,6 +35,23 @@ export const billerAction={
         return data || [];
     },
 
+    fetchBillerById: async (billerId: string): Promise<{ name: string, biller_code: string }> => {
+        const supabase = createClient();
+    
+        const { data: biller, error: billerError } = await supabase
+          .from('billers')
+          .select('name, biller_code')
+          .eq('id', billerId)
+          .single(); 
+    
+        if (billerError || !biller) {
+          console.error('Failed to fetch biller details:', billerError);
+          throw new Error('Biller not found');
+        }
+    
+        return biller;
+      },
+
     //Create Default Saved Billers
     // Example of a saved biller: "biller_name|biller_code|ref_num" , "biller_name2|biller_code2|ref_num"
     createDefaultSavedBillers: async (user_id: string): Promise<void> => {
@@ -44,6 +61,7 @@ export const billerAction={
     const { data: billers, error: fetchError } = await supabase
       .from('billers')
       .select('*')
+      .order('id', { ascending: true })
       .limit(4);
 
       if (fetchError) {
@@ -67,8 +85,8 @@ export const billerAction={
 
     // Extract the reference number from the savedBillersArray to use in biller_reference
     const billerReferencesArray = savedBillersArray.map((savedBiller) => {
-      const [billerName, , referenceNum] = savedBiller.split('|'); // Split by '|' and get the reference number
-      return `${billerName}|${referenceNum}`; // For biller_reference: "biller_name|reference_num"
+      const [billerName, , referenceNum] = savedBiller.split('|'); // Split '|' and get the reference number
+      return `${billerName}|${referenceNum}`; 
     });
 
     // Join the biller references into a single string
@@ -76,12 +94,12 @@ export const billerAction={
 
     // Prepare the single user biller entry
     const userBiller: Partial<SavedBiller> = {
-      owner: user_id, // The user ID to associate with the billers
-      saved_billers: savedBillers, // The string array of saved billers with reference numbers
-      biller_reference: billerReferences, // The string array of biller references only
+      owner: user_id, 
+      saved_billers: savedBillers, 
+      biller_reference: billerReferences, 
     };
   
-      console.log('Inserting the following saved billers:', userBiller); // Log for debugging
+      console.log('Inserting the following saved billers:', userBiller); 
   
       // Insert a single row into the 'user_billers' table
       const { error: insertError } = await supabase
@@ -102,7 +120,7 @@ export const billerAction={
       .from('user_billers')
       .select('saved_billers')
       .eq('owner', user_id)
-      .single(); // Get a single row for the user
+      .single();
 
     if (fetchError) {
       throw new Error(`Error fetching user billers: ${fetchError.message}`);
@@ -125,7 +143,7 @@ export const billerAction={
 
     // Extract the biller codes from saved billers
     const billerCodes = savedBillersArray.map((entry: string) => {
-        const [, billerCode] = entry.split('|'); // Split by '|' and get the second element (biller code)
+        const [, billerCode] = entry.split('|'); // Split '|' and get the second element (biller code)
         return billerCode;
       });
 
@@ -142,5 +160,83 @@ export const billerAction={
     return billers || [];
   },
 
+  // Add a new biller to the user's saved billers if it doesn't already exist
+  addNewBiller: async (
+    biller_name: string,
+    biller_code: string,
+    reference_number: string,
+    owner: string
+  ): Promise<void> => {
+    const supabase = createClient();
+
+    // Fetch the current saved billers
+    const savedBillersArray = await billerAction.fetchSavedBillers(owner);
+
+    // Format the new biller string
+    const newBiller = `${biller_name}|${biller_code}|${reference_number}`;
+
+    // Check if the new biller already exists in the saved billers array
+    const billerExists = savedBillersArray.some(
+      (biller: string) => biller === newBiller
+    );
+
+    if (!billerExists) {
+      // Add the new biller to the array if it doesn't already exist
+      savedBillersArray.push(newBiller);
+
+      // Update the user's saved billers in the database
+      const { error: updateError } = await supabase
+        .from("user_billers")
+        .update({ saved_billers: savedBillersArray.join(", ") })
+        .eq("owner", owner);
+
+      if (updateError) {
+        throw new Error(`Error updating saved billers: ${updateError.message}`);
+      }
+
+      console.log("New biller added successfully");
+    } else {
+      console.log("Biller already exists, no need to add it");
+    }
+  },
+
+    // Function to fetch reference number by biller name
+    fetchReferenceNumberByBillerName: async (user_id: string, billerName: string): Promise<string | null> => {
+        const supabase = createClient();
+    
+        // Fetch the 'biller_reference' from the 'user_billers' table for the given user_id
+        const { data: userBillers, error: fetchError } = await supabase
+          .from('user_billers')
+          .select('biller_reference')
+          .eq('owner', user_id)
+          .single(); // Assuming there's only one row per user
+    
+        if (fetchError || !userBillers) {
+          console.error('Error fetching user billers:', fetchError);
+          return null;
+        }
+    
+        const billerReference = userBillers.biller_reference;
+    
+        if (!billerReference) {
+          console.error('No biller reference found for the user.');
+          return null;
+        }
+    
+        // billerReference is a string like "biller_name|reference_num, biller_name2|reference_num2"
+        const billerArray = billerReference.split(', ').map((entry: string) => entry.split('|'));
+    
+        // Find the biller entry that matches the billerName
+        const foundBiller = billerArray.find(([name]: [string, string]) => name === billerName);
+    
+        if (!foundBiller) {
+          console.error(`No reference number found for biller: ${billerName}`);
+          return null;
+        }
+    
+        // The second element of the foundBiller array is the reference number
+        const referenceNumber = foundBiller[1];
+        return referenceNumber || null;
+    },
 
 }

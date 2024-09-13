@@ -44,7 +44,11 @@ const BPAY = () => {
   }, [user_id]);
 
   if (loading) {
-    return <div>Loading...</div>; // Display a loading message while fetching accounts
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="spinner"></div> {/* Spinner shown while loading */}
+      </div>
+    );
   }
 
   if (error) {

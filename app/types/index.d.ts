@@ -67,6 +67,21 @@ declare type SearchParamProps = {
     to_account_username: string;
 }
 
+  declare interface BPAYTransaction {
+    id: string;
+    description: string;
+    amount: number;
+    paid_on: Date;
+    from_account: string;
+    from_account_username: string;
+    biller_name: string;
+    biller_code: string;
+    reference_number: string;
+    card_number: string;
+    expiry_date: string;
+    cvv: string;
+  }
+
   declare interface Bill {
     id: string;
     billed_user: string;

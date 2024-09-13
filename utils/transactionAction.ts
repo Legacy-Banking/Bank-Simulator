@@ -61,10 +61,11 @@ export const transactionAction = {
     createBPAYTransaction: async (
         fromAccount: Account,
         billerName: string,
+        billerCode: string,
         referenceNum: string,
         amount: number,
         description: string,
-        cardDetails: { cardNumber: string; expiryDate: string; cvv: string } | null
+        cardDetails: { cardNumber: string | undefined; expiryDate: string | undefined; cvv: string | undefined} | null
     ): Promise<void> => {
         const supabase = createClient();
 
@@ -78,13 +79,16 @@ export const transactionAction = {
             // Update the 'from' account balance
             await transactionAction.updateAccounts(fromAccount, fromNewBalance);
 
+            // Construct the detailed description including biller details
+            const detailedDescription = `${description} | Biller: ${billerName}, Code: ${billerCode}, Ref: ${referenceNum}`;
+
             // Insert the new BPAY transaction
             const newTransaction: Partial<Transaction> = {
-                description: description,
+                description: detailedDescription,
                 amount: amount,
                 paid_on: new Date(),
                 from_account: fromAccount.id,
-                to_biller: billerName,
+                to_account_username: billerName,
                 //reference_number: referenceNum,
                 //card_number: cardDetails?.cardNumber || null,  // Optional card details
                 //expiry_date: cardDetails?.expiryDate || null,

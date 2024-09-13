@@ -13,17 +13,18 @@ import { Input } from "./ui/input";
 import { Checkbox } from "@/components/ui/checkbox"; // Import Checkbox from shadcn
 import { PaymentWhenOptions } from "./PaymentWhenOptions";
 import { BillerDropdown } from './BillerDropDown';
-import { transactionAction } from '@/utils/transactionAction'; // Import the transaction action
+import { transactionAction } from '@/utils/transactionAction';
+import { billerAction } from '@/utils/billerAction';
 
 const formSchema = z.object({
-  toBiller: z.number().nullable().optional(),
+  toBiller: z.number().optional(),
   fromBank: z.union([z.number().min(1, "Please select a valid bank account"), z.literal(-1)]),
   billerCode: z.string().optional(),
   billerName: z.string().optional(),
   referenceNum: z.string().optional(),
   amount: z.string().min(1, "Amount is required").regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"),
   description: z.string().optional(),
-  saveBiller: z.boolean().optional(),
+  saveBiller: z.number().optional(),
   paymentOption: z.enum(["payNow", "schedule", "recurring"]).default("payNow"), // Payment options
   fromBankType: z.enum(["debit", "credit", "personal", "savings"]), // Payment options
   scheduleDate: z.date().optional(),
@@ -179,7 +180,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
       referenceNum: "",
       amount: "",
       description: "",
-      saveBiller: false,
+      saveBiller: 0,
       paymentOption: "payNow", // Default to "Pay Now"
       scheduleDate: undefined,
       frequency: "",
@@ -259,24 +260,76 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
         }
         : null;
 
-      //const billerDetail = `Biller ${data.toBiller}`;
+    // Variables to hold final biller details
+    let finalBillerName: string = '';
+    let finalBillerCode: string = '';
+    let finalReferenceNum: string = '';
 
-      const billerDetail = String(data.toBiller);
+
+    // Check if toBiller is selected
+    if (data.toBiller != 0) {
+      // Fetch the biller details from the billers table using the toBiller ID
+      const biller = await billerAction.fetchBillerById(String(data.toBiller));
+      finalBillerName = biller.name;
+      finalBillerCode = biller.biller_code;
+      // Fetch the reference number from the user_billers table
+      const referenceNum = await billerAction.fetchReferenceNumberByBillerName(fromAccount.owner, biller.name);
+      if (referenceNum) {
+        finalReferenceNum = referenceNum;
+      }
+
+    } else {
+      // Use manually entered biller details
+      finalBillerName = data.billerName!;
+      finalBillerCode = data.billerCode!;
+      finalReferenceNum = data.referenceNum!;
+
+      // Verify if manually entered biller details exist in the billers table
+      const billers = await billerAction.fetchBillerByName(finalBillerName);
+      // Ensure there's at least one biller matching the name
+      if (billers.length === 0 || String(billers[0].biller_code) !== String(finalBillerCode)) {
+        console.log(billers[0]);
+        console.log(finalBillerCode);
+        setError("Invalid biller name or biller code.");
+        setIsLoading(false);
+        return;
+      }
+
+      // Check if the reference number matches the one in biller_reference
+      const referenceNum = await billerAction.fetchReferenceNumberByBillerName(fromAccount.owner, finalBillerName);
+      if (referenceNum !== finalReferenceNum) {
+        setError("Invalid reference number.");
+        setIsLoading(false);
+        return;
+      }
+      
+    }
 
 
       console.log("Creating transaction with the following details:")
       // Call the createBPAYTransaction action
       await transactionAction.createBPAYTransaction(
         fromAccount,
-        billerDetail,
-        data.referenceNum,
+        finalBillerName,
+        finalBillerCode,
+        finalReferenceNum,
         amountF,
         data.description || '',
-        cardDetails
+        cardDetails,
       );
 
-      if (data.saveBiller) {
-        console.log("Biller will be saved for future transactions.");
+      if(data.saveBiller) {
+        // Check if billerName, billerCode, and referenceNum are filled
+        if (data.billerName && data.billerCode && data.referenceNum) {
+          console.log("Biller will be saved for future transactions.");
+          try {
+            await billerAction.addNewBiller(data.billerName, data.billerCode, data.referenceNum, fromAccount.owner);
+          } catch (err) {
+            console.error("Error saving biller:", err);
+          }
+        } else {
+          console.warn("Biller details are incomplete. Biller will not be saved.");
+        }
       }
 
       form.reset();
@@ -397,16 +450,32 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
           )}
         />
 
-        <div className="border-t border-gray-200 ">
-          <label className="payment-transfer_form-item pb-5 pt-6">
-            <span className="text-14 w-full max-w-[280px] font-medium text-gray-700">Save to my Billers
-              <p className="text-14 font-normal text-gray-600">Save this Billers details</p>
-            </span>
-            <Checkbox {...form.register("saveBiller")}
-              className="custom-checkbox" />
-          </label>
-        </div>
-
+        {/* Save Biller Checkbox */}
+        <FormField
+          control={form.control}
+          name="saveBiller"
+          render={({ field }) => (
+            <FormItem className="border-t border-gray-200">
+              <div className="payment-transfer_form-item pb-5 pt-6">
+                <div className="payment-transfer_form-content">
+                <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">
+                  Save to my Billers
+                </FormLabel>
+                <FormDescription className="text-14 font-normal text-gray-600">
+                  Save this biller's details for future transactions
+                </FormDescription>
+              </div>
+                <FormControl>
+                <Checkbox
+                  className="custom-checkbox"
+                  checked={field.value === 1} // Check if the value is 1 for checked state
+                  onCheckedChange={(checked) => field.onChange(checked ? 1 : 0)} // Toggle between 1 and 0
+                />
+                </FormControl>
+              </div>
+            </FormItem>
+          )}
+        />
 
         <div className="payment-transfer_form-details">
           <h2 className="text-18 font-semibold text-gray-900">Step 2 - Payment Details</h2>

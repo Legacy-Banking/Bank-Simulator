@@ -63,7 +63,7 @@ export const TransactionsTable = ({ transactions = [] }: TransactionTableProps) 
                         t.to_account ? (
                           `Account ${t.to_account}`  // Show the "to" account if it's not null
                         ) : (
-                          `Biller ${t.to_biller}`  // Show the "to_biller" if to_account is null
+                          `Biller ${t.to_account_username}`  // Show the "to_biller" if to_account is null
                         )
                       )}
                     </h1>
