@@ -72,7 +72,7 @@ const Cards = () => {
   const spending = 2840.40
 
   return (
-    <section className="flex w-full flex-row max-xl:max-h-screen  font-inter">
+    <section className="flex w-full flex-row max-xl:max-h-screen font-inter">
         <div className="flex w-full flex-1 flex-col gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen ">
 
             <header className="home-header">
@@ -88,7 +88,7 @@ const Cards = () => {
                 <h2 className="text-20 lg:text-24 font-semibold text-blackText-50">Cards:</h2>
             </div>
 
-            <div className='flex flex-row gap-10 flex-wrap'>
+            <div className='flex flex-col gap-10 flex-wrap'>
             <DebitCard 
                 type={type}
                 name={name} 
@@ -97,13 +97,13 @@ const Cards = () => {
                 maxSpending={maxSpending}
                 spending={spending}
                 cvc={123}></DebitCard>
-            <DebitCard2 
+            {/* <DebitCard2 
                 type={type}
                 name={name} 
                 cardNumber={cardNumber}
                 expirationDate={expirationDate}
                 maxSpending={maxSpending}
-                spending={spending}></DebitCard2>
+                spending={spending}></DebitCard2> */}
                 
             <CreditCardModel
                 type={type}
@@ -111,7 +111,8 @@ const Cards = () => {
                 cardNumber={cardNumber}
                 expirationDate={expirationDate}
                 maxSpending={maxSpending}
-                spending={spending}></CreditCardModel>
+                spending={spending}
+                cvc={101}></CreditCardModel>
 
             </div>
             
