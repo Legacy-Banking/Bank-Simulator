@@ -3,13 +3,18 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { SignOut} from '@supabase/supabase-js'
+import { createClient } from '@/utils/supabase/client'
+import { updateUserId } from '@/app/store/userSlice'
+import { useAppDispatch } from "@/app/store/hooks";
 
 const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const session = null; // Placeholder session object
     const router = useRouter(); // Next.js router
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const supabase = createClient();
+    const dispatch = useAppDispatch();
+
 
     // Simulated unread messages count for demonstration
     const unreadMessageCount = 5;
@@ -29,7 +34,8 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
     };
 
     const handleLogout = async () => {
-        const { error } = await SupabaseClient.auth.SignOut()
+        const { error } = await supabase.auth.signOut()
+        dispatch(updateUserId(""));
         console.log("User logged out");
         router.push('/');
     };
