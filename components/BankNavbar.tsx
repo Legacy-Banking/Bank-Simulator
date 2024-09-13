@@ -1,37 +1,36 @@
-'use client'
-
 import { bankNavLinks, transferPayLinks } from '@/constants'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { SignOut} from '@supabase/supabase-js'
 
-
-const BankNavbar = () => {
+const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const session = null; // Placeholder session object
     const router = useRouter(); // Next.js router
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    // Function to close the dropdown menu
+    // Simulated unread messages count for demonstration
+    const unreadMessageCount = 5;
+
     const handleLinkClick = () => {
         setIsDropdownOpen(false);
         setIsMobileMenuOpen(false);
     };
 
-    // Function to redirect to the transaction history of the user's personal account
     const handleTransactionHistoryClick = () => {
-        const personalAccountId = account.id; // Replace with the actual logic to get the user's personal account ID
-        router.push(`/transaction-history?accountid=${personalAccountId}`);
-        handleLinkClick(); // Close any open menus
+        if (personalAccount) {
+            router.push(`/transaction-history?accountid=${personalAccount.id}`);
+        } else {
+            console.error('No personal account found');
+        }
+        handleLinkClick();
     };
 
-    // Placeholder logout function
-    const handleLogout = () => {
-        // Placeholder for logout logic (e.g., API call to log out the user)
+    const handleLogout = async () => {
+        const { error } = await SupabaseClient.auth.SignOut()
         console.log("User logged out");
-
-        // Redirect to the home page after logout
         router.push('/');
     };
 
@@ -54,24 +53,21 @@ const BankNavbar = () => {
 
             <div className='flex items-center gap-12'>
                 <ul className='xl:flex hidden text-small gap-12'>
-                    {/* Dashboard */}
                     <li key="/dashboard" className='font-inter'>
                         <Link href="/dashboard" className='hover:text-blue-25 hover:underline underline-blue-25' onClick={handleLinkClick}>
                             Dashboard
                         </Link>
                     </li>
 
-                    {/* Transaction History */}
                     <li key="/transaction-history" className='font-inter'>
                         <button
                             className='hover:text-blue-25 hover:underline underline-blue-25'
-                            onClick={handleTransactionHistoryClick} // Updated to use the click handler
+                            onClick={handleTransactionHistoryClick}
                         >
                             Transaction History
                         </button>
                     </li>
 
-                    {/* Transfer & Pay Dropdown */}
                     <li className='relative font-inter'>
                         <button
                             className='flex items-center gap-2 hover:text-blue-25 hover:underline underline-blue-25'
@@ -103,18 +99,23 @@ const BankNavbar = () => {
                         )}
                     </li>
 
-                    {/* Bills */}
                     <li key="/view-bills" className='font-inter'>
                         <Link href="/view-bills" className='hover:text-blue-25 hover:underline underline-blue-25' onClick={handleLinkClick}>
                             Bills
                         </Link>
                     </li>
 
-                    {/* Inbox */}
-                    <li key="/inbox" className='font-inter'>
+                    {/* Inbox with Notification */}
+                    <li key="/inbox" className='relative font-inter'>
                         <Link href="/inbox" className='hover:text-blue-25 hover:underline underline-blue-25' onClick={handleLinkClick}>
                             Inbox
                         </Link>
+
+                        {unreadMessageCount > 0 && (
+                            <span className="absolute -top-2 -right-4 bg-yellow-gradient text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                                {unreadMessageCount}
+                            </span>
+                        )}
                     </li>
                 </ul>
 
@@ -127,7 +128,7 @@ const BankNavbar = () => {
 
                     <button
                         onClick={handleLogout}
-                        className="bg-yellow-gradient text-blackText-100 font-inter font-bold py-2 px-7 rounded-2xl items-center justify-center shadow-md hover:text-blue-25 hover:underline underline-blue-25 hidden xl:block "
+                        className="bg-yellow-gradient text-blackText-100 font-inter font-bold py-2 px-7 rounded-2xl items-center justify-center shadow-md hover:text-blue-25 hover:underline underline-blue-25 hidden xl:block"
                     >
                         Log Out
                     </button>
@@ -159,7 +160,6 @@ const BankNavbar = () => {
                             </Link>
                         </li>
                     ))}
-                    {/* Admin link for mobile */}
                     {session && (
                         <li className='font-inter text-left'>
                             <Link
@@ -171,7 +171,6 @@ const BankNavbar = () => {
                             </Link>
                         </li>
                     )}
-                    {/* Log Out button for mobile */}
                     <li className='font-inter text-left px-3 py-2'>
                         <button
                             onClick={handleLogout}
@@ -186,4 +185,4 @@ const BankNavbar = () => {
     )
 }
 
-export default BankNavbar
+export default BankNavbar;
