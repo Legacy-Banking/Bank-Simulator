@@ -7,22 +7,14 @@ import { useAppSelector } from '@/app/store/hooks';
 import { billAction } from '@/utils/billAction';
 
 // Define the Transaction type
-type Transaction = {
-  id: string;
-  name: string;
-  date: string | Date;
-  amount: number;
-  totalBalance: number;
-  description?: string;
-};
 
 const ViewBills = () => {
 
   const user_id = useAppSelector((state) => state.user.user_id)?.toString();
-  const [bills, setBills] = useState<Bill[]>([]);
+  const [bills, setBills] = useState<BillDetails[]>([]);
   useEffect(() => {
     if (user_id) {
-      billAction.fetchBillsbyUserId(user_id).then((data) => {
+      billAction.fetchBillDetails(user_id).then((data) => {
         setBills(data);
       }).catch((error) => {
         console.error('Error fetching bills:', error);
