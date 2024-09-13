@@ -90,7 +90,7 @@ export const BankDropdown = ({
               <SelectItem
                 key={account.id}
                 value={account.id}
-                className="cursor-pointer border-t hover:bg-gray-100  hover:bg-gray-100"
+                className="cursor-pointer border-t hover:bg-gray-100"
               >
                 <div className="flex flex-col ">
                   <p className="text-16 font-medium ">{`${account.type}`}</p>

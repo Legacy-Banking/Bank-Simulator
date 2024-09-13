@@ -13,4 +13,10 @@ function billerCodeGenerator():string{
     return `${Math.floor(1000 + Math.random() * 9000)}`;
 }
 
-export { accbsbGenerator, billerCodeGenerator };
+function referenceNumberGenerator(): string {
+    // Generate a 12-digit reference number as a string
+    return `${Math.floor(100000000000 + Math.random() * 900000000000)}`;
+}
+
+export { accbsbGenerator, billerCodeGenerator, referenceNumberGenerator };
+

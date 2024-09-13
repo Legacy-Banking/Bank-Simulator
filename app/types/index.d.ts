@@ -90,6 +90,12 @@ declare type SearchParamProps = {
     biller_code: string;
     biller_details: string;
   }
+  declare interface SavedBiller{
+    id: string;
+    saved_billers: string;
+    owner: string;
+    biller_reference: string;
+  }
 
   declare interface User{
     user_id: string;

@@ -26,7 +26,7 @@ const BPAY = () => {
 
         // Fetch billers
         console.log("Fetching billers"); // Debug: Check biller fetch
-        const billers = await billerAction.fetchAllBillers();
+        const billers = await billerAction.fetchBillersFromSavedBillers(user_id);
         console.log("Fetched billers data:", billers); // Debug: Check fetched billers
         setBillersData(billers);
 

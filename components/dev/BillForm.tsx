@@ -56,7 +56,7 @@ const BillForm = () => {
     };
 
     return (
-        <div>
+        <div className='bg-yellow-25'>
             <h1>Create a new bill</h1>
             <div>
                 <label htmlFor="biller">Select a biller</label>
