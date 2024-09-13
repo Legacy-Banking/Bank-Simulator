@@ -21,5 +21,17 @@ export const billerAction={
             throw new Error(error.message);
         }
         return data || [];
+    },
+
+    fetchBillerByName:async (name:string):Promise<Biller[]>=>{
+        const supabase = createClient();
+        const { data, error } = await supabase
+            .from('billers')
+            .select('*')
+            .eq('name', name);
+        if (error) {
+            throw new Error(error.message);
+        }
+        return data || [];
     }
 }

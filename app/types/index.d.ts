@@ -77,11 +77,18 @@ declare type SearchParamProps = {
     created_on: Date;
     due_date: Date
     status: string;
+    invoice_number: string;
+    reference_number: string;
+  }
+  declare interface BillDetails {
+    bill:Partial<Bill>;
+    biller:Partial<Biller>;
   }
   declare interface Biller{
     id: string;
     name: string;
     biller_code: string;
+    biller_details: string;
   }
 
   declare interface User{
@@ -130,7 +137,7 @@ declare interface BillerAccount {
   };
   
   type BillProps = {
-    bills: Bill[]
+    bills: BillDetails[]
   }
   
   declare type Category = "Food and Drink" | "Travel" | "Transfer";
