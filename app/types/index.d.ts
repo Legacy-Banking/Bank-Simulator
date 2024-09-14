@@ -71,6 +71,7 @@ declare interface Card {
   card_number: string;
   expiry_date: string;
   cvv: string;
+  owner_username: string
 }
 
   // declare type Transaction = {
