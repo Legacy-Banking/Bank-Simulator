@@ -1,6 +1,7 @@
 import { createClient } from "./supabase/client";
 import { accbsbGenerator } from "./accbsbGenerator";
 import { transactionAction } from "./transactionAction";
+import { billerAction } from './billerAction';
 
  enum AccountType {
     SAVINGS = 'savings',
@@ -125,8 +126,10 @@ export const accountAction = {
             await accountAction.createAccount(account as Account);
         });
 
+        await billerAction.createDefaultSavedBillers(user_id);
+
         //Need to also generate Cards with their number and CSV
-        //Generate their bills/and billers
+        //Generate their bills
         //Generate default transaction history
     },
 
