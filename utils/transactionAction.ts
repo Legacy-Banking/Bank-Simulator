@@ -1,4 +1,5 @@
 import { createClient } from "./supabase/client";
+import { randomNameGenerator } from "./randomNameGenerator";
 
 export const transactionAction = {
     createTransaction: async (fromAccount: Account, toAccount: Account, amount: number, description: string): Promise<void> => {
@@ -24,7 +25,9 @@ export const transactionAction = {
                 amount: amount,
                 paid_on: new Date(),
                 from_account: fromAccount.id,
+                from_account_username: fromAccount.owner_username,
                 to_account: toAccount.id,
+                to_account_username: toAccount.owner_username,
             };
 
             const { error: insertError } = await supabase
@@ -73,7 +76,8 @@ export const transactionAction = {
         const { data, error } = await supabase
             .from('transaction')
             .select('*')
-            .or(`from_account.eq.${accountId},to_account.eq.${accountId}`);
+            .or(`from_account.eq.${accountId},to_account.eq.${accountId}`)
+            .order('paid_on', { ascending: false });
 
         if (error) {
             console.error('Error fetching transactions:', error);
@@ -88,6 +92,12 @@ export const transactionAction = {
     processTransactionsForAccount: (transactions: Transaction[], accountId: string): void => {
         transactions.forEach((t) => {
             t.amount = t.from_account.toString() === accountId ? -t.amount : t.amount;
+            if(!t.from_account_username){
+                t.from_account_username = randomNameGenerator();
+            }
+            if(!t.to_account_username){
+                t.to_account_username = randomNameGenerator();
+            }
         });
     },
 };

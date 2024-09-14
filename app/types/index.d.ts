@@ -53,6 +53,7 @@ declare type SearchParamProps = {
     bsb: string;
     acc: string;
     opening_balance: number;
+    owner_username: string;
   }
   declare interface Transaction {
     id: string;
@@ -60,8 +61,45 @@ declare type SearchParamProps = {
     amount: number;
     paid_on: Date;
     from_account: string;
+    from_account_username: string;
     to_account: string;
+    to_account_username: string;
 }
+  declare interface Bill {
+    id: string;
+    billed_user: string;
+    from: string;
+    description: string;
+    amount: number;
+    paid_on: Date;
+    created_on: Date;
+    due_date: Date
+    status: string;
+    invoice_number: string;
+    reference_number: string;
+  }
+  declare interface BillDetails {
+    bill:Partial<Bill>;
+    biller:Partial<Biller>;
+  }
+  declare interface Biller{
+    id: string;
+    name: string;
+    biller_code: string;
+    biller_details: string;
+  }
+
+  declare interface User{
+    user_id: string;
+  }
+
+  declare interface Message {
+    id: string;
+    description: string;
+    date_received: Date;
+    from_account: string;
+    to_account: string;
+  }
 
 declare interface Card {
   id: string;
@@ -96,8 +134,15 @@ declare interface Card {
   type TransactionTableProps = {
     transactions: Transaction[];
   };
-  
 
+  type InboxTableProps = {
+    messages: Message[];
+  };
+  
+  type BillProps = {
+    bills: BillDetails[]
+  }
+  
   declare type Category = "Food and Drink" | "Travel" | "Transfer";
 
 
@@ -107,4 +152,10 @@ declare interface Card {
     otherStyles?: string;
   }
 
+  declare interface PaginationProps {
+    page: number;
+    totalPages: number;
+    setPage: (page: number) => void; // Function to update the page state
+  }
+  
   

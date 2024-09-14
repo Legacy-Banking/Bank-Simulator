@@ -18,7 +18,8 @@ export const accountAction = {
         const { data, error } = await supabase
             .from('account')
             .select('*')
-            .eq('owner', user_id);
+            .eq('owner', user_id)
+            .order('id', { ascending: true }); // Sort by 'id' in ascending order
 
         if (error) {
             throw new Error(error.message);
@@ -37,8 +38,19 @@ export const accountAction = {
         }
         return data[0];
     },
+    //This should be admin only
+    fetchAllAccounts: async (): Promise<Account[]> => {
+        const supabase = createClient();
+        const { data, error } = await supabase
+            .from('account')
+            .select('*');
+        if (error) {
+            throw new Error(error.message);
+        }
+        return data || [];
+    },
 
-    // New method to fetch an account by BSB and account number
+    // Fetch an account by BSB and account number
     fetchAccountByBSBAndAccountNumber: async (bsb: string, accountNum: string): Promise<Account | null> => {
         const supabase = createClient();
         const { data, error } = await supabase
@@ -53,6 +65,28 @@ export const accountAction = {
             return null;  // Return null if there's an error or no account is found
         }
         return data || null;
+    },
+
+    fetchPersonalAccountByUserId: async (user_id: string) => {
+        const supabase = createClient();
+      
+        const { data, error } = await supabase
+          .from('account')
+          .select('*')
+          .eq('owner', user_id)
+          .eq('type', 'personal'); // Fetch only personal accounts
+      
+        if (error) {
+          console.error('Error fetching personal account:', error);
+          throw error;
+        }
+      
+        if (data && data.length > 0) {
+            return data[0]; // Return the first personal account found
+        } else {
+            console.error('No personal account found for the user.');
+            return null;
+        }
     },
 
     createAccount: async (account: Account): Promise<void> => {
@@ -90,7 +124,13 @@ export const accountAction = {
         accounts.forEach(async (account) => {
             await accountAction.createAccount(account as Account);
         });
-    }, fetchUsernamebyUserId: async (user_id: string): Promise<string> => {
+        
+      //Need to also generate Cards with their number and CSV
+      //Generate their bills/and billers
+      //Generate default transaction history
+    }, 
+    
+    fetchUsernamebyUserId: async (user_id: string): Promise<string> => {
         const supabase = createClient();
         const { data, error } = await supabase
             .from('account')
@@ -104,6 +144,7 @@ export const accountAction = {
     
         const ownerUsername = data?.[0]?.owner_username || 'Guest';
         return ownerUsername;
+
     },
     
 

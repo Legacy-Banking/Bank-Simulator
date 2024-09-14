@@ -28,7 +28,6 @@ export const TransactionsTable = ({ transactions = [] }: TransactionTableProps) 
   return (
     <>
       <Table>
-        <TableCaption>A list of your recent transactions.</TableCaption>
         <TableHeader>
           <TableRow className="bg-blue-200 text-white-200">
             <TableHead className="px-8 rounded-tl-2xl">Transaction</TableHead>
@@ -57,7 +56,8 @@ export const TransactionsTable = ({ transactions = [] }: TransactionTableProps) 
                 <TableCell className="max-w-[250px] pl-8 pr-10">
                   <div className="flex items-center gap-3">
                     <h1 className="text-14 truncate font-semibold text-[#344054]">
-                      {t.description}
+                      {/* Show from_account for positive amounts and to_account for negative */}
+                      {isPositive ? t.from_account_username : t.to_account_username}'s Account
                     </h1>
                   </div>
                 </TableCell>

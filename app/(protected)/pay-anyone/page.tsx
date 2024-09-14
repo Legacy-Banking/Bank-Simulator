@@ -37,9 +37,9 @@ const PayAnyone = () => {
     }
   }, [user_id]);
 
-  if (loading) {
-    return <div>Loading...</div>; // Display a loading message while fetching accounts
-  }
+  // if (loading) {
+  //   return <div>Loading...</div>; // Display a loading message while fetching accounts
+  // }
 
   if (error) {
     console.error("Error fetching accounts:", error); // Debug: Error state
@@ -51,14 +51,14 @@ const PayAnyone = () => {
 
 
   return (
-    <section className="no-scrollbar flex flex-col overflow-y-scroll bg-gray-25 md:max-h-screen py-6 lg:py-12 xl:py-16 px-8 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen">
+    <section className="no-scrollbar flex flex-col md:max-h-screen py-6 lg:py-12 xl:py-16 px-8 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen">
             <HeaderBox 
               type="title"
               title="Payment Transfer"
               subtext="Please provide any specific details or notes related to the payment transfer"
             />
 
-      <section className="size-full pt-5">
+      <section className="size-full pt-5 pb-8">
         {/* Pass the fetched accounts to the TransferFundForm component */}
         <PayAnyoneForm accounts={accountsData} />
       </section>

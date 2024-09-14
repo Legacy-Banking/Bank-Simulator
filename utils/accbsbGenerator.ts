@@ -8,9 +8,6 @@ function accbsbGenerator(): { bsb: string, acc: string } {
     return { bsb, acc };
 }
 
-export { accbsbGenerator };
-
-
 function card_detailGenerator(): { card_num: string, expiry: string, cvv: string } {
     // Generate a 16-digit card number as a string
     const card_num = Array.from({ length: 16 }, () => Math.floor(Math.random() * 10)).join('');
@@ -27,5 +24,10 @@ function card_detailGenerator(): { card_num: string, expiry: string, cvv: string
     return { card_num, expiry, cvv };
 }
 
-export { card_detailGenerator };
+function billerCodeGenerator():string{
+    //return a 4-6 digit biller code
+    return `${Math.floor(1000 + Math.random() * 9000)}`;
+}
+
+export { accbsbGenerator, billerCodeGenerator, card_detailGenerator };
 

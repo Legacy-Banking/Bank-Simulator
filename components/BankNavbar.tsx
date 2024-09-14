@@ -7,7 +7,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 
-const BankNavbar = () => {
+const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const session = null; // Placeholder session object
     const router = useRouter(); // Next.js router
@@ -21,8 +21,12 @@ const BankNavbar = () => {
 
     // Function to redirect to the transaction history of the user's personal account
     const handleTransactionHistoryClick = () => {
-        const personalAccountId = account.id; // Replace with the actual logic to get the user's personal account ID
-        router.push(`/transaction-history?accountid=${personalAccountId}`);
+        if (personalAccount) {
+            // Redirect to transaction history for the personal account
+            router.push(`/transaction-history?accountid=${personalAccount.id}`);
+        } else {
+            console.error('No personal account found');
+        }
         handleLinkClick(); // Close any open menus
     };
 
@@ -99,7 +103,7 @@ const BankNavbar = () => {
                                     <li key={link.route} className='font-inter'>
                                         <Link
                                             href={link.route}
-                                            className='block px-5 py-4 hover:text-blue-25 hover:underline underline-blue-25'
+                                            className='block px-5 py-4 hover:text-blue-25 hover:underline underline-blue-25 hover:bg-gray-100'
                                             onClick={handleLinkClick}
                                         >
                                             {link.label}

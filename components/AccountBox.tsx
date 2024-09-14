@@ -6,6 +6,14 @@ type AccountBoxProps = {
     account: Partial<Account>;
 }
 
+const formatBSB = (bsb: string = ''): string => {
+    return bsb.slice(0, 3) + '-' + bsb.slice(3, 6);
+};
+
+const formatAccountNumber = (acc: string = ''): string => {
+    return acc.slice(0, 2) + '-' + acc.slice(2, 5) + '-' + acc.slice(5, 9);
+};
+
 const AccountBox: React.FC<AccountBoxProps> = ({ account }) => {
     const router = useRouter();
     const variant = account.type === 'savings' ? 'primary' : 'secondary';
@@ -36,11 +44,11 @@ const AccountBox: React.FC<AccountBoxProps> = ({ account }) => {
                     >
                         {accountType} Account
                     </h2>
-                    <p className={`text-14 ${textColor}`}>
-                        Karen's {account?.type} Account
+                    <p className={`text-14`}>
+                        {account?.owner_username}'s {account?.type} Account
                     </p>
                     <p className="text-14 font-medium tracking-[1.1px] text-blackText-100">
-                        BSB: {account?.bsb} <span className="mx-4"> </span> Account Number: {account?.acc}
+                        BSB: {account?.bsb ? formatBSB(account.bsb.toString()) : ''} <span className="mx-4"> </span> Account Number: {account?.acc ? formatAccountNumber(account.acc.toString()) : ''}
                     </p>
                 </div>
 
