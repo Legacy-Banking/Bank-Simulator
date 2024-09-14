@@ -98,7 +98,21 @@ export const billAction = {
         items.push(parseFloat(remainingAmount.toFixed(2)));
       
         return items;
-      }
+    },
+    fetchAssignedBills: async (user_id:string,biller_name:string):Promise<Partial<Bill>[]>=>{
+        const supabase = createClient();
+        const {data,error} = await supabase
+        .from('bill')
+        .select('*')
+        .eq('billed_user',user_id)
+        .eq('from',biller_name)
+        if (error){
+            throw error;
+        }
+        data.sort((a:Partial<Bill>,b:Partial<Bill>)=>a.due_date?.getTime()!-b.due_date?.getTime()!);
+        return data;
+    }
+
       
       
 };
