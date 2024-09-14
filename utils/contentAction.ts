@@ -5,13 +5,11 @@ export const contentAction = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('content_embeddings')
-      .select('key, content') 
-      .eq('page_key', pageKey);
-
+      .select('*') 
+      .eq('page_key', 'home');
     if (error) {
       throw error;
     }
-    console.log(data);
     const result = (data || []).reduce((acc: Record<string, string>, item: { key: string, content: string }) => {
       acc[item.key] = item.content;
       return acc;

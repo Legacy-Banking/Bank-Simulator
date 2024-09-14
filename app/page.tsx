@@ -2,12 +2,11 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import RootLayout from './(root)/layout';
-
 import { contentAction } from '@/utils/contentAction';
+import HoverMessage from '@/components/content/HoverMessage';
 
 export default async function Home() {
   const contentEmbeddings = await contentAction.fetchEmbedding('home');
-
   return (
     <RootLayout>
       <div className="flex flex-col min-h-screen items-center bg-white">
@@ -37,11 +36,15 @@ export default async function Home() {
                   → Login
                 </button>
               </Link>
-              <Link href="/sign-up">
-                <button className="w-full md:w-auto px-6 md:px-8 py-2 md:py-3 text-base md:text-lg font-medium text-[#FFFFFF] bg-gradient-to-r from-[#468DC6] to-[#1A70B8] rounded-lg hover:text-gray-600 shadow-2xl">
-                  → Sign up
-                </button>
-              </Link>
+              <HoverMessage message={contentEmbeddings?.sign_up_hover || "Sign up to start learning!"}>
+                <Link href="/sign-up">
+                  <button className="w-full md:w-auto px-6 md:px-8 py-2 md:py-3 text-base md:text-lg font-medium text-[#FFFFFF] bg-gradient-to-r from-[#468DC6] to-[#1A70B8] rounded-lg hover:text-gray-600 shadow-2xl">
+                    → Sign up
+                  </button>
+                </Link>
+
+              </HoverMessage>
+
             </div>
           </div>
 
@@ -60,27 +63,28 @@ export default async function Home() {
               <Link href="/resources">
                 <div className="flex flex-col items-start space-y-2 w-[280px]">
                   <div className="w-full h-[148px] relative">
-                    <Image src="/demo.png" alt="Learn How to Use this Website" layout="fill" objectFit="cover" />
+                    <Image src="/demo.png" alt="Learn How to Use this Website" fill style={{ objectFit: 'cover' }} />
                   </div>
                   <h3 className="text-[20px] font-bold text-[#17181A] hover:underline">
-                    {contentEmbeddings?.column1_title || 'Learn How to Use this Website'}
+                    {contentEmbeddings?.resource_column1_title || 'Learn How to Use this Website'}
                   </h3>
                   <p className="text-[14px] text-[#5F5F64]">
-                    {contentEmbeddings?.column1_description || 'Watch this video demo to learn how to use the website'}
+                    {contentEmbeddings?.resource_column1_description || 'Watch this video demo to learn how to use the website'}
                   </p>
+
                 </div>
               </Link>
               {/* Column 2 */}
               <Link href="https://www.sonicwall.com/phishing-iq-test" target="_blank" rel="noreferrer">
                 <div className="flex flex-col items-start space-y-2 w-[280px]">
                   <div className="w-full h-[148px] relative">
-                    <Image src="/phishing.png" alt="Scam Phishing Quiz" layout="fill" objectFit="cover" />
+                    <Image src="/phishing.png" alt="Scam Phishing Quiz" fill style={{ objectFit: 'cover' }} />
                   </div>
                   <h3 className="text-[20px] font-bold text-[#17181A] hover:underline">
-                    {contentEmbeddings?.column2_title || 'Scam Phishing Quiz'}
+                    {contentEmbeddings?.resource_column2_title || 'Scam Phishing Quiz'}
                   </h3>
                   <p className="text-[14px] text-[#5F5F64]">
-                    {contentEmbeddings?.column2_description || 'Take this quiz to test your ability to identify fraudulent emails and websites'}
+                    {contentEmbeddings?.resource_column2_description || 'Take this quiz to test your ability to identify fraudulent emails and websites'}
                   </p>
                 </div>
               </Link>
@@ -88,13 +92,13 @@ export default async function Home() {
               <Link href="https://www.seniorsit.com.au/" target="_blank" rel="noreferrer">
                 <div className="flex flex-col items-start space-y-2 w-[280px]">
                   <div className="w-full h-[148px] relative">
-                    <Image src="/seniorit.png" alt="SeniorIT Program" layout="fill" objectFit="cover" />
+                    <Image src="/seniorit.png" alt="SeniorIT Program" fill style={{ objectFit: 'cover' }} />
                   </div>
                   <h3 className="text-[20px] font-bold text-[#17181A] hover:underline">
-                    {contentEmbeddings?.column3_title || 'SeniorIT Program'}
+                    {contentEmbeddings?.resource_column3_title || 'SeniorIT Program'}
                   </h3>
                   <p className="text-[14px] text-[#5F5F64]">
-                    {contentEmbeddings?.column3_description || 'Learn more about other resources that are available to aid in your online learning'}
+                    {contentEmbeddings?.resource_column3_description || 'Learn more about other resources that are available to aid in your online learning'}
                   </p>
                 </div>
               </Link>
