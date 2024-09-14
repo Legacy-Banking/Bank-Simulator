@@ -228,7 +228,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
       // Reset selected biller if any manual field is filled
       form.setValue("toBiller", 0);
     }
-  }, [billerCode, billerName, referenceNum]);
+  }, [billerCode, billerName, referenceNum, form]);
 
   const submit = async (data: z.infer<typeof formSchema>) => {
 
@@ -380,7 +380,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
                           console.log("Biller Selected: ", id);
                         }
                       }}
-                      initialSelected={(form.getValues("toBiller")) || undefined}
+                      initialSelected={(form.getValues("toBiller")) || ''}
                       label="Select Biller"
                       otherStyles="!w-full"
                     />

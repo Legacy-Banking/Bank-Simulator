@@ -25,32 +25,29 @@ export const BillerDropdown = ({
   label: string,
   otherStyles?: string,
 }) => {
-  const [selected, setSelected] = useState<BillerAccount | null>(
-    initialSelected ? billerAccounts.find(acc => acc.id === initialSelected) || null : null
-  );
+  const [selected, setSelected] = useState<string | null>(initialSelected || "");
 
   useEffect(() => {
-    if (initialSelected) {
-      const account = billerAccounts.find(acc => acc.id === initialSelected) || null;
-      setSelected(account);
-    }
-  }, [initialSelected, billerAccounts]);
+    // Reset selected value when initialSelected changes
+    setSelected(initialSelected || "");
+  }, [initialSelected]);
 
   const handleBillerChange = (id: string) => {
-    if (id === "reset") {
+    if (id === "0") {
       // Reset the dropdown selection
       setSelected(null);
-      onChange("0");
+      onChange(null); // Pass null to onChange to signal no selection
+    } else {
+      const account = billerAccounts.find((account) => account.id === id);
+      setSelected(account?.id || null);
+      onChange(account?.id || null);
     }
-    const account = billerAccounts.find((account) => account.id === id) || null;
-    setSelected(account);
-    onChange(account ? account.id : null);
   };
 
   return (
     <>
       <Select
-        value={selected?.id || ""}
+        value={selected || ""}
         onValueChange={(value) => handleBillerChange(value)}
       >
         <SelectTrigger
@@ -63,7 +60,10 @@ export const BillerDropdown = ({
             alt="biller"
           />
           <p className="line-clamp-1 w-full text-left">
-            {selected ? `${selected.name}` : "Choose Biller"}
+          {selected
+            ? billerAccounts.find((account) => account.id === selected)?.name ||
+              "Select Biller"
+            : "Choose Biller"}
           </p>
         </SelectTrigger>
         <SelectContent
@@ -71,7 +71,7 @@ export const BillerDropdown = ({
           align="end"
         >
           <SelectGroup>
-            <SelectItem value="reset" className="py-2 font-normal text-gray-500">
+            <SelectItem value="0" className="py-2 font-normal text-gray-500">
               {label}
             </SelectItem>
             {billerAccounts.map((account: BillerAccount) => (
