@@ -36,21 +36,8 @@ const ViewBills = () => {
           />
         </header>
 
-        {/* Bills Title */}
-        <div className="flex justify-between items-center">
-          <h2 className="py-2 text-18 font-semibold text-gray-900">
-            Bills
-          </h2>
-        </div>
-
         {/* Transaction History Table */}
         <section className="flex w-full flex-col gap-6">
-          {/* Working on this one  */}
-          {/*   ============== */}
-          {/*       |     |
-                    |     |
-                    V     V*/}
-          {/* <ViewBillsTable bills={bills} /> */}
           <ViewBillsTable bills={bills} />
         </section>
 
