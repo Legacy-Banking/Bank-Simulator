@@ -239,4 +239,48 @@ export const billerAction={
         return referenceNumber || null;
     },
 
+    addReferenceNumber: async (user_id: string, billerName: string, referenceNumber: string): Promise<void> => {
+      const supabase = createClient();
+    
+      // Fetch the existing biller_reference for the user
+      console.log(`Fetching biller reference for user ID: ${user_id}`);
+      const { data: userBillers, error: fetchError } = await supabase
+        .from('user_billers')
+        .select('biller_reference')
+        .eq('owner', user_id)
+        .single();
+    
+      if (fetchError || !userBillers) {
+        console.error(`Failed to fetch user billers: ${fetchError?.message || 'Unknown error'}`);
+        throw new Error(`Failed to fetch user billers: ${fetchError?.message || 'Unknown error'}`);
+      }
+    
+      console.log(`Fetched biller reference: ${userBillers.biller_reference}`);
+    
+      // Append the new reference to the existing biller_reference
+      const billerReference = userBillers.biller_reference;
+      console.log(`Existing biller reference: ${billerReference}`);
+    
+      const updatedBillerReference = billerReference
+        ? `${billerReference}, ${billerName}|${referenceNumber}`
+        : `${billerName}|${referenceNumber}`;
+    
+      console.log(`Updated biller reference: ${updatedBillerReference}`);
+    
+      // Update the user's biller_reference column
+      console.log(`Updating biller reference for user ID: ${user_id}`);
+      const { error: updateError } = await supabase
+        .from('user_billers')
+        .update({ biller_reference: updatedBillerReference })
+        .eq('owner', user_id);
+    
+      if (updateError) {
+        console.error(`Failed to update biller reference: ${updateError.message}`);
+        throw new Error(`Failed to update biller reference: ${updateError.message}`);
+      }
+    
+      console.log('Biller reference updated successfully');
+    },
+    
+
 }
