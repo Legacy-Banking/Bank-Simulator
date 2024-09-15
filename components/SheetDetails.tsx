@@ -13,7 +13,7 @@ const SheetDetails = (bills: BillDetails) => {
       <div className="grid grid-cols-2 gap-4 items-start mb-2">
         <div>
           <h1 className="text-2xl underline underline-offset-1 font-semibold">Invoice</h1>
-          <p className="text-sm mt-2">Invoice Number: <span className="text-sm font-medium">{bill.invoice_number}</span></p>
+          <p className="text-sm mt-2">Invoice Number: <span className="text-sm font-medium">{bill.invoice_number.replace("/", "-")}</span></p>
           <p className="text-sm"> Invoice Date: <span className="text-sm font-medium">{formatDateTime(bill.created_on!)}</span></p>
         </div>
         <div className="text-sm text-right leading-2">
