@@ -18,7 +18,6 @@ export const formatDateTime = (dateTime: string | Date): string => {
   const date = typeof dateTime === 'string' ? new Date(dateTime) : dateTime;
   return new Intl.DateTimeFormat('en-US', {
     dateStyle: 'medium',
-    timeStyle: 'short',
   }).format(date);
 };
 
