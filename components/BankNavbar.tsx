@@ -75,6 +75,13 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
                         </button>
                     </li>
 
+                    {/* Cards */}
+                    <li key="/cards" className='font-inter'>
+                        <Link href="/cards" className='hover:text-blue-25 hover:underline underline-blue-25' onClick={handleLinkClick}>
+                            Cards
+                        </Link>
+                    </li>
+
                     {/* Transfer & Pay Dropdown */}
                     <li className='relative font-inter'>
                         <button

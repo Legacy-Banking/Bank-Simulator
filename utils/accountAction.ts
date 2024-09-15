@@ -125,12 +125,33 @@ export const accountAction = {
         accounts.forEach(async (account) => {
             await accountAction.createAccount(account as Account);
         });
+        
+      //Need to also generate Cards with their number and CSV
+      //Generate their bills/and billers
+      //Generate default transaction history
+    }, 
+    
+    fetchUsernamebyUserId: async (user_id: string): Promise<string> => {
+        const supabase = createClient();
+        const { data, error } = await supabase
+            .from('account')
+            .select('owner_username')
+            .eq('owner', user_id);
+    
+        if (error) {
+            console.error('Error fetching Owner Username:', error);
+            throw error;
+        }
+    
+        const ownerUsername = data?.[0]?.owner_username || 'Guest';
+        return ownerUsername;
 
-        await billerAction.createDefaultSavedBillers(user_id);
+        //await billerAction.createDefaultSavedBillers(user_id);
 
         //Need to also generate Cards with their number and CSV
         //Generate their bills
         //Generate default transaction history
     },
+    
 
 }

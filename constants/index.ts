@@ -8,6 +8,10 @@ export const bankNavLinks = [
     label: "Transaction History",
   },
   {
+    route: "/cards",
+    label: "Cards",
+  },
+  {
     route: "/transfer-funds",
     label: "Transfer funds",
   },

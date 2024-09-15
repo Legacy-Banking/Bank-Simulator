@@ -124,11 +124,22 @@ declare type SearchParamProps = {
     to_account: string;
   }
 
-declare interface BillerAccount {
-  id: string;
-  name: string; 
-  biller_code: string;
-}
+  declare interface Card {
+    id: string;
+    card_type: AccountType;
+    credit: number;
+    owner: string; 
+    card_number: string;
+    expiry_date: string;
+    cvv: string;
+    owner_username: string
+  }
+
+  declare interface BillerAccount {
+    id: string;
+    name: string; 
+    biller_code: string;
+  }
 
   // declare type Transaction = {
   //   id: string;
