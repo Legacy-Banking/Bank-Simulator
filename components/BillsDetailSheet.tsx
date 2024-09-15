@@ -31,7 +31,7 @@ const BillSheet: React.FC<BillSheetProps> = ({ bills, onClose }) => {
         </DialogHeader>
         <SheetDetails {...bills} />
         <DialogFooter className="w-full flex justify-center items-center">
-          <Button onClick={onClose} className="text-sm bg-slate-200 w-32 m-auto">Print Bill</Button> {/*PRINT button needs to be implemented*/}
+          <Button onClick={onClose} className="text-sm bg-slate-200 w-32 m-auto hover:underline">Print Bill</Button> {/*PRINT button needs to be implemented*/}
         </DialogFooter>
       </DialogContent>
     </Dialog>
