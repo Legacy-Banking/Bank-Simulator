@@ -25,12 +25,14 @@ export const BankDropdown = ({
   initialSelected,
   label,
   otherStyles,
+  additionalOption,
 }: {
   accounts: Account[],
   onChange: (id: string | null) => void,
   initialSelected?: string,
   label: string,
   otherStyles?: string,
+  additionalOption?: { id: string , label: string },
 }) => {
   const [selected, setSelected] = useState<Account | null>(
     initialSelected ? accounts.find(acc => acc.id === initialSelected) || null : null
@@ -44,11 +46,19 @@ export const BankDropdown = ({
   }, [initialSelected, accounts]);
 
   const handleBankChange = (id: string) => {
+    if (id === "reset") {
+      setSelected(null);
+      onChange("0");
+    } else if (id === additionalOption?.id) {
+      setSelected(null);
+      onChange(id);
+    } else {
     const account = accounts.find((account) => account.id === id) || null;
     setSelected(account);
     onChange(account ? account.id : null);
+    }
   };
-
+  
   return (
     <>
       <Select
@@ -73,23 +83,32 @@ export const BankDropdown = ({
           align="end"
         >
           <SelectGroup>
-            <SelectLabel className="py-2 font-normal text-gray-500">
-              {label}
-            </SelectLabel>
+          <SelectItem value="reset" className="py-2 font-normal text-gray-500">
+            {label}
+          </SelectItem>
             {accounts.map((account: Account) => (
               <SelectItem
                 key={account.id}
                 value={account.id}
                 className="cursor-pointer border-t hover:bg-gray-100"
               >
-                <div className="flex flex-col">
-                  <p className="text-16 font-medium">{`${account.type}`}</p>
-                  <p className="text-14 font-medium text-blue-600">
+                <div className="flex flex-col ">
+                  <p className="text-16 font-medium ">{`${account.type}`}</p>
+                  <p className="text-14 font-medium text-blue-600 ">
                     {formatCurrency(account.balance)}
                   </p>
                 </div>
               </SelectItem>
             ))}
+            {additionalOption && ( // Display "Use Card" option
+              <SelectItem
+                key={additionalOption.id}
+                value={additionalOption.id}
+                className="cursor-pointer border-t hover:bg-gray-100"
+              >
+                <p className="text-16 font-medium">{additionalOption.label}</p>
+              </SelectItem>
+            )}
           </SelectGroup>
         </SelectContent>
       </Select>
