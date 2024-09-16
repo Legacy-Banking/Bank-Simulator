@@ -22,16 +22,16 @@ const BillSheet: React.FC<BillSheetProps> = ({ bills, onClose }) => {
 
   return (
     <Dialog open={!!bills} onOpenChange={onClose}>
-      <DialogContent className="bg-white-100 w-max">
+      <DialogContent className="bg-white-100 p-6 max-w-lg w-full max-h-screen overflow-auto">
         <DialogHeader>
-          <DialogTitle>Bill Details</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-xl font-semibold">Bill Details</DialogTitle>
+          <DialogDescription className="text-sm text-gray-500">
             Detailed information about the selected bill.
           </DialogDescription>
         </DialogHeader>
         <SheetDetails {...bills} />
-        <DialogFooter>
-          <Button onClick={onClose} className="bg-slate-100">Close</Button>
+        <DialogFooter className="w-full flex justify-center items-center">
+          <Button onClick={onClose} className="text-sm bg-slate-200 w-32 m-auto hover:underline">Print Bill</Button> {/*PRINT button needs to be implemented*/}
         </DialogFooter>
       </DialogContent>
     </Dialog>

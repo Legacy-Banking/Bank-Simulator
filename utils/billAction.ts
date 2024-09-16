@@ -1,6 +1,7 @@
 import { createClient } from "./supabase/client";
 import { billerAction } from "./billerAction";
 import { number } from "zod";
+import { referenceNumberGenerator, generateUniqueInvoiceNumber, calculateDueDate } from "./accbsbGenerator"
 
 // Define types (Assuming they are declared elsewhere)
 interface Bill {
@@ -10,8 +11,10 @@ interface Bill {
     amount: number;
     paid_on: Date;
     status: string;
-    created_on: Date;
+    created_at: Date;
     due_date: Date;
+    invoice_number: string;
+    reference_number: string;
 }
 
 interface Biller {
@@ -39,6 +42,18 @@ export const billAction = {
 
     createBill: async (user_id: string, biller: Biller, amount: number, description: string): Promise<void> => {
         const supabase = createClient();
+
+        //Fetch the reference number from user_billers if it exists
+        let referenceNumber = await billerAction.fetchReferenceNumberByBillerName(user_id, biller.name);
+        // If no reference number found, generate a new one
+        if (!referenceNumber) {
+            referenceNumber = referenceNumberGenerator();
+            // Add this reference number to the user's biller_reference list
+            await billerAction.addReferenceNumber(user_id, biller.name, referenceNumber);
+        }
+
+        const invoiceNumber = await generateUniqueInvoiceNumber();
+
         const newBill: Bill = {
             billed_user: user_id,
             from: biller.name,
@@ -46,8 +61,10 @@ export const billAction = {
             amount: amount,
             paid_on: new Date(),
             status: 'unpaid',
-            created_on: new Date(),
-            due_date: new Date(),
+            created_at: new Date(),
+            due_date: calculateDueDate(),
+            invoice_number: invoiceNumber, 
+            reference_number: referenceNumber, 
         };
 
         const { data, error } = await supabase.from('bills').insert(newBill);

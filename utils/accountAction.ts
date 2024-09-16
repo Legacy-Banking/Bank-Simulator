@@ -1,6 +1,7 @@
 import { createClient } from "./supabase/client";
 import { accbsbGenerator } from "./accbsbGenerator";
 import { transactionAction } from "./transactionAction";
+import { billerAction } from './billerAction';
 
  enum AccountType {
     SAVINGS = 'savings',
@@ -124,10 +125,30 @@ export const accountAction = {
         accounts.forEach(async (account) => {
             await accountAction.createAccount(account as Account);
         });
+        await billerAction.createDefaultSavedBillers(user_id);
 
         //Need to also generate Cards with their number and CSV
-        //Generate their bills/and billers
+        //Generate their bills
         //Generate default transaction history
     },
+    
+    fetchUsernamebyUserId: async (user_id: string): Promise<string> => {
+        const supabase = createClient();
+        const { data, error } = await supabase
+            .from('account')
+            .select('owner_username')
+            .eq('owner', user_id);
+    
+        if (error) {
+            console.error('Error fetching Owner Username:', error);
+            throw error;
+        }
+    
+        const ownerUsername = data?.[0]?.owner_username || 'Guest';
+        return ownerUsername;
+
+
+    },
+    
 
 }

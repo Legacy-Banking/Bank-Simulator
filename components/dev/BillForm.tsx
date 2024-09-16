@@ -26,9 +26,9 @@ const BillForm = () => {
     }, []);
 
     const handleBillerChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const billerIndex = parseInt(e.target.value) - 1;
-        const biller = billers[billerIndex];
-        setSelectedBiller(biller);
+        const billerId = e.target.value; // Get the selected biller ID
+        const biller = billers.find(b => Number(b.id) === parseInt(billerId)); // Find the biller by ID
+        setSelectedBiller(biller); // Set the selected biller
     };
 
     const handleUserChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -56,7 +56,7 @@ const BillForm = () => {
     };
 
     return (
-        <div>
+        <div className='bg-yellow-25'>
             <h1>Create a new bill</h1>
             <div>
                 <label htmlFor="biller">Select a biller</label>
