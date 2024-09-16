@@ -6,7 +6,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { accountAction } from "@/utils/accountAction";
 import { cardAction } from "@/utils/cardAction";
 
-export default function Login({
+export default function SignUp({
   searchParams,
 }: {
   searchParams: { message: string };
