@@ -58,12 +58,12 @@ export const TransactionsTable = ({ transactions = [] }: TransactionTableProps) 
                     <h1 className="text-14 truncate font-semibold text-[#344054]">
                       {/* Show from_account for positive amounts, and to_account or to_biller based on whether to_account is null */}
                       {isPositive ? (
-                        `Account ${t.from_account}`  // Show the "from" account for positive amounts
+                        `${t.from_account_username}`  // Show the "from" account for positive amounts
                       ) : (
                         t.to_account ? (
-                          `Account ${t.to_account}`  // Show the "to" account if it's not null
+                          `${t.to_account_username}`  // Show the "to" account if it's not null
                         ) : (
-                          `Biller ${t.to_account_username}`  // Show the "to_biller" if to_account is null
+                          `(Biller) ${t.to_account_username}`  // Show the "to_biller" if to_account is null
                         )
                       )}
                     </h1>
