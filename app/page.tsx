@@ -6,7 +6,7 @@ import RootLayout from './(root)/layout'
 const Home = () => {
   return (
     <RootLayout>
-      <div className="flex flex-col min-h-screen items-center bg-white">
+      <div className="flex flex-col min-h-screen items-center bg-white-200">
         <div className="flex w-full m-5 px-10 max-w-7xl">
 
           {/* Title Section */}
