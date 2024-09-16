@@ -162,6 +162,8 @@ declare type SearchParamProps = {
 
   type AccountsTableProps = {
     accounts: Account[];
+    setShowUpdatePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+    setShowDeletePopUp: React.Dispatch<React.SetStateAction<boolean>>;
   }
 
   type TransactionTableProps = {

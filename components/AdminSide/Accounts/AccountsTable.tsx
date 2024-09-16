@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -15,9 +15,11 @@ import { cn, formatAmount, formatDateTime } from "@/lib/utils";
 import { Button } from '@/components/ui/button';
 import TrashAccountDetailSheet from './TrashAccountDetailSheet';
 import { boolean } from 'zod';
+import EditAccountDetailSheet from './EditAccountDetailSheet';
+import PopUp from './PopUp';
 
 // AccountsTable component
-export const AccountsTable = ({ accounts = [] }: AccountsTableProps) => {
+export const AccountsTable = ({ accounts = [], setShowUpdatePopUp, setShowDeletePopUp }: AccountsTableProps) => {
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const [deleteAccountWindow, setDeleteAccountWindow] = useState(false);
   const [editAccountWindow, setEditAccountWindow] = useState(false);
@@ -26,13 +28,24 @@ export const AccountsTable = ({ accounts = [] }: AccountsTableProps) => {
     setDeleteAccountWindow((prevState) => !prevState);
   };
 
-  const toggleEditAccountWindow = () => {
+  const toggleEditAccountWindow = (acc : Account | null) => {
+      
     setEditAccountWindow((prevState) => !prevState);
+    setSelectedAccount(acc);
+    
   };
 
   const deleteAccount = () => {
     // currently empty but this will delete the selected account
+    toggleDeleteAccountWindow();
+    setShowDeletePopUp(true);
   }
+  const updateAccount = () => {
+    toggleEditAccountWindow(null);
+    setShowUpdatePopUp(true);
+    // currently empty but this will update the selected account
+  }
+
 
 
   return (
@@ -40,10 +53,10 @@ export const AccountsTable = ({ accounts = [] }: AccountsTableProps) => {
       <Table>
         <TableHeader >
           <TableRow className="bg-blue-200 text-white-200">
-            <TableHead className="px-8 rounded-tl-2xl font-normal tracking-wider">Account Name</TableHead>
-            <TableHead className="px-4 font-normal tracking-wider">Balance</TableHead>
-            <TableHead className="px-2 font-normal tracking-wider">Last Login</TableHead>
-            <TableHead className="px-8 rounded-tr-2xl font-normal tracking-wider">Action</TableHead>
+            <TableHead className="font-inter px-8 rounded-tl-2xl font-normal tracking-wider">Account Name</TableHead>
+            <TableHead className="font-inter px-4 font-normal tracking-wider">Balance</TableHead>
+            <TableHead className="font-inter px-2 font-normal tracking-wider">Last Login</TableHead>
+            <TableHead className="font-inter px-8 rounded-tr-2xl font-normal tracking-wider">Action</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -59,7 +72,7 @@ export const AccountsTable = ({ accounts = [] }: AccountsTableProps) => {
               >
                 <TableCell className="max-w-[200px] pl-8 pr-10">
                   <div className="flex items-center gap-3">
-                    <h1 className="text-16 truncate font-semibold text-[#344054]">
+                    <h1 className="font-inter text-16 truncate font-semibold text-[#344054]">
                       {/* Show from_account for positive amounts, and to_account or to_biller based on whether to_account is null */}
                       {accountName}
                     </h1>
@@ -67,16 +80,16 @@ export const AccountsTable = ({ accounts = [] }: AccountsTableProps) => {
                 </TableCell>
 
 
-                <TableCell className="font-bold">
+                <TableCell className="font-inter font-bold">
                   {formatAmount(balance)}
                 </TableCell>
 
-                <TableCell className="min-w-32 pl-2 pr-10 text-[#475467]">
+                <TableCell className="font-inter min-w-32 pl-2 pr-10 text-[#475467]">
                   {lastLogin.toDateString()}
                 </TableCell>
                 
                 <TableCell >
-                    <Button onClick={toggleEditAccountWindow} className="p-0 ml-4"> <img src="../Edit.png" alt="Edit button" /></Button>
+                    <Button onClick={() => toggleEditAccountWindow(acc)} className="p-0 ml-4"> <img src="../Edit.png" alt="Edit button" /></Button>
                     <Button onClick={toggleDeleteAccountWindow} className="p-0 ml-4"> <img src="../Delete.png" alt="Delete button" /></Button>
                 </TableCell>
               </TableRow>
@@ -90,6 +103,12 @@ export const AccountsTable = ({ accounts = [] }: AccountsTableProps) => {
         onClose={toggleDeleteAccountWindow}
         deleteAccount={deleteAccount}
       />
+      <EditAccountDetailSheet
+        account={selectedAccount}
+        status={editAccountWindow}
+        onClose={() => toggleEditAccountWindow(selectedAccount)}
+        updateAccount={updateAccount}/>
+
     </>
   );
 };
