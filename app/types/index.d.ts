@@ -160,6 +160,10 @@ declare type SearchParamProps = {
   //   receiverBankId: string;
   // };
 
+  type AccountsTableProps = {
+    accounts: Account[];
+  }
+
   type TransactionTableProps = {
     transactions: Transaction[];
   };

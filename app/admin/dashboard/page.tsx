@@ -1,5 +1,5 @@
 "use client";
-import AccountsPage from '@/components/AdminSide/AccountsPage';
+import AccountsPage from '@/components/AdminSide/Accounts/AccountsPage';
 import AdditionalFundsPage from '@/components/AdminSide/AdditionalFundsPage';
 import AdminSideBar from '@/components/AdminSide/AdminSideBar'
 import CreateBillPage from '@/components/AdminSide/CreateBillPage';
