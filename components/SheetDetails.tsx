@@ -5,7 +5,6 @@ import { billAction } from "@/utils/billAction";
 const SheetDetails = (bills: BillDetails) => {
   const { bill, biller } = bills;
   const user = useAppSelector((state) => state.user);
-  const itemPartition = billAction.billItemRandomPartition(bill.amount!);
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-2xl max-w-4xl mx-auto">
@@ -14,7 +13,7 @@ const SheetDetails = (bills: BillDetails) => {
         <div>
           <h1 className="text-2xl underline underline-offset-1 font-semibold">Invoice</h1>
           <p className="text-sm mt-2">Invoice Number: <span className="text-sm font-medium">{bill.invoice_number?.replace("/", "-") ?? "N/A"}</span></p>
-          <p className="text-sm"> Invoice Date: <span className="text-sm font-medium">{formatDateTime(bill.created_on!)}</span></p>
+          <p className="text-sm"> Invoice Date: <span className="text-sm font-medium">{formatDateTime(bill.created_at!)}</span></p>
         </div>
         <div className="text-sm text-right leading-2">
           <h2 className="font-semibold mb-2">{biller.name}</h2>
@@ -74,9 +73,8 @@ const SheetDetails = (bills: BillDetails) => {
       <div className="flex justify-start mb-4 text-sm">
         <div className="text-left">
           <h3 className="text-sm font-semibold">Payment Details</h3>
-          <p>Account Name</p>
-          <p>Biller Code</p>
-          <p>Reference Number</p>
+          <p>Biller Code:{biller.biller_code}</p>
+          <p>Reference Number:{bill.reference_number}</p>
         </div>
       </div>
 

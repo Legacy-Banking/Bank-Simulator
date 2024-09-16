@@ -4,18 +4,7 @@ import { number } from "zod";
 import { referenceNumberGenerator, generateUniqueInvoiceNumber, calculateDueDate } from "./accbsbGenerator"
 
 // Define types (Assuming they are declared elsewhere)
-interface Bill {
-    billed_user: string;
-    from: string;
-    description: string;
-    amount: number;
-    paid_on: Date;
-    status: string;
-    created_at: Date;
-    due_date: Date;
-    invoice_number: string;
-    reference_number: string;
-}
+
 
 interface Biller {
     name: string;
@@ -54,7 +43,7 @@ export const billAction = {
 
         const invoiceNumber = await generateUniqueInvoiceNumber();
 
-        const newBill: Bill = {
+        const newBill: Partial<Bill> = {
             billed_user: user_id,
             from: biller.name,
             description: description,
@@ -119,15 +108,36 @@ export const billAction = {
     fetchAssignedBills: async (user_id:string,biller_name:string):Promise<Partial<Bill>[]>=>{
         const supabase = createClient();
         const {data,error} = await supabase
-        .from('bill')
+        .from('bills')
         .select('*')
         .eq('billed_user',user_id)
         .eq('from',biller_name)
         if (error){
             throw error;
         }
-        data.sort((a:Partial<Bill>,b:Partial<Bill>)=>a.due_date?.getTime()!-b.due_date?.getTime()!);
         return data;
+    },
+    updateBillStatus: async (bill:Partial<Bill>,status:string):Promise<void>=>{
+        const invoice_number = bill.invoice_number;
+        const supabase = createClient();
+        const {data,error} = await supabase
+        .from('bills')
+        .update({status})
+        .eq('invoice_number',invoice_number);
+        if (error){
+            throw error;
+        }
+    },
+    updateBillAmount: async (bill:Partial<Bill>,amount:number):Promise<void>=>{
+        const invoice_number = bill.invoice_number;
+        const supabase = createClient();
+        const {data,error} = await supabase
+        .from('bills')
+        .update({amount})
+        .eq('invoice_number',invoice_number);
+        if (error){
+            throw error;
+        }
     }
 
       

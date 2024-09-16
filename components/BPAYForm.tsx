@@ -13,8 +13,9 @@ import { Input } from "./ui/input";
 import { Checkbox } from "@/components/ui/checkbox"; // Import Checkbox from shadcn
 import { PaymentWhenOptions } from "./PaymentWhenOptions";
 import { BillerDropdown } from './BillerDropDown';
-import { transactionAction } from '@/utils/transactionAction';
+import { useAppSelector } from '@/app/store/hooks';
 import { billerAction } from '@/utils/billerAction';
+import { bpayAction } from '@/utils/bpayAction';
 
 const formSchema = z.object({
   toBiller: z.number().optional(),
@@ -54,11 +55,11 @@ const formSchema = z.object({
 
     // Only require billerCode, billerName, and referenceNum when `toBiller` is null
     if (data.toBiller === 0) {
-      if (!data.billerCode || !/^\d{4}$/.test(data.billerCode)) {
+      if (!data.billerCode || !/^\d{4,6}$/.test(data.billerCode)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["billerCode"],
-          message: "Biller Code must be a 4-digit number",
+          message: "Biller Code must be a 4 to 6-digit number",
         });
       }
       if (!data.billerName) {
@@ -169,6 +170,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null); // State to manage error messages
   const [showCardDetails, setShowCardDetails] = useState(false); // State to control visibility of card details section
+  const user_id = useAppSelector(state => state.user.user_id);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -260,65 +262,65 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
         }
         : null;
 
-    // Variables to hold final biller details
-    let finalBillerName: string = '';
-    let finalBillerCode: string = '';
-    let finalReferenceNum: string = '';
+      // Variables to hold final biller details
+      let finalBillerName: string = '';
+      let finalBillerCode: string = '';
+      let finalReferenceNum: string = '';
 
 
-    // Check if toBiller is selected
-    if (data.toBiller != 0) {
-      // Fetch the biller details from the billers table using the toBiller ID
-      const biller = await billerAction.fetchBillerById(String(data.toBiller));
-      finalBillerName = biller.name;
-      finalBillerCode = biller.biller_code;
-      // Fetch the reference number from the user_billers table
-      const referenceNum = await billerAction.fetchReferenceNumberByBillerName(fromAccount.owner, biller.name);
-      if (referenceNum) {
-        finalReferenceNum = referenceNum;
+      // Check if toBiller is selected
+      if (data.toBiller != 0) {
+        // Fetch the biller details from the billers table using the toBiller ID
+        const biller = await billerAction.fetchBillerById(String(data.toBiller));
+        finalBillerName = biller.name;
+        finalBillerCode = biller.biller_code;
+        // Fetch the reference number from the user_billers table
+        const referenceNum = await billerAction.fetchReferenceNumberByBillerName(fromAccount.owner, biller.name);
+        if (referenceNum) {
+          finalReferenceNum = referenceNum;
+        }
+
+      } else {
+        // Use manually entered biller details
+        finalBillerName = data.billerName!;
+        finalBillerCode = data.billerCode!;
+        finalReferenceNum = data.referenceNum!;
+
+        // Verify if manually entered biller details exist in the billers table
+        const billers = await billerAction.fetchBillerByName(finalBillerName);
+        // Ensure there's at least one biller matching the name
+        if (billers.length === 0 || String(billers[0].biller_code) !== String(finalBillerCode)) {
+          console.log(billers[0]);
+          console.log(finalBillerCode);
+          setError("Invalid biller name or biller code.");
+          setIsLoading(false);
+          return;
+        }
+
+        // Check if the reference number matches the one in biller_reference
+        const referenceNum = await billerAction.fetchReferenceNumberByBillerName(fromAccount.owner, finalBillerName);
+        if (referenceNum !== finalReferenceNum) {
+          setError("Invalid reference number.");
+          setIsLoading(false);
+          return;
+        }
+
       }
-
-    } else {
-      // Use manually entered biller details
-      finalBillerName = data.billerName!;
-      finalBillerCode = data.billerCode!;
-      finalReferenceNum = data.referenceNum!;
-
-      // Verify if manually entered biller details exist in the billers table
-      const billers = await billerAction.fetchBillerByName(finalBillerName);
-      // Ensure there's at least one biller matching the name
-      if (billers.length === 0 || String(billers[0].biller_code) !== String(finalBillerCode)) {
-        console.log(billers[0]);
-        console.log(finalBillerCode);
-        setError("Invalid biller name or biller code.");
-        setIsLoading(false);
-        return;
-      }
-
-      // Check if the reference number matches the one in biller_reference
-      const referenceNum = await billerAction.fetchReferenceNumberByBillerName(fromAccount.owner, finalBillerName);
-      if (referenceNum !== finalReferenceNum) {
-        setError("Invalid reference number.");
-        setIsLoading(false);
-        return;
-      }
-      
-    }
 
 
       console.log("Creating transaction with the following details:")
       // Call the createBPAYTransaction action
-      await transactionAction.createBPAYTransaction(
+      await bpayAction.payBills(
+        user_id,
         fromAccount,
         finalBillerName,
         finalBillerCode,
         finalReferenceNum,
         amountF,
         data.description || '',
-        cardDetails,
       );
 
-      if(data.saveBiller) {
+      if (data.saveBiller) {
         // Check if billerName, billerCode, and referenceNum are filled
         if (data.billerName && data.billerCode && data.referenceNum) {
           console.log("Biller will be saved for future transactions.");
@@ -458,19 +460,19 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
             <FormItem className="border-t border-gray-200">
               <div className="payment-transfer_form-item pb-5 pt-6">
                 <div className="payment-transfer_form-content">
-                <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">
-                  Save to my Billers
-                </FormLabel>
-                <FormDescription className="text-14 font-normal text-gray-600">
-                  Save this biller's details for future transactions
-                </FormDescription>
-              </div>
+                  <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">
+                    Save to my Billers
+                  </FormLabel>
+                  <FormDescription className="text-14 font-normal text-gray-600">
+                    Save this biller's details for future transactions
+                  </FormDescription>
+                </div>
                 <FormControl>
-                <Checkbox
-                  className="custom-checkbox"
-                  checked={field.value === 1} // Check if the value is 1 for checked state
-                  onCheckedChange={(checked) => field.onChange(checked ? 1 : 0)} // Toggle between 1 and 0
-                />
+                  <Checkbox
+                    className="custom-checkbox"
+                    checked={field.value === 1} // Check if the value is 1 for checked state
+                    onCheckedChange={(checked) => field.onChange(checked ? 1 : 0)} // Toggle between 1 and 0
+                  />
                 </FormControl>
               </div>
             </FormItem>
@@ -509,7 +511,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
                       label="From Bank Account"
                       otherStyles="!w-full"
                     />
-                    
+
                   </FormControl>
                   <FormMessage className="text-12 text-red-500" />
                 </div>
