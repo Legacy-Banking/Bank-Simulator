@@ -4,6 +4,8 @@ import Link from 'next/link';
 import RootLayout from './(root)/layout';
 import { contentAction } from '@/utils/contentAction';
 import HoverMessage from '@/components/content/HoverMessage';
+export const revalidate = 60
+
 
 export default async function Home() {
   const contentEmbeddings = await contentAction.fetchEmbedding('home');
@@ -36,7 +38,7 @@ export default async function Home() {
                   → Login
                 </button>
               </Link>
-              <HoverMessage message={contentEmbeddings?.sign_up_hover || "Sign up to start learning!"}>
+              <HoverMessage position="top-right" message={contentEmbeddings?.sign_up_hover || "Sign up to start learning!"}>
                 <Link href="/sign-up">
                   <button className="w-full md:w-auto px-6 md:px-8 py-2 md:py-3 text-base md:text-lg font-medium text-[#FFFFFF] bg-gradient-to-r from-[#468DC6] to-[#1A70B8] rounded-lg hover:text-gray-600 shadow-2xl">
                     → Sign up

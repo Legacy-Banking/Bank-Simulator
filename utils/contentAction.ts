@@ -5,8 +5,8 @@ export const contentAction = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('content_embeddings')
-      .select('*') 
-      .eq('page_key', 'home');
+      .select('key,content') 
+      .eq('page_key', pageKey)
     if (error) {
       throw error;
     }
