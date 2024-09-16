@@ -35,13 +35,13 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
 
     const handleLogout = async () => {
         const { error } = await supabase.auth.signOut()
-        dispatch(updateUserId(""));
+        dispatch(updateUserId(null));
         console.log("User logged out");
         router.push('/');
     };
 
     return (
-        <nav className="flexBetween navbar relative z-10">
+        <nav className="flexBetween navbar relative z-10 bg-white-200 text-black shadow-md">
             <div className='flex-1 flexStart gap-12'>
                 <Link href="/" className="flex items-center gap-0.5" onClick={handleLinkClick}>
                     <Image
