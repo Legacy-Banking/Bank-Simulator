@@ -13,6 +13,8 @@ const AccountsPage = () => {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Pagination
   const searchParams = useSearchParams();
 
   const rowsPerPage = 10;
@@ -24,6 +26,7 @@ const AccountsPage = () => {
   const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
   const currentAccounts = accounts.slice(indexOfFirstTransaction, indexOfLastTransaction);
 
+  // getting data
   const supabase = createClient();
   useEffect(() => {
     const fetchUsers = async () => {

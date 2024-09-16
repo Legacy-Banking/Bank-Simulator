@@ -12,33 +12,29 @@ import { cn, formatAmount, formatDateTime } from "@/lib/utils"
 
 // Define the props type for the component
 type AccountDetailSheetProps = {
-  account: Account | null;
+  status: boolean;
   onClose: () => void;
   deleteAccount: () => void;
 };
 
-const TrashAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, onClose, deleteAccount }) => {
-  if (!account) return null;
+const TrashAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ status, onClose, deleteAccount }) => {
+  if (!status) return null;
 
   return (
-    <Dialog open={!!account} onOpenChange={onClose}>
+    <Dialog open={!!status} onOpenChange={onClose}>
       <DialogContent className="bg-white-100 p-6">
         <DialogHeader>
-          <DialogTitle className="text-lg font-semibold">Confirm Delete</DialogTitle>
-          <DialogDescription className="text-sm text-gray-500">
-            Detailed information about the selected transaction.
+          <DialogTitle className="text-2xl font-semibold font-inter mb-10">Confirm Delete</DialogTitle>
+          <DialogDescription className="text-base font-inter text-[#191919] border-blue-25 border-y-2 py-4">
+          Are you sure you want to delete user permanently. <br />
+          You can’t undo this action.
           </DialogDescription>
         </DialogHeader>
 
-        {/* Transaction details */}
-        <div className="space-y-4">
-          Text here
-        </div>
-
         {/* Footer with Close button */}
-        <DialogFooter>
-            <Button onClick={onClose}>Cancel</Button>
-          <Button onClick={deleteAccount}>Delete</Button>
+        <DialogFooter className="mt-8 flex ">
+            <Button onClick={onClose} className="grow uppercase font-inter border-2 hover:bg-slate-200 tracking-wider">Cancel</Button>
+          <Button onClick={deleteAccount} className="grow uppercase font-inter tracking-wider bg-blue-25 hover:bg-blue-200 text-white-100">Delete</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

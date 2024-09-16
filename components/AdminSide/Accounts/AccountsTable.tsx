@@ -22,10 +22,6 @@ export const AccountsTable = ({ accounts = [] }: AccountsTableProps) => {
   const [deleteAccountWindow, setDeleteAccountWindow] = useState(false);
   const [editAccountWindow, setEditAccountWindow] = useState(false);
 
-  const openAccountDetails = (account: Account) => {
-    setSelectedAccount(account);
-  };
-
   const toggleDeleteAccountWindow = () => {
     setDeleteAccountWindow((prevState) => !prevState);
   };
@@ -34,12 +30,8 @@ export const AccountsTable = ({ accounts = [] }: AccountsTableProps) => {
     setEditAccountWindow((prevState) => !prevState);
   };
 
-  const closeAccountDetails = () => {
-    setSelectedAccount(null);
-  };
-
   const deleteAccount = () => {
-
+    // currently empty but this will delete the selected account
   }
 
 
@@ -83,9 +75,9 @@ export const AccountsTable = ({ accounts = [] }: AccountsTableProps) => {
                   {lastLogin.toDateString()}
                 </TableCell>
                 
-                <TableCell>
-                    <Button onClick={toggleEditAccountWindow}> Edit</Button>
-                    <Button onClick={toggleDeleteAccountWindow}> Trash</Button>
+                <TableCell >
+                    <Button onClick={toggleEditAccountWindow} className="p-0 ml-4"> <img src="../Edit.png" alt="Edit button" /></Button>
+                    <Button onClick={toggleDeleteAccountWindow} className="p-0 ml-4"> <img src="../Delete.png" alt="Delete button" /></Button>
                 </TableCell>
               </TableRow>
             );
@@ -94,8 +86,8 @@ export const AccountsTable = ({ accounts = [] }: AccountsTableProps) => {
       </Table>
 
       <TrashAccountDetailSheet
-        account={selectedAccount}
-        onClose={closeAccountDetails}
+        status={deleteAccountWindow}
+        onClose={toggleDeleteAccountWindow}
         deleteAccount={deleteAccount}
       />
     </>
