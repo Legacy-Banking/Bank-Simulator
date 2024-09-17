@@ -131,7 +131,7 @@ declare interface Card {
   credit: number;
   owner: string;
   card_number: string;
-  expiry_date: string;
+  expiry_date: Date;
   cvv: string;
   owner_username: string;
   linked_to: string;

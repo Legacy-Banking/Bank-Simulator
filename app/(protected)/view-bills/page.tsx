@@ -23,7 +23,7 @@ const ViewBills = () => {
   }, [user_id]);
 
   return (
-    <section className="flex w-full flex-row max-xl:max-h-screen max-xl:overflow-y-scroll font-inter bg-gray-50">
+    <section className="flex w-full flex-row max-xl:max-h-screen max-xl:overflow-y-scroll font-inter">
       <div className="flex w-full flex-1 flex-col gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen xl:overflow-y-scroll">
 
         <header className="home-header">

@@ -10,15 +10,17 @@ function accbsbGenerator(): { bsb: string, acc: string } {
     return { bsb, acc };
 }
 
-function card_detailGenerator(): { card_num: string, expiry: string, cvv: string } {
+function card_detailGenerator(): { card_num: string, expiry: Date, cvv: string } {
     // Generate a 16-digit card number as a string
     const card_num = Array.from({ length: 16 }, () => Math.floor(Math.random() * 10)).join('');
 
-    // Generate an expiry date in MM/YY format
+    // Get the current year and create an expiration date 5 years from now
     const currentYear = new Date().getFullYear();
-    const month = Math.floor(Math.random() * 12) + 1; // Random month between 1 and 12
-    const year = (currentYear % 100) + 5; // 5 years from now year 
-    const expiry = `${month.toString().padStart(2, '0')}/${year.toString().padStart(2, '0')}`;
+    const randomMonth = Math.floor(Math.random() * 12); // Random month between 0 and 11 for Date object
+    const expiryYear = currentYear + 5;
+
+    // Create the expiry date as the first day of the selected month 5 years from now
+    const expiry = new Date(expiryYear, randomMonth, 1);
 
     // Generate a 3-digit CVV as a string
     const cvv = Math.floor(Math.random() * 900 + 100).toString(); // Random 3-digit number between 100 and 999
