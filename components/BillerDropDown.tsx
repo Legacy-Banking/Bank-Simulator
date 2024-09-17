@@ -33,22 +33,24 @@ export const BillerDropdown = ({
   }, [initialSelected]);
 
   const handleBillerChange = (id: string) => {
-    if (id === "0") {
+    if (id === "reset") {
       // Reset the dropdown selection
       setSelected(null);
-      onChange(null); // Pass null to onChange to signal no selection
+      onChange(""); // Pass null to onChange to signal no selection
     } else {
-      const account = billerAccounts.find((account) => account.id === id);
-      setSelected(account?.id || null);
-      onChange(account?.id || null);
+      const account = billerAccounts.find((account) => String(account.id) === String(id));
+      setSelected(String(account?.id) || "");
+      onChange(String(account?.id) || "");
     }
   };
 
   return (
     <>
       <Select
-        value={selected || ""}
-        onValueChange={(value) => handleBillerChange(value)}
+        value={String(selected) || ""}
+        onValueChange={(value) => {
+          console.log("onValueChange triggered with:", value);
+          handleBillerChange(value)}}
       >
         <SelectTrigger
           className={`flex w-full bg-white-100 gap-3 md:w-[300px] ${otherStyles}`}
@@ -61,7 +63,7 @@ export const BillerDropdown = ({
           />
           <p className="line-clamp-1 w-full text-left">
           {selected
-            ? billerAccounts.find((account) => account.id === selected)?.name ||
+            ? billerAccounts.find((account) => String(account.id) === selected)?.name ||
               "Select Biller"
             : "Choose Biller"}
           </p>
@@ -71,7 +73,7 @@ export const BillerDropdown = ({
           align="end"
         >
           <SelectGroup>
-            <SelectItem value="0" className="py-2 font-normal text-gray-500">
+            <SelectItem value="reset" className="py-2 font-normal text-gray-500">
               {label}
             </SelectItem>
             {billerAccounts.map((account: BillerAccount) => (
