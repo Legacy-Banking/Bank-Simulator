@@ -112,9 +112,12 @@ export const billAction = {
         .select('*')
         .eq('billed_user',user_id)
         .eq('from',biller_name)
+        .neq('status','paid')
+        .neq('status','pending');
         if (error){
             throw error;
         }
+        console.log(data);
         return data;
     },
     updateBillStatus: async (bill:Partial<Bill>,status:string):Promise<void>=>{
@@ -138,8 +141,5 @@ export const billAction = {
         if (error){
             throw error;
         }
-    }
-
-      
-      
+    }      
 };

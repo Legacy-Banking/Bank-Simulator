@@ -223,7 +223,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
       form.setValue("billerName", "");
       form.setValue("referenceNum", "");
     }
-  }, [toBiller, form]);
+  }, [toBiller, form])
 
   useEffect(() => {
     if (billerCode || billerName || referenceNum) {
@@ -290,8 +290,6 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
         const billers = await billerAction.fetchBillerByName(finalBillerName);
         // Ensure there's at least one biller matching the name
         if (billers.length === 0 || String(billers[0].biller_code) !== String(finalBillerCode)) {
-          console.log(billers[0]);
-          console.log(finalBillerCode);
           setError("Invalid biller name or biller code.");
           setIsLoading(false);
           return;
@@ -308,7 +306,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
       }
 
 
-      console.log("Creating transaction with the following details:")
+
       // Call the createBPAYTransaction action
       await bpayAction.payBills(
         user_id,
@@ -323,7 +321,6 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
       if (data.saveBiller) {
         // Check if billerName, billerCode, and referenceNum are filled
         if (data.billerName && data.billerCode && data.referenceNum) {
-          console.log("Biller will be saved for future transactions.");
           try {
             await billerAction.addNewBiller(data.billerName, data.billerCode, data.referenceNum, fromAccount.owner);
           } catch (err) {
@@ -379,7 +376,6 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
                       onChange={(id) => {
                         if (id) {
                           form.setValue("toBiller", Number(id));  // Ensure the ID is treated as a number
-                          console.log("Biller Selected: ", id);
                         }
                       }}
                       initialSelected={(form.getValues("toBiller")) || ''}
@@ -503,7 +499,6 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
                       onChange={(id) => {
                         if (id) {
                           form.setValue("fromBank", Number(id));  // Ensure the ID is treated as a number
-                          console.log("From Bank Changed: ", id);
                         }
                       }}
                       additionalOption={{ id: -1, label: "Use Card" }}  // Add "Use Card" option
