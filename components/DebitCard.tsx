@@ -24,19 +24,19 @@ const DebitCard = (
                     
                     {/* Card Type */}
                     <div className='relative top-4 left-4 text-white-200 font-semibold text-lg'>{type}</div>
+
+                    {/* Card Number */}
+                    <div className="relative -bottom-20 -right-4 text-white-200 text-base tracking-widest font-manrope">
+                        {formatCardNumber(cardNumber.toString())}    
+                    </div>
                 
                     {/* Cardholder Name */}
                     <div className="relative -bottom-24 left-4 text-white-200 text-sm font-manrope tracking-widest">
-                        {name.toUpperCase()}
-                    </div>
-
-                    {/* Card Number */}
-                    <div className="relative -bottom-24 -right-4 text-white-200 text-lg tracking-widest font-manrope">
-                        {formatCardNumber(cardNumber.toString())}    
+                        {name}
                     </div>
 
                     {/* Expiration Date */}
-                    <div className="relative -bottom-12 -right-44 text-white-200 text-xs font-manrope">
+                    <div className="relative -bottom-20 -right-44 text-white-200 text-xs font-manrope">
                         {formattedExpirationDate}
                     </div>
 
