@@ -1,4 +1,4 @@
-import { Inter, Poppins } from "next/font/google";
+import { Inter, Poppins, Manrope } from "next/font/google";
 import "./globals.css";
 import StoreProvider from './store/StoreProvider'; // Import your StoreProvider component
 
@@ -8,6 +8,12 @@ const poppins = Poppins({
   weight: ['500', '700'],
   variable: '--font-poppins'
 });
+
+const manrope = Manrope({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-manrope'
+})
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -26,7 +32,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${poppins.variable}`}>
+      <body className={`${inter.variable} ${poppins.variable} ${manrope.variable}`}>
         <StoreProvider>
           {children}
         </StoreProvider>

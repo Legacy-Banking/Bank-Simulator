@@ -1,18 +1,10 @@
 import { createClient } from "./supabase/client";
 import { billerAction } from "./billerAction";
 import { number } from "zod";
+import { referenceNumberGenerator, generateUniqueInvoiceNumber, calculateDueDate } from "./accbsbGenerator"
 
 // Define types (Assuming they are declared elsewhere)
-interface Bill {
-    billed_user: string;
-    from: string;
-    description: string;
-    amount: number;
-    paid_on: Date;
-    status: string;
-    created_on: Date;
-    due_date: Date;
-}
+
 
 interface Biller {
     name: string;
@@ -39,15 +31,29 @@ export const billAction = {
 
     createBill: async (user_id: string, biller: Biller, amount: number, description: string): Promise<void> => {
         const supabase = createClient();
-        const newBill: Bill = {
+
+        //Fetch the reference number from user_billers if it exists
+        let referenceNumber = await billerAction.fetchReferenceNumberByBillerName(user_id, biller.name);
+        // If no reference number found, generate a new one
+        if (!referenceNumber) {
+            referenceNumber = referenceNumberGenerator();
+            // Add this reference number to the user's biller_reference list
+            await billerAction.addReferenceNumber(user_id, biller.name, referenceNumber);
+        }
+
+        const invoiceNumber = await generateUniqueInvoiceNumber();
+
+        const newBill: Partial<Bill> = {
             billed_user: user_id,
             from: biller.name,
             description: description,
             amount: amount,
             paid_on: new Date(),
             status: 'unpaid',
-            created_on: new Date(),
-            due_date: new Date(),
+            created_at: new Date(),
+            due_date: calculateDueDate(),
+            invoice_number: invoiceNumber, 
+            reference_number: referenceNumber, 
         };
 
         const { data, error } = await supabase.from('bills').insert(newBill);
@@ -98,7 +104,42 @@ export const billAction = {
         items.push(parseFloat(remainingAmount.toFixed(2)));
       
         return items;
-      }
-      
-      
+    },
+    fetchAssignedBills: async (user_id:string,biller_name:string):Promise<Partial<Bill>[]>=>{
+        const supabase = createClient();
+        const {data,error} = await supabase
+        .from('bills')
+        .select('*')
+        .eq('billed_user',user_id)
+        .eq('from',biller_name)
+        .neq('status','paid')
+        .neq('status','pending');
+        if (error){
+            throw error;
+        }
+        console.log(data);
+        return data;
+    },
+    updateBillStatus: async (bill:Partial<Bill>,status:string):Promise<void>=>{
+        const invoice_number = bill.invoice_number;
+        const supabase = createClient();
+        const {data,error} = await supabase
+        .from('bills')
+        .update({status})
+        .eq('invoice_number',invoice_number);
+        if (error){
+            throw error;
+        }
+    },
+    updateBillAmount: async (bill:Partial<Bill>,amount:number):Promise<void>=>{
+        const invoice_number = bill.invoice_number;
+        const supabase = createClient();
+        const {data,error} = await supabase
+        .from('bills')
+        .update({amount})
+        .eq('invoice_number',invoice_number);
+        if (error){
+            throw error;
+        }
+    }      
 };

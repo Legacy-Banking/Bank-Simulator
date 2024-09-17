@@ -31,6 +31,65 @@ const TransactionHistory = () => {
   const [loading, setLoading] = useState(false); // Add loading state
   const rowsPerPage = 10;
 
+  const dummy_data : Transaction[] = [
+    {
+      "id": "104",
+      "description": "Rent Payment",
+      "amount": 1200.00,
+      "paid_on": new Date("2024-09-16T14:00:00.000Z"),
+      "from_account": "7",
+      "from_account_username": "jack_smith",
+      "to_account": user_id,
+      "to_biller": "",
+      "to_account_username": "landlord_jones"
+    },
+    {
+      "id": "105",
+      "description": "| Biller: Water Utility, Code: 5643, Ref: 6789",
+      "amount": 25.50,
+      "paid_on": new Date("2024-09-17T09:15:00.000Z"),
+      "from_account": "9",
+      "from_account_username": "linda_rose",
+      "to_account": user_id,
+      "to_biller": "Water Utility",
+      "to_account_username": "water_utility"
+    },
+    {
+      "id": "101",
+      "description": "| Biller: Gas Service, Code: 1234, Ref: 5678",
+      "amount": -45.67,
+      "paid_on": new Date("2024-09-15T10:00:00.000Z"),
+      "from_account": user_id,
+      "from_account_username": "john_doe",
+      "to_account": "2",
+      "to_biller": "Gas Service",
+      "to_account_username": "gas_service"
+    },
+    {
+      "id": "102",
+      "description": "Funds Transfer to Savings",
+      "amount": -500.00,
+      "paid_on": new Date("2024-09-15T12:30:00.000Z"),
+      "from_account": user_id,
+      "from_account_username": "mary_jane",
+      "to_account": "4",
+      "to_biller": "",
+      "to_account_username": "mary_savings"
+    },
+    {
+      "id": "103",
+      "description": "| Biller: Internet Service, Code: 8765, Ref: 4321",
+      "amount": 79.99,
+      "paid_on": new Date("2024-09-16T08:45:00.000Z"),
+      "from_account": "5",
+      "from_account_username": "alex123",
+      "to_account": user_id,
+      "to_biller": "Internet Service",
+      "to_account_username": "internet_service"
+    },
+  ];
+  
+
   // Fetch accounts by user_id
   useEffect(() => {
     if (user_id) {
@@ -58,7 +117,8 @@ const TransactionHistory = () => {
 
       // Fetch transaction history for the selected account
       transactionAction.getTransactionsByAccountId(accountId).then((data) => {
-        setTransactions(data);
+        const combinedData = (data || []).concat(dummy_data);
+        setTransactions(combinedData);
         setLoading(false); // Set loading to false after fetching data
       }).catch((error) => {
         console.error('Error fetching transactions:', error);

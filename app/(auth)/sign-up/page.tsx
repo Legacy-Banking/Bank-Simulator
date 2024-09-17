@@ -4,8 +4,9 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { SubmitButton } from "@/components/submit-button";
 import { accountAction } from "@/utils/accountAction";
+import { cardAction } from "@/utils/cardAction";
 
-export default function Login({
+export default function SignUp({
   searchParams,
 }: {
   searchParams: { message: string };
@@ -33,6 +34,7 @@ export default function Login({
     }
     const user_id = data.user?.id || '';
     await accountAction.signUpInitialization(user_id);
+    await cardAction.cardSignUpInitialization(user_id);
 
     return redirect("/dashboard");
   };

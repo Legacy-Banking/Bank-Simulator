@@ -20,6 +20,13 @@
   scrollbar-width: none; /* Firefox */
 }
 
+.custom-checkbox {
+  width: 16px;
+  height: 16px;
+  transform: scale(1.5); /* Makes the checkbox bigger */
+}
+
+
 @layer utilities {
 
   .text14_padding10 {
@@ -201,7 +208,7 @@
 /* Spinner styles */
 .spinner {
   border: 4px solid rgba(0, 0, 0, 0.1);
-  border-left-color: #4f46e5; /* Your theme's primary color */
+  border-left-color: #1A70B8; /* Your theme's primary color */
   border-radius: 50%;
   width: 40px;
   height: 40px;
