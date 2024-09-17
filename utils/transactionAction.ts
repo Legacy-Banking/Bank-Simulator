@@ -1,5 +1,6 @@
 import { createClient } from "./supabase/client";
 import { randomNameGenerator } from "./randomNameGenerator";
+import { accountAction } from "./accountAction";
 
 export const transactionAction = {
     createTransaction: async (fromAccount: Account, toAccount: Account, amount: number, description: string): Promise<void> => {
@@ -28,6 +29,7 @@ export const transactionAction = {
                 from_account_username: fromAccount.owner_username,
                 to_account: toAccount.id,
                 to_account_username: toAccount.owner_username,
+                transaction_type: fromAccount.type,
             };
 
             const { error: insertError } = await supabase
@@ -65,7 +67,7 @@ export const transactionAction = {
         referenceNum: string,
         amount: number,
         description: string,
-        cardDetails: { cardNumber: string | undefined; expiryDate: string | undefined; cvv: string | undefined} | null
+        cardDetails: { cardNumber: string | undefined; expiryDate: string | undefined; cvv: string | undefined } | null
     ): Promise<void> => {
         const supabase = createClient();
 
@@ -88,6 +90,7 @@ export const transactionAction = {
                 amount: amount,
                 paid_on: new Date(),
                 from_account: fromAccount.id,
+                from_account_username: fromAccount.owner_username,
                 to_account_username: billerName,
                 //reference_number: referenceNum,
                 //card_number: cardDetails?.cardNumber || null,  // Optional card details
@@ -147,12 +150,13 @@ export const transactionAction = {
     processTransactionsForAccount: (transactions: Transaction[], accountId: string): void => {
         transactions.forEach((t) => {
             t.amount = t.from_account.toString() === accountId ? -t.amount : t.amount;
-            if(!t.from_account_username){
-                t.from_account_username = randomNameGenerator();
-            }
-            if(!t.to_account_username){
-                t.to_account_username = randomNameGenerator();
-            }
+            // if (!t.from_account_username) {
+            //     t.from_account_username = randomNameGenerator();
+            // }
+            // if (!t.to_account_username) {
+            //     t.to_account_username = randomNameGenerator();
+            // }
+
         });
     },
 };
