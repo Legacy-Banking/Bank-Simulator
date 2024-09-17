@@ -1,6 +1,5 @@
 import { formatDateTime } from "@/lib/utils";
 import { useAppSelector } from "@/app/store/hooks";
-import { billAction } from "@/utils/billAction";
 
 const SheetDetails = (bills: BillDetails) => {
   const { bill, biller } = bills;
@@ -80,7 +79,8 @@ const SheetDetails = (bills: BillDetails) => {
 
       {/* Footer */}
       <div className="mt-2 border-t-2 border-slate-400 pt-4 text-center">
-        <p className="text-sm text-gray-500">Please make the payment by the due date.</p>
+        {bill.status === "paid" ? (<p className="text-sm text-grey-500">Bill is paid, Well done!</p>) : (<p className="text-sm text-gray-500">Please make the payment by the due date.</p>)}
+
         <p className="text-sm font-semibold">Payment is due {formatDateTime(bill.due_date!)}</p>
       </div>
     </div>
