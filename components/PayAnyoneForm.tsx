@@ -16,7 +16,7 @@ import { accountAction } from '@/utils/accountAction'; // Import the transaction
 
 // Zod schema for form validation with BSB and account number
 const formSchema = z.object({
-  fromBank: z.number().min(1, "Please select a valid bank account"), // Validates the 'fromBank' selection
+  fromBank: z.string().min(1, "Please select a valid bank account"), // Validates the 'fromBank' selection
   bsb: z
     .string()
     .regex(/^\d{6}$/, "BSB must be a 6-digit number"), // Validates BSB
@@ -35,7 +35,7 @@ const PayAnyoneForm = ({ accounts }: { accounts: Account[] }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      fromBank: 0, // Set default value as 0 for numeric IDs
+      fromBank: "0", // Set default value as 0 for numeric IDs
       bsb: "",
       accountNum: "",
       amount: "",
@@ -48,7 +48,7 @@ const PayAnyoneForm = ({ accounts }: { accounts: Account[] }) => {
     setIsLoading(true);
 
     try {
-      const fromAccount = accounts.find(account => Number(account.id) === data.fromBank);
+      const fromAccount = accounts.find(account => String(account.id) === data.fromBank);
 
       if (!fromAccount) {
         throw new Error("Invalid bank account selected.");
@@ -124,11 +124,10 @@ const PayAnyoneForm = ({ accounts }: { accounts: Account[] }) => {
                       accounts={accounts}
                       onChange={(id) => {
                         if (id) {
-                          form.setValue("fromBank", Number(id));  // Ensure the ID is treated as a number
+                          form.setValue("fromBank", id);  // Ensure the ID is treated as a number
                           console.log("From Bank Changed: ", id);
                         }
                       }}
-                      initialSelected={(form.getValues("fromBank")) || undefined}
                       label="From Bank Account"
                       otherStyles="!w-full"
                     />

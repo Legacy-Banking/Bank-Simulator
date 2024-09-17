@@ -18,16 +18,15 @@ import { billerAction } from '@/utils/billerAction';
 import { bpayAction } from '@/utils/bpayAction';
 
 const formSchema = z.object({
-  toBiller: z.number().optional(),
-  fromBank: z.union([z.number().min(1, "Please select a valid bank account"), z.literal(-1)]),
+  toBiller: z.string().optional(),
+  fromBank: z.string().min(1, "Please select a valid bank account"),
   billerCode: z.string().optional(),
   billerName: z.string().optional(),
   referenceNum: z.string().optional(),
   amount: z.string().min(1, "Amount is required").regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"),
   description: z.string().optional(),
   saveBiller: z.number().optional(),
-  paymentOption: z.enum(["payNow", "schedule", "recurring"]).default("payNow"), // Payment options
-  fromBankType: z.enum(["debit", "credit", "personal", "savings"]), // Payment options
+  paymentOption: z.enum(["payNow", "schedule", "recurring"]).default("payNow"),
   scheduleDate: z.date().optional(),
   frequency: z.string().optional(),
   recurringStartDate: z.date().optional(),
@@ -40,12 +39,13 @@ const formSchema = z.object({
 })
   .superRefine((data, ctx) => {
 
+    console.log("Form VALIDATION started", data);
+
     // If `billerCode`, `billerName`, and `referenceNum` are all filled, skip `toBiller` validation
-    const hasManualBillerInfo =
-      data.billerCode && data.billerName && data.referenceNum;
+    const hasManualBillerInfo = data.billerCode && data.billerName && data.referenceNum;
 
     // Only validate `toBiller` if manual biller fields are not filled
-    if (!hasManualBillerInfo && data.toBiller === 0) {
+    if (!hasManualBillerInfo && !data.toBiller) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["toBiller"],
@@ -54,29 +54,29 @@ const formSchema = z.object({
     }
 
     // Only require billerCode, billerName, and referenceNum when `toBiller` is null
-    if (data.toBiller === 0) {
-      if (!data.billerCode || !/^\d{4,6}$/.test(data.billerCode)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["billerCode"],
-          message: "Biller Code must be a 4 to 6-digit number",
-        });
-      }
-      if (!data.billerName) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["billerName"],
-          message: "Biller Name is required if no biller is selected",
-        });
-      }
-      if (!data.referenceNum || !/^\d{12}$/.test(data.referenceNum)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["referenceNum"],
-          message: "Reference Number must be a 12-digit number",
-        });
-      }
+  if (!data.toBiller) {
+    if (!data.billerCode || !/^\d{4,6}$/.test(data.billerCode)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["billerCode"],
+        message: "Biller Code must be a 4 to 6-digit number",
+      });
     }
+    if (!data.billerName) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["billerName"],
+        message: "Biller Name is required if no biller is selected",
+      });
+    }
+    if (!data.referenceNum || !/^\d{12}$/.test(data.referenceNum)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["referenceNum"],
+        message: "Reference Number must be a 12-digit number",
+      });
+    }
+  }
 
 
     // Schedule Payment validation
@@ -137,7 +137,7 @@ const formSchema = z.object({
         }
 
         // Validation for debit card details
-        if (data.fromBankType === "debit") {  // Check if the selected account type is 'debit'
+        if (data.fromBank === "-1") {  // Check if the selected account type is "Use Card"
           if (!data.cardNumber || !/^\d{16}$/.test(data.cardNumber)) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
@@ -175,8 +175,8 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      toBiller: 0, // Set default value as 0 for numeric IDs
-      fromBank: 0, // Set default value as 0 for numeric IDs
+      toBiller: "", // Set default value as 0 for numeric IDs
+      fromBank: "", // Set default value as 0 for numeric IDs
       billerCode: "",
       billerName: "",
       referenceNum: "",
@@ -205,20 +205,21 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
   const fromBank = useWatch({ control: form.control, name: "fromBank" });
   // Show card details if "Use Card" is selected
   useEffect(() => {
-    if (fromBank === -1) {
+    if (fromBank === "-1") {
       // If "Use Card" is selected, show the card details
       setShowCardDetails(true);
     } else {
       // Otherwise, only show card details if the selected account type is "debit"
-      const selectedAccount = accounts.find(account => Number(account.id) === fromBank);
-      form.setValue("fromBankType", selectedAccount?.type);
-      setShowCardDetails(selectedAccount?.type === 'debit');
+      setShowCardDetails(false);
+      const selectedAccount = accounts.find(account => String(account.id) === fromBank);
+      //could check if its either a credit or debit card
+      setShowCardDetails(selectedAccount?.type === 'debit');      
     }
   }, [fromBank, accounts, form]);
 
   // Clear manual biller fields if a toBiller is selected
   useEffect(() => {
-    if (toBiller && toBiller !== 0) {
+    if (toBiller && toBiller !== "") {
       form.setValue("billerCode", "");
       form.setValue("billerName", "");
       form.setValue("referenceNum", "");
@@ -228,7 +229,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
   useEffect(() => {
     if (billerCode || billerName || referenceNum) {
       // Reset selected biller if any manual field is filled
-      form.setValue("toBiller", 0);
+      form.setValue("toBiller", "");
     }
   }, [billerCode, billerName, referenceNum, form]);
 
@@ -238,7 +239,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
     setIsLoading(true);
 
     try {
-      const fromAccount = accounts.find(account => Number(account.id) === data.fromBank);
+      const fromAccount = accounts.find(account => String(account.id) === data.fromBank);
 
       if (!fromAccount) {
         throw new Error("Invalid bank account selected.");
@@ -269,7 +270,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
 
 
       // Check if toBiller is selected
-      if (data.toBiller != 0) {
+      if (data.toBiller != "") {
         // Fetch the biller details from the billers table using the toBiller ID
         const biller = await billerAction.fetchBillerById(String(data.toBiller));
         finalBillerName = biller.name;
@@ -304,8 +305,6 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
         }
 
       }
-
-
 
       // Call the createBPAYTransaction action
       await bpayAction.payBills(
@@ -350,6 +349,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
   //const selectedPaymentOption = form.watch("paymentOption");
 
   return (
+    
     <Form {...form}>
       <form onSubmit={form.handleSubmit(submit)} className="flex flex-col">
         <div className="payment-transfer_form-details">
@@ -375,7 +375,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
                       billerAccounts={billers} // Pass billers array here
                       onChange={(id) => {
                         if (id) {
-                          form.setValue("toBiller", Number(id));  // Ensure the ID is treated as a number
+                          form.setValue("toBiller", id);  // Ensure the ID is treated as a number
                         }
                       }}
                       initialSelected={(form.getValues("toBiller")) || ''}
@@ -498,11 +498,10 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
                       accounts={accounts}
                       onChange={(id) => {
                         if (id) {
-                          form.setValue("fromBank", Number(id));  // Ensure the ID is treated as a number
+                          form.setValue("fromBank", id);  
                         }
                       }}
-                      additionalOption={{ id: -1, label: "Use Card" }}  // Add "Use Card" option
-                      initialSelected={(form.getValues("fromBank")) || undefined}
+                      additionalOption={{ id: "-1", label: "Use Card" }}  // Add "Use Card" option
                       label="From Bank Account"
                       otherStyles="!w-full"
                     />
