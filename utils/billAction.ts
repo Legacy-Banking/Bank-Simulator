@@ -26,7 +26,36 @@ export const billAction = {
         if (error) {
             throw new Error(error.message);
         }
-        return data || [];
+        const sortedBills = billAction.sortBill(data);
+        
+        return sortedBills;
+    },
+    sortBill: (bills: Bill[]): Bill[] => {
+        const statusPriority: { [key: string]: number } = {
+            unpaid: 1,
+            partial: 2,
+            pending: 3,
+            paid: 4
+          };
+          
+          const sortedBills = bills.sort((a: Bill, b: Bill) => {
+            // Sort by status based on the defined priority (lower number has higher priority)
+            const statusA = statusPriority[a.status] || 5; // Default to 5 if status is unknown
+            const statusB = statusPriority[b.status] || 5;
+          
+            if (statusA !== statusB) {
+              return statusA - statusB;
+            }
+          
+            // Ensure due_date is a Date object before comparing
+            const dueDateA = new Date(a.due_date);
+            const dueDateB = new Date(b.due_date);
+          
+            // Sort by due date (earliest first)
+            return dueDateA.getTime() - dueDateB.getTime();
+          });
+          
+        return sortedBills;
     },
 
     createBill: async (user_id: string, biller: Biller, amount: number, description: string): Promise<void> => {
@@ -116,10 +145,10 @@ export const billAction = {
         .neq('status','pending');
         if (error){
             throw error;
-        }
-        console.log(data);
+        } 
         return data;
     },
+      
     updateBillStatus: async (bill:Partial<Bill>,status:string):Promise<void>=>{
         const invoice_number = bill.invoice_number;
         const supabase = createClient();
