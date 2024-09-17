@@ -3,15 +3,13 @@ import { accbsbGenerator } from "./accbsbGenerator";
 import { transactionAction } from "./transactionAction";
 import { billerAction } from './billerAction';
 
- enum AccountType {
+enum AccountType {
     SAVINGS = 'savings',
     PERSONAL = 'personal',
     CREDIT = 'credit',
     DEBIT = 'debit',
     OTHER = 'other'
 }
-
-
 
 export const accountAction = {
     fetchAccountsbyUserId: async (user_id: string): Promise<Account[]> => {
@@ -70,18 +68,18 @@ export const accountAction = {
 
     fetchPersonalAccountByUserId: async (user_id: string) => {
         const supabase = createClient();
-      
+
         const { data, error } = await supabase
-          .from('account')
-          .select('*')
-          .eq('owner', user_id)
-          .eq('type', 'personal'); // Fetch only personal accounts
-      
+            .from('account')
+            .select('*')
+            .eq('owner', user_id)
+            .eq('type', 'personal'); // Fetch only personal accounts
+
         if (error) {
-          console.error('Error fetching personal account:', error);
-          throw error;
+            console.error('Error fetching personal account:', error);
+            throw error;
         }
-      
+
         if (data && data.length > 0) {
             return data[0]; // Return the first personal account found
         } else {
@@ -101,8 +99,8 @@ export const accountAction = {
         }
     },
     signUpInitialization: async (user_id: string): Promise<void> => {
-        const { bsb:perbsb, acc:peracc } = accbsbGenerator();
-        const { bsb:savbsb, acc:savacc } = accbsbGenerator();
+        const { bsb: perbsb, acc: peracc } = accbsbGenerator();
+        const { bsb: savbsb, acc: savacc } = accbsbGenerator();
 
         const accounts: Partial<Account>[] = [
             {
@@ -131,24 +129,37 @@ export const accountAction = {
         //Generate their bills
         //Generate default transaction history
     },
-    
+
     fetchUsernamebyUserId: async (user_id: string): Promise<string> => {
         const supabase = createClient();
         const { data, error } = await supabase
             .from('account')
             .select('owner_username')
             .eq('owner', user_id);
-    
+
         if (error) {
             console.error('Error fetching Owner Username:', error);
             throw error;
         }
-    
+
         const ownerUsername = data?.[0]?.owner_username || 'Guest';
         return ownerUsername;
-
-
     },
-    
 
+    //fetch account type
+    fetchAccountType: async (account_id: string): Promise<string> => {
+        const supabase = createClient();
+        const { data, error } = await supabase
+            .from('account')
+            .select('type')
+            .eq('id', account_id)
+            .single();
+
+        if (error) {
+            console.error('Error fetching Account Type:', error);
+            throw error;
+        }
+
+        return data.type;
+    },
 }
