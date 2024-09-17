@@ -26,6 +26,7 @@ export const cardAction = {
         const { card_num: debit_card_num, expiry: debit_expiry, cvv: debit_cvv } = card_detailGenerator();
         const { card_num: credit_card_num, expiry: credit_expiry, cvv: credit_cvv } = card_detailGenerator();
         const owner_username = await accountAction.fetchUsernamebyUserId(user_id);
+        const personalAccount = await accountAction.fetchPersonalAccountByUserId(user_id);
         const cards: Partial<Card>[] = [
             {
                 card_type: AccountType.DEBIT,
@@ -35,6 +36,7 @@ export const cardAction = {
                 expiry_date: debit_expiry,
                 cvv: debit_cvv,
                 owner_username: owner_username,
+                linked_to: personalAccount.id,
             },
             {
                 card_type: AccountType.CREDIT,

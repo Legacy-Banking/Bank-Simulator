@@ -133,7 +133,8 @@ declare interface Card {
   card_number: string;
   expiry_date: string;
   cvv: string;
-  owner_username: string
+  owner_username: string;
+  linked_to: string;
 }
 
 declare interface BillerAccount {
