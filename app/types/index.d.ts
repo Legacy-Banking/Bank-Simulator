@@ -188,7 +188,6 @@ declare interface PaginationProps {
   setPage: (page: number) => void; // Function to update the page state
 }
 
-
   // declare interface PaymentWhenOptionsProps {
   //   showScheduleDate: boolean;
   // }

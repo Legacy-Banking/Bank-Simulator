@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Account, AccountType } from '@/types/Account';
 import { createClient } from '@/utils/supabase/client';
 import { useAppSelector } from '@/app/store/hooks';
 import { accbsbGenerator } from '@/utils/accbsbGenerator';
