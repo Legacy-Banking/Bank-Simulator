@@ -5,14 +5,11 @@ import React, { useEffect, useState } from 'react'
 import AccountBox from '@/components/AccountBox';
 import { useAppSelector } from '@/app/store/hooks';
 import { accountAction } from '@/utils/accountAction';
-import BillForm from '@/components/dev/BillForm';
-import CreateDefaultBillersButton from '@/components/dev/CreateDefaultBillersButton';
-import JuiceButton from '@/components/dev/JuiceButton';
-
 
 
 const Dashboard = () => {
-    const user_id = useAppSelector((state) => state.user.user_id)?.toString();
+    const user =  useAppSelector(state => state.user);
+    const user_id = (user.user_id)?.toString();
     const [accounts, setAccounts] = useState<Account[]>([]);
     useEffect(() => {
         if (user_id) {
@@ -25,7 +22,6 @@ const Dashboard = () => {
     }, [user_id]);
 
     const totalBalance = accounts.reduce((acc, account) => acc + (account.balance || 0), 0);
-    const loggedIn = { userName: 'Karen' };
 
     return (
         <section className="flex w-full flex-row max-xl:max-h-screen font-inter">
@@ -35,7 +31,7 @@ const Dashboard = () => {
                     <HeaderBox
                         type="greeting"
                         title="Welcome"
-                        user={loggedIn?.userName || 'Guest'}
+                        user={user.user_name || 'Guest'}
                         subtext="View your account summaries"
                     />
                 </header>
@@ -65,13 +61,6 @@ const Dashboard = () => {
                         <AnimatedCounter amount={totalBalance} />
                     </div>
                 </div>
-
-                <div className="my-6">
-                    <CreateDefaultBillersButton user_id={user_id} /> {/* Use the component */}
-                </div>
-
-                <BillForm />
-                <JuiceButton />
 
             </div>
         </section>
