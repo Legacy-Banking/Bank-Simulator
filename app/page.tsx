@@ -1,14 +1,9 @@
-import React from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import RootLayout from './(root)/layout';
-import { contentAction } from '@/utils/contentAction';
-import HoverMessage from '@/components/content/HoverMessage';
-export const revalidate = 60
+import React from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import RootLayout from './(root)/layout'
 
-
-export default async function Home() {
-  const contentEmbeddings = await contentAction.fetchEmbedding('home');
+const Home = () => {
   return (
     <RootLayout>
       <div className="flex flex-col min-h-screen items-center bg-white">
@@ -16,37 +11,34 @@ export default async function Home() {
 
           {/* Title Section */}
           <div className="flex flex-col space-y-6 mt-[30px]">
+
             {/* Title */}
             <h1 className="text-xl md:text-6xl lg:text-7xl xl:text-7xl font-bold leading-none text-[#222223] items-center">
-              {contentEmbeddings?.title || 'Learning made easy'}
+              Learning made easy
             </h1>
 
             {/* Subtitle */}
             <p className="text-l md:text-base lg:text-lg font-normal leading-6 text-[#535354]">
-              {contentEmbeddings?.subtitle || 'Simple and modern banking simulator made to make learning easy'}
+              Simple and modern banking simulator made to make learning easy
             </p>
 
             {/* Subtitle 2 */}
             <p className="text-l md:text-base lg:text-lg font-semibold leading-none text-[#535351]">
-              {contentEmbeddings?.start_encourage || 'Login Or Sign Up to START NOW!'}
+              Login Or Sign Up to START NOW !
             </p>
 
-            {/* Buttons for Login & Signup */}
+            {/* Buttons for Login & Signup*/}
             <div className="flex flex-col md:flex-row place-items-start space-x-0 space-y-4 md:space-x-10 md:space-y-0">
               <Link href="/login">
                 <button className="w-full md:w-auto px-6 md:px-8 py-2 md:py-3 text-base md:text-lg font-medium text-[#FFFFFF] bg-gradient-to-r from-[#468DC6] to-[#1A70B8] rounded-lg hover:text-gray-600 shadow-2xl">
                   → Login
                 </button>
               </Link>
-              <HoverMessage position="top-right" message={contentEmbeddings?.sign_up_hover || "Sign up to start learning!"}>
-                <Link href="/sign-up">
-                  <button className="w-full md:w-auto px-6 md:px-8 py-2 md:py-3 text-base md:text-lg font-medium text-[#FFFFFF] bg-gradient-to-r from-[#468DC6] to-[#1A70B8] rounded-lg hover:text-gray-600 shadow-2xl">
-                    → Sign up
-                  </button>
-                </Link>
-
-              </HoverMessage>
-
+              <Link href="/sign-up">
+                <button className="w-full md:w-auto px-6 md:px-8 py-2 md:py-3 text-base md:text-lg font-medium text-[#FFFFFF] bg-gradient-to-r from-[#468DC6] to-[#1A70B8] rounded-lg hover:text-gray-600 shadow-2xl">
+                  → Sign up
+                </button>
+              </Link>
             </div>
           </div>
 
@@ -65,43 +57,30 @@ export default async function Home() {
               <Link href="/resources">
                 <div className="flex flex-col items-start space-y-2 w-[280px]">
                   <div className="w-full h-[148px] relative">
-                    <Image src="/demo.png" alt="Learn How to Use this Website" fill style={{ objectFit: 'cover' }} />
+                    <Image src="/demo.png" alt="Learn How to Use this Website" layout="fill" objectFit="cover" />
                   </div>
-                  <h3 className="text-[20px] font-bold text-[#17181A] hover:underline">
-                    {contentEmbeddings?.resource_column1_title || 'Learn How to Use this Website'}
-                  </h3>
-                  <p className="text-[14px] text-[#5F5F64]">
-                    {contentEmbeddings?.resource_column1_description || 'Watch this video demo to learn how to use the website'}
-                  </p>
-
+                  <h3 className="text-[20px] font-bold text-[#17181A] hover:underline">Learn How to Use this Website</h3>
+                  <p className="text-[14px] text-[#5F5F64]">Watch this video demo to learn how to use the website</p>
                 </div>
               </Link>
               {/* Column 2 */}
               <Link href="https://www.sonicwall.com/phishing-iq-test" target="_blank" rel="noreferrer">
                 <div className="flex flex-col items-start space-y-2 w-[280px]">
                   <div className="w-full h-[148px] relative">
-                    <Image src="/phishing.png" alt="Scam Phishing Quiz" fill style={{ objectFit: 'cover' }} />
+                    <Image src="/phishing.png" alt="Scam Phishing Quiz" layout="fill" objectFit="cover" />
                   </div>
-                  <h3 className="text-[20px] font-bold text-[#17181A] hover:underline">
-                    {contentEmbeddings?.resource_column2_title || 'Scam Phishing Quiz'}
-                  </h3>
-                  <p className="text-[14px] text-[#5F5F64]">
-                    {contentEmbeddings?.resource_column2_description || 'Take this quiz to test your ability to identify fraudulent emails and websites'}
-                  </p>
+                  <h3 className="text-[20px] font-bold text-[#17181A] hover:underline">Scam Phishing Quiz</h3>
+                  <p className="text-[14px] text-[#5F5F64]">Take this quiz to test your ability to identify fraudulent emails and websites</p>
                 </div>
               </Link>
               {/* Column 3 */}
               <Link href="https://www.seniorsit.com.au/" target="_blank" rel="noreferrer">
                 <div className="flex flex-col items-start space-y-2 w-[280px]">
                   <div className="w-full h-[148px] relative">
-                    <Image src="/seniorit.png" alt="SeniorIT Program" fill style={{ objectFit: 'cover' }} />
+                    <Image src="/seniorit.png" alt="SeniorIT Program" layout="fill" objectFit="cover" />
                   </div>
-                  <h3 className="text-[20px] font-bold text-[#17181A] hover:underline">
-                    {contentEmbeddings?.resource_column3_title || 'SeniorIT Program'}
-                  </h3>
-                  <p className="text-[14px] text-[#5F5F64]">
-                    {contentEmbeddings?.resource_column3_description || 'Learn more about other resources that are available to aid in your online learning'}
-                  </p>
+                  <h3 className="text-[20px] font-bold text-[#17181A] hover:underline">SeniorIT Program</h3>
+                  <p className="text-[14px] text-[#5F5F64]">Learn more about other resources that are available to aid in your online learning</p>
                 </div>
               </Link>
             </div>
@@ -109,5 +88,7 @@ export default async function Home() {
         </div>
       </div>
     </RootLayout>
-  );
+  )
 }
+
+export default Home
