@@ -38,26 +38,12 @@ export const TransactionsTable = ({ transactions = [] }: TransactionTableProps) 
   };
 
   useEffect(() => {
-    const fetchAllAccountTypes = async () => {
-      setIsLoading(true);
-      await Promise.all(transactions.map((transaction) => {
-        if (transaction.to_account_username === transaction.from_account_username) {
-          return fetchAccountTypes(transaction);
-        }
-      }));
-      setIsLoading(false);
-    };
-
-    fetchAllAccountTypes();
+    transactions.forEach(transaction => {
+      if (transaction.to_account_username === transaction.from_account_username) {
+        fetchAccountTypes(transaction);
+      }
+    });
   }, [transactions]);
-
-  // useEffect(() => {
-  //   transactions.forEach(transaction => {
-  //     if (transaction.to_account_username === transaction.from_account_username) {
-  //       fetchAccountTypes(transaction);
-  //     }
-  //   });
-  // }, [transactions]);
 
   const openTransactionDetails = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
@@ -99,19 +85,17 @@ export const TransactionsTable = ({ transactions = [] }: TransactionTableProps) 
                 <TableCell className="max-w-[250px] pl-8 pr-10">
                   <div className="flex items-center gap-3">
                     <h1 className="text-14 truncate font-semibold text-[#344054]">
-                      {/* Conditional rendering based on isLoading */}
-                      {isLoading ? 'Loading...' : (
-                        isPositive ? (
+                      {/* Show from_account for positive amounts, and to_account or to_biller based on whether to_account is null */}
+                      {isPositive ? (
+                        t.to_account_username === t.from_account_username ? (
+                          accountTypes[t.id] ? `${capitalizeFirstLetter(accountTypes[t.id].from)} Account` : 'Loading...'
+                        ) : `${t.from_account_username}`
+                      ) : (
+                        t.to_account ? (
                           t.to_account_username === t.from_account_username ? (
-                            accountTypes[t.id] ? `${capitalizeFirstLetter(accountTypes[t.id].from)} Account` : 'Unknown Account'
-                          ) : `${t.from_account_username}`
-                        ) : (
-                          t.to_account ? (
-                            t.to_account_username === t.from_account_username ? (
-                              accountTypes[t.id] ? `${capitalizeFirstLetter(accountTypes[t.id].to)} Account` : 'Unknown Account'
-                            ) : `${t.to_account_username}`
-                          ) : `(Biller) ${t.to_account_username}`
-                        )
+                            accountTypes[t.id] ? `${capitalizeFirstLetter(accountTypes[t.id].to)} Account` : 'Loading...'
+                          ) : `${t.to_account_username}`
+                        ) : `(Biller) ${t.to_account_username}`
                       )}
                     </h1>
                   </div>
