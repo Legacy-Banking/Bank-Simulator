@@ -11,6 +11,19 @@ const CreditCardModel = (
         month: '2-digit',
       });
 
+    
+    function formatToCurrency(amount: number | undefined): string {
+        if (!amount) {
+            return '$0.00';
+        }
+        const formattedAmount = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2,
+        }).format(amount);
+    
+        return formattedAmount;
+    }
     const formatCardNumber = (number: string) => {
         return number.replace(/\d{4}(?=\d)/g, "$& ");
     };
@@ -45,15 +58,15 @@ const CreditCardModel = (
                 {/* Spending Info and Progress Bar */}
                 <div className="mt-4">
                     <div className="flex justify-between text-sm text-gray-700 font-inter ">
-                        <span className="font-medium">Spending this month</span>
-                        <span>${spending.toFixed(2)}</span>
+                        <span className="font-medium">Credit Available</span>
+                        <span>{formatToCurrency(maxSpending)}</span>
                     </div>
 
                     {/* Spending Progress */}
                     <div className="relative h-2 mt-2 bg-gray-200 rounded-full">
                         <div
-                            className="absolute top-0 left-0 h-2 bg-blue-500 rounded-full"
-                            style={{ width: `${(spending / maxSpending) * 100}%` }}
+                            className="absolute top-0 left-0 h-2 bg-gradient-to-r from-[#4A1FFB] to-[#381AB7] rounded-full"
+                            style={{ width: `${((maxSpending - spending) / maxSpending) * 100}%` }}
                         ></div>
                     </div>
                 </div>

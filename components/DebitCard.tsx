@@ -1,8 +1,9 @@
+import { link } from 'fs';
 import { useState } from 'react';
 
 const DebitCard = (
-    {type, name, cardNumber, expirationDate, maxSpending, spending, cvc}: 
-    {type : string, name : string, cardNumber : number, expirationDate : Date, maxSpending : number, spending : number, cvc : number}
+    {type, name, cardNumber, expirationDate, maxSpending, spending, cvc, linkedAccount}: 
+    {type : string, name : string, cardNumber : number, expirationDate : Date, maxSpending : number, spending : number, cvc : number, linkedAccount : Account | undefined}
 )  => {
     // State to track the spending amount (you can replace this with real data)
 
@@ -10,6 +11,19 @@ const DebitCard = (
         year: '2-digit',
         month: '2-digit',
       });
+    
+    function formatToCurrency(amount: number | undefined): string {
+        if (!amount) {
+            return '$0.00';
+        }
+        const formattedAmount = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2,
+        }).format(amount);
+    
+        return formattedAmount;
+    }
 
     const formatCardNumber = (number: string) => {
         return number.replace(/\d{4}(?=\d)/g, "$& ");
@@ -45,16 +59,8 @@ const DebitCard = (
                 {/* Spending Info and Progress Bar */}
                 <div className="mt-4">
                     <div className="flex justify-between text-sm text-gray-700 font-inter ">
-                        <span className="font-medium">Spending this month</span>
-                        <span>${spending.toFixed(2)}</span>
-                    </div>
-
-                    {/* Spending Progress */}
-                    <div className="relative h-2 mt-2 bg-gray-200 rounded-full">
-                        <div
-                            className="absolute top-0 left-0 h-2 bg-blue-500 rounded-full"
-                            style={{ width: `${(spending / maxSpending) * 100}%` }}
-                        ></div>
+                        <span className="font-medium">Linked to <i>Personal Account</i></span>
+                        <span>{formatToCurrency(linkedAccount?.balance)}</span>
                     </div>
                 </div>
             </div>

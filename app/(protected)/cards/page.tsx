@@ -7,6 +7,7 @@ import CreditCardModel from '@/components/CreditCardModel';
 import { useSearchParams } from 'next/navigation';
 import { cardAction } from '@/utils/cardAction';
 import { useAppSelector } from '@/app/store/hooks';
+import { accountAction } from '@/utils/accountAction';
 
 const Cards = () => {
   const [cards, setCards] = useState<Card[]>([]);
@@ -22,6 +23,19 @@ const Cards = () => {
         });
     }
   }, [ownerId]);
+
+  const [account, setAccounts] = useState<Account>();
+    useEffect(() => {
+        if (ownerId) {
+            accountAction.fetchPersonalAccountByUserId(ownerId).then((data) => {
+                setAccounts(data);
+            }).catch((error) => {
+                console.error('Error fetching accounts:', error);
+            });
+        }
+    }, [ownerId]);
+
+    const totalBalance = account;
 
   return (
     <section className="flex w-full flex-row font-inter">
@@ -49,6 +63,7 @@ const Cards = () => {
                 maxSpending={card.credit}
                 spending={123} // assuming spending is fetched separately
                 cvc={parseInt(card.cvv)}
+                linkedAccount={account}
               />
             ) : (
               <CreditCardModel
