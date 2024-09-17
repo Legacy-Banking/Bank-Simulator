@@ -89,7 +89,7 @@ declare type SearchParamProps = {
     description: string;
     amount: number;
     paid_on: Date;
-    created_on: Date;
+    created_at: Date;
     due_date: Date
     status: string;
     invoice_number: string;

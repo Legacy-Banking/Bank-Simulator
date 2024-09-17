@@ -7,6 +7,7 @@ import { useAppSelector } from '@/app/store/hooks';
 import { accountAction } from '@/utils/accountAction';
 import BillForm from '@/components/dev/BillForm';
 import CreateDefaultBillersButton from '@/components/dev/CreateDefaultBillersButton';
+import JuiceButton from '@/components/dev/JuiceButton';
 
 
 
@@ -65,11 +66,12 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-            <div className="my-6">
-                        <CreateDefaultBillersButton user_id={user_id} /> {/* Use the component */}
-            </div>
+                <div className="my-6">
+                    <CreateDefaultBillersButton user_id={user_id} /> {/* Use the component */}
+                </div>
 
-            <BillForm/>
+                <BillForm />
+                <JuiceButton />
 
             </div>
         </section>
