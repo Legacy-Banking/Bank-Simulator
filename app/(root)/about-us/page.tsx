@@ -14,14 +14,14 @@ const AboutUs = () => {
       </div>
 
       {/* First Content Section */}
-      <div className="flex w-full flex-col md:flex-row items-center gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen">
+      <div className="flex w-full flex-col lg:flex-row items-center gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen">
         <div className="flex w-full flex-col md:w-1/2 py-8">
           <p className="text-lg text-gray-700 leading-8">
             It is designed to help seniors learn how to use an online banking system. The application provides a safe and user-friendly environment to practice essential banking tasks such as paying bills, transferring funds, logging in and
             signing up, and managing multiple accounts like personal, business, and savings. Our aim is to empower users by enhancing their digital literacy and boosting their confidence in using online banking services. By simulating a real-world online banking experience, we enable users to practice and master these tasks at their own pace.
           </p>
         </div>
-        <div className="px-20 mx-auto">
+        <div className="hidden lg:block px-20 mx-auto">
           <Image
             src="/senior.png"
             alt="Senior citizens using computer"

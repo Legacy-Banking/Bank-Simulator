@@ -162,7 +162,8 @@ const TransactionHistoryContent = () => {
     const tableRows: any[] = [];
     transactions.forEach((transaction) => {
       const transactionData = [
-        transaction.from_account_username,
+        transaction.amount > 0 
+        ? transaction.from_account_username : transaction.to_account_username, 
         new Date(transaction.paid_on).toLocaleDateString('en-GB'),
         `${transaction.amount > 0 ? `+$${transaction.amount.toFixed(2)}` : `-$${Math.abs(transaction.amount).toFixed(2)}`}`,
       ];

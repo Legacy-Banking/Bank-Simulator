@@ -6,14 +6,19 @@ module.exports = {
   ],
   theme: {
     // Centers the content and applies padding of 2rem. For screens that are 2XL (1400px and above), the container width is capped at 1400px.
+    
     container: {
       center: true,
       padding: "2rem",
       screens: {
         "2xl": "1400px",
+        "3xl": "1920px",
       },
     },
     extend: {
+      screens: {
+        '3xl': '1920px', // Custom 3xl screen size
+      },
       colors: {
         //for overlay effect
         fill: {
