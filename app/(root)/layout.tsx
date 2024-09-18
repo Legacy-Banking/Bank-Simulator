@@ -35,7 +35,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <html lang="en">
-      <body className="bg-background text-foreground">
+      <body className="bg-background text-foreground bg-[#FFFFFF]">
         {user_id ? <SpecialNavbar /> : <RootNavbar />}
         
         <main>

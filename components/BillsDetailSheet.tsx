@@ -23,6 +23,19 @@ type BillSheetProps = {
   onClose: () => void;
 };
 
+function formatToCurrency(amount: number | undefined): string {
+  if (!amount) {
+      return '$0.00';
+  }
+  const formattedAmount = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+  }).format(amount);
+
+  return formattedAmount;
+}
+
 const BillSheet: React.FC<BillSheetProps> = ({ bills, onClose }) => {
   if (!bills) return null;
 
@@ -64,9 +77,9 @@ const BillSheet: React.FC<BillSheetProps> = ({ bills, onClose }) => {
       startY: 80,
       head: [['', 'Amount']],
       body: [
-        ['Subtotal', `$${(bill.amount! * 0.9).toFixed(2)}`],
-        ['Tax', `$${(bill.amount! * 0.1).toFixed(2)}`],
-        ['Total', `$${(bill.amount || 0).toFixed(2)}`],
+        ['Subtotal', `${formatToCurrency(bill.amount! * 0.9)}`],
+        ['Tax', `${formatToCurrency(bill.amount! * 0.1)}`],
+        ['Total', `${formatToCurrency(bill.amount! || 0)}`],
       ],
       columnStyles: {
         0: { halign: 'left', fillColor: [255, 255, 255] }, // Aligning the items column to the left

@@ -5,6 +5,19 @@ const SheetDetails = (bills: BillDetails) => {
   const { bill, biller } = bills;
   const user = useAppSelector((state) => state.user);
 
+
+  function formatToCurrency(amount: number | undefined): string {
+    if (!amount) {
+        return '$0.00';
+    }
+    const formattedAmount = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+    }).format(amount);
+
+    return formattedAmount;
+}
   return (
     <div className="bg-white p-6 rounded-lg shadow-2xl max-w-4xl mx-auto">
       {/* Header */}
@@ -45,7 +58,7 @@ const SheetDetails = (bills: BillDetails) => {
           style={{
             wordBreak: 'break-word', // Ensures long words break into the next line
             overflowWrap: 'break-word', // Alternative support for breaking long words
-          }}>Description of the bill.....</p>
+          }}>{bill.description}</p>
       </div>
 
       {/* Total */}
@@ -56,15 +69,15 @@ const SheetDetails = (bills: BillDetails) => {
         <div className="text-right items-end font-semibold">AMOUNT</div>
 
         <div className="text-left">Subtotal</div>
-        <div className="text-right">${(bill.amount! * 0.9).toFixed(2)}</div>
+        <div className="text-right">{formatToCurrency((bill.amount! * 0.9))}</div>
 
         <div className="text-left">Tax</div>
-        <div className="text-right">${(bill.amount! * 0.1).toFixed(2)}</div>
+        <div className="text-right">{formatToCurrency((bill.amount! * 0.1))}</div>
 
         {/* Merge the TOTAL row into one and align both text and value */}
         <div className="col-span-2 font-semibold bg-slate-300 rounded-sm py-1 flex justify-between">
           <span>TOTAL</span>
-          <span>${bill.amount?.toFixed(2)}</span>
+          <span>{formatToCurrency(bill.amount!)}</span>
         </div>
       </div>
 
