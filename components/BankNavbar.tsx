@@ -42,13 +42,13 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
         <nav className="flexBetween navbar relative z-10 bg-white-200 text-black shadow-md">
             <div className='flex-1 flexStart gap-12'>
                 <Link href="/" className="flex items-center gap-0.5" onClick={handleLinkClick}>
-                    <Image className='w-9 h-9 sm:w-12 sm:h-12'
+                    <Image
                         src="/logo.png"
                         width={44}
                         height={44}
                         alt="LearntoBank"
                     />
-                    <span className="font-poppins font-medium text-[26px] sm:text-[36px]">
+                    <span className="font-poppins font-medium text-[32px]">
                         <span className="text-yellow-500">Learnto</span>
                         <span className="text-blue-25">Bank</span>
                     </span>
