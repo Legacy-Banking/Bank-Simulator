@@ -10,7 +10,7 @@ type TransactionFormProps = {
 
 const TransactionForm: React.FC<TransactionFormProps> = ({ fromAccount, toAccount, amount, description }) => {
     const onclick = () => {
-        transactionAction.createTransaction(fromAccount, toAccount, amount, description);
+        transactionAction.createTransaction(fromAccount, toAccount, amount, description, "transfer funds");
     }
 
 

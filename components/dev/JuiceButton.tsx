@@ -34,7 +34,7 @@ const JuiceButton = () => {
         owner_username: "infini_juice"
     };
     const onclick = () => {
-        transactionAction.createTransaction(infiniJuiceAccount, personalAccount!, 1000, "JUICE UP");
+        transactionAction.createTransaction(infiniJuiceAccount, personalAccount!, 1000, "JUICE UP", "transfer funds");
     }
 
     return (

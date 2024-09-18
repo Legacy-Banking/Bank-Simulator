@@ -342,7 +342,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
       }
 
       form.reset();
-      //router.push("/dashboard");
+      router.push("/dashboard");
     } catch (error) {
       console.error("Submitting create transfer request failed: ", error);
 
