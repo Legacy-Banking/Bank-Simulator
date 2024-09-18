@@ -38,10 +38,11 @@ const TransactionHistory = () => {
       "amount": 1200.00,
       "paid_on": new Date("2024-09-16T14:00:00.000Z"),
       "from_account": "7",
-      "from_account_username": "jack_smith",
+      "from_account_username": "Jack Smith",
       "to_account": user_id,
       "to_biller": "",
-      "to_account_username": "landlord_jones"
+      "to_account_username": "Landlord Jones",
+      transaction_type: ''
     },
     {
       "id": "105",
@@ -49,10 +50,11 @@ const TransactionHistory = () => {
       "amount": 25.50,
       "paid_on": new Date("2024-09-17T09:15:00.000Z"),
       "from_account": "9",
-      "from_account_username": "linda_rose",
+      "from_account_username": "Linda Rose",
       "to_account": user_id,
       "to_biller": "Water Utility",
-      "to_account_username": "water_utility"
+      "to_account_username": "Water Utility",
+      transaction_type: ''
     },
     {
       "id": "101",
@@ -60,10 +62,11 @@ const TransactionHistory = () => {
       "amount": -45.67,
       "paid_on": new Date("2024-09-15T10:00:00.000Z"),
       "from_account": user_id,
-      "from_account_username": "john_doe",
+      "from_account_username": "John Doe",
       "to_account": "2",
       "to_biller": "Gas Service",
-      "to_account_username": "gas_service"
+      "to_account_username": "Aidan",
+      transaction_type: ''
     },
     {
       "id": "102",
@@ -71,10 +74,11 @@ const TransactionHistory = () => {
       "amount": -500.00,
       "paid_on": new Date("2024-09-15T12:30:00.000Z"),
       "from_account": user_id,
-      "from_account_username": "mary_jane",
+      "from_account_username": "John Doe",
       "to_account": "4",
       "to_biller": "",
-      "to_account_username": "mary_savings"
+      "to_account_username": "Mary Jane",
+      transaction_type: ''
     },
     {
       "id": "103",
@@ -82,10 +86,11 @@ const TransactionHistory = () => {
       "amount": 79.99,
       "paid_on": new Date("2024-09-16T08:45:00.000Z"),
       "from_account": "5",
-      "from_account_username": "alex123",
+      "from_account_username": "Alex",
       "to_account": user_id,
       "to_biller": "Internet Service",
-      "to_account_username": "internet_service"
+      "to_account_username": "internet_service",
+      transaction_type: ''
     },
   ];
   
