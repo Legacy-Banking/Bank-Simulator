@@ -31,9 +31,9 @@ export default async function Home() {
               {contentEmbeddings?.start_encourage || 'Login Or Sign Up to START NOW!'}
             </p>
 
-            {/* Buttons for Login & Signup */}
-            <HomeAuthLinks />
-          </div>
+              {/* Buttons for Login & Signup */}
+              <HomeAuthLinks />
+            </div>
 
           {/* Image Section */}
           <div className="hidden lg:block left-[100px] top-[100px] 3xl:left-[200px] 3xl:top-[150px]">
