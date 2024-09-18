@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { updateUserId } from '@/app/store/userSlice'
 import { useAppDispatch } from "@/app/store/hooks";
-
+import { homeNavLinks } from '@/constants'
 const SpecialNavbar = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const router = useRouter(); // Next.js router
@@ -24,7 +24,7 @@ const SpecialNavbar = () => {
 
     const handleLogout = async () => {
         const { error } = await supabase.auth.signOut()
-        dispatch(updateUserId(null));
+        dispatch(updateUserId(''));
         console.log("User logged out");
         router.push('/');
     };
