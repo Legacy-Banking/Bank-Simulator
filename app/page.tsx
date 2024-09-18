@@ -47,7 +47,7 @@ export default async function Home() {
         <div className="flex flex-row bg-[#9d9d9d] w-full py-10 border-b-[20px] border-[#0B0A0B] flex-grow">
           <div className="flex flex-row w-full justify-center items-center">
             {/* Box Frame */}
-            <div className="flex flex-wrap lg:flex-nowrap justify-between items-start w-full max-w-screen-lg gap-20">
+            <div className="flex flex-wrap lg:flex-nowrap justify-center items-start w-full max-w-screen-lg gap-20">
               {/* Column 1 */}
               <Link href="/resources">
                 <div className="flex flex-col items-start space-y-2 w-[280px] min-w-[280px]">
