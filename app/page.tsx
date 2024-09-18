@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import RootLayout from './(root)/layout';
 import { contentAction } from '@/utils/contentAction';
-import HoverMessage from '@/components/content/HoverMessage';
+import HomeAuthLinks from '@/components/HomeAuthLinks';
 export const revalidate = 60
 
 
@@ -11,7 +11,7 @@ export default async function Home() {
   const contentEmbeddings = await contentAction.fetchEmbedding('home');
   return (
     <RootLayout>
-      <div className="flex flex-col min-h-screen items-center bg-white">
+      <div className="flex flex-col min-h-screen items-center bg-white-100">
         <div className="flex w-full m-5 px-10 max-w-7xl">
 
           {/* Title Section */}
@@ -32,22 +32,7 @@ export default async function Home() {
             </p>
 
             {/* Buttons for Login & Signup */}
-            <div className="flex flex-col md:flex-row place-items-start space-x-0 space-y-4 md:space-x-10 md:space-y-0">
-              <Link href="/login">
-                <button className="w-full md:w-auto px-6 md:px-8 py-2 md:py-3 text-base md:text-lg font-medium text-[#FFFFFF] bg-gradient-to-r from-[#468DC6] to-[#1A70B8] rounded-lg hover:text-gray-600 shadow-2xl">
-                  → Login
-                </button>
-              </Link>
-              <HoverMessage position="top-right" message={contentEmbeddings?.sign_up_hover || "Sign up to start learning!"}>
-                <Link href="/sign-up">
-                  <button className="w-full md:w-auto px-6 md:px-8 py-2 md:py-3 text-base md:text-lg font-medium text-[#FFFFFF] bg-gradient-to-r from-[#468DC6] to-[#1A70B8] rounded-lg hover:text-gray-600 shadow-2xl">
-                    → Sign up
-                  </button>
-                </Link>
-
-              </HoverMessage>
-
-            </div>
+            <HomeAuthLinks />
           </div>
 
           {/* Image Section */}

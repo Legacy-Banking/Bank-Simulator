@@ -64,3 +64,22 @@ export const homeNavLinks = [
   },
 
 ];
+
+export const specialNavLinks = [
+  {
+    route: "/",
+    label: "Home",
+  },
+  {
+    route: "/about-us",
+    label: "About Us",
+  },
+  {
+    route: "/resources",
+    label: "Resources",
+  },
+  {
+    route: "/dashboard",
+    label: "Dashboard",
+  },
+];

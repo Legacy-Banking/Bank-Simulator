@@ -1,15 +1,20 @@
 'use client'
 
-import { homeNavLinks, transferPayLinks} from '@/constants'
+import { specialNavLinks, transferPayLinks } from '@/constants'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/utils/supabase/client'
+import { updateUserId } from '@/app/store/userSlice'
+import { useAppDispatch } from "@/app/store/hooks";
 
-const RootNavbar = () => {
+const SpecialNavbar = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const router = useRouter(); // Next.js router
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const supabase = createClient();
+    const dispatch = useAppDispatch();
 
     // Function to close the dropdown menu
     const handleLinkClick = () => {
@@ -17,12 +22,10 @@ const RootNavbar = () => {
         setIsMobileMenuOpen(false);
     };
 
-    // Placeholder logout function
-    const handleLogout = () => {
-        // Placeholder for logout logic (e.g., API call to log out the user)
+    const handleLogout = async () => {
+        const { error } = await supabase.auth.signOut()
+        dispatch(updateUserId(null));
         console.log("User logged out");
-
-        // Redirect to the home page after logout
         router.push('/');
     };
 
@@ -45,7 +48,7 @@ const RootNavbar = () => {
 
             <div className='flex items-center gap-8'>
                 <ul className='xl:flex hidden text-small gap-8'>
-                    {homeNavLinks.map((link) => (
+                    {specialNavLinks.map((link) => (
                         <li key={link.route} className='font-inter'>
                             <Link
                                 href={link.route}
@@ -64,7 +67,7 @@ const RootNavbar = () => {
                             onClick={handleLogout}
                             className="bg-yellow-gradient text-blackText-100 font-inter font-bold py-2 px-7 rounded-2xl items-center justify-center shadow-md hover:text-blue-25 hover:underline underline-blue-25 hidden xl:block "
                         >
-                            Log In
+                            Log Out
                         </button>
                     </Link>
                 </div>
@@ -113,4 +116,4 @@ const RootNavbar = () => {
     )
 }
 
-export default RootNavbar
+export default SpecialNavbar
