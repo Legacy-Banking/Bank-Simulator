@@ -33,9 +33,7 @@ const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children
             if (error || !data?.user) {
                 console.log(error);
                 toast.error("Not logged in, redirecting..."); // Show toast notification
-                setTimeout(() => {
-                    router.push("/login"); // Redirect after showing the toast
-                }, 0;
+                router.push('/')
             } else {
                 dispatch(updateUserId(data.user.id));
                 dispatch(updateUserName(data.user.email!));
