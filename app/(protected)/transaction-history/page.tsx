@@ -31,30 +31,33 @@ const TransactionHistory = () => {
   const [loading, setLoading] = useState(false); // Add loading state
   const rowsPerPage = 10;
 
+  const user =  useAppSelector(state => state.user);
+  
+  
   const dummy_data : Transaction[] = [
     {
       "id": "104",
       "description": "Rent Payment",
       "amount": 1200.00,
       "paid_on": new Date("2024-09-16T14:00:00.000Z"),
-      "from_account": "7",
+      "from_account": "",
       "from_account_username": "Jack Smith",
       "to_account": user_id,
       "to_biller": "",
-      "to_account_username": "Landlord Jones",
-      transaction_type: ''
+      "to_account_username": user.user_name?user.user_name:'Guest',
+      transaction_type: 'pay anyone'
     },
     {
       "id": "105",
       "description": "| Biller: Water Utility, Code: 5643, Ref: 6789",
       "amount": 25.50,
       "paid_on": new Date("2024-09-17T09:15:00.000Z"),
-      "from_account": "9",
+      "from_account": "",
       "from_account_username": "Linda Rose",
       "to_account": user_id,
-      "to_biller": "Water Utility",
-      "to_account_username": "Water Utility",
-      transaction_type: ''
+      "to_biller": "",
+      "to_account_username": user.user_name?user.user_name:'Guest',
+      transaction_type: 'pay anyone'
     },
     {
       "id": "101",
@@ -62,11 +65,11 @@ const TransactionHistory = () => {
       "amount": -45.67,
       "paid_on": new Date("2024-09-15T10:00:00.000Z"),
       "from_account": user_id,
-      "from_account_username": "John Doe",
-      "to_account": "2",
-      "to_biller": "Gas Service",
+      "from_account_username": user.user_name?user.user_name:'Guest',
+      "to_account": "",
+      "to_biller": "",
       "to_account_username": "Aidan",
-      transaction_type: ''
+      transaction_type: 'pay anyone'
     },
     {
       "id": "102",
@@ -74,23 +77,23 @@ const TransactionHistory = () => {
       "amount": -500.00,
       "paid_on": new Date("2024-09-15T12:30:00.000Z"),
       "from_account": user_id,
-      "from_account_username": "John Doe",
-      "to_account": "4",
+      "from_account_username": user.user_name?user.user_name:'Guest',
+      "to_account": "",
       "to_biller": "",
       "to_account_username": "Mary Jane",
-      transaction_type: ''
+      transaction_type: 'pay anyone'
     },
     {
       "id": "103",
       "description": "| Biller: Internet Service, Code: 8765, Ref: 4321",
       "amount": 79.99,
       "paid_on": new Date("2024-09-16T08:45:00.000Z"),
-      "from_account": "5",
+      "from_account": "",
       "from_account_username": "Alex",
       "to_account": user_id,
-      "to_biller": "Internet Service",
-      "to_account_username": "internet_service",
-      transaction_type: ''
+      "to_biller": "",
+      "to_account_username": user.user_name?user.user_name:'Guest',
+      transaction_type: 'pay anyone'
     },
   ];
   
