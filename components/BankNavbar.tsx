@@ -33,7 +33,7 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
 
     const handleLogout = async () => {
         const { error } = await supabase.auth.signOut()
-        dispatch(updateUserId(null));
+        dispatch(updateUserId(''));
         console.log("User logged out");
         router.push('/');
     };
