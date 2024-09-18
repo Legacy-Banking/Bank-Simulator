@@ -53,7 +53,7 @@ const SheetDetails = (bills: BillDetails) => {
 
         {/* Empty placeholder for proper alignment */}
         <div></div>
-        <div className="text-right items-end font-semibold">AMOUNT DUE</div>
+        <div className="text-right items-end font-semibold">AMOUNT</div>
 
         <div className="text-left">Subtotal</div>
         <div className="text-right">${(bill.amount! * 0.9).toFixed(2)}</div>
@@ -72,8 +72,8 @@ const SheetDetails = (bills: BillDetails) => {
       <div className="flex justify-start mb-4 text-sm">
         <div className="text-left">
           <h3 className="text-sm font-semibold">Payment Details</h3>
-          <p>Biller Code:{biller.biller_code}</p>
-          <p>Reference Number:{bill.reference_number}</p>
+          <p>Biller Code: {biller.biller_code}</p>
+          <p>Reference Number: {bill.reference_number}</p>
         </div>
       </div>
 

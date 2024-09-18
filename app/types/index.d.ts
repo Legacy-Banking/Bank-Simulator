@@ -95,6 +95,11 @@ declare interface Bill {
   status: string;
   invoice_number: string;
   reference_number: string;
+
+  invoice_date: string;
+  billed_to: string;
+  total: string;
+  tax: string;
 }
 declare interface BillDetails {
   bill: Partial<Bill>;
@@ -105,6 +110,7 @@ declare interface Biller {
   name: string;
   biller_code: string;
   biller_details: string;
+
 }
 declare interface SavedBiller {
   id: string;
