@@ -87,7 +87,7 @@ const SpecialNavbar = () => {
             {/* Mobile Menu */}
             {isMobileMenuOpen && (
                 <ul className='absolute top-full left-0 mt-0.5 bg-white-100 shadow-lg rounded-lg w-full py-4 z-20'>
-                    {homeNavLinks.map((link) => (
+                    {specialNavLinks.map((link) => (
                         <li key={link.route} className='font-inter text-left'>
                             <Link
                                 href={link.route}

@@ -15,7 +15,7 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
     const supabase = createClient();
     const dispatch = useAppDispatch();
 
-    const unreadMessageCount = 5;
+    const unreadMessageCount = 0;
 
     const handleLinkClick = () => {
         setIsDropdownOpen(false);
