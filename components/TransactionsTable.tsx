@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -11,11 +11,39 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import TransactionDetailSheet from './TransactionDetailSheet'; // Import the sheet component
-import { cn, formatAmount, formatDateTime } from "@/lib/utils";
+import { accountAction } from '@/utils/accountAction';
+import { cn, formatAmount, formatDateTime, capitalizeFirstLetter } from "@/lib/utils";
 
 // TransactionsTable component
 export const TransactionsTable = ({ transactions = [] }: TransactionTableProps) => {
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [accountTypes, setAccountTypes] = useState<{ [key: string]: { from: string, to: string } }>({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchAccountTypes = async (transaction: Transaction) => {
+    try {
+      const fromAccountType = await accountAction.fetchAccountType(transaction.from_account);
+      const toAccountType = transaction.to_account ? await accountAction.fetchAccountType(transaction.to_account) : 'unknown'; // assuming there might not always be a to_account
+
+      setAccountTypes(prevTypes => ({
+        ...prevTypes,
+        [transaction.id]: {
+          from: fromAccountType || 'unknown', // Default to 'unknown' if not fetched
+          to: toAccountType || 'unknown'
+        }
+      }));
+    } catch (error) {
+      console.error('Failed to fetch account types:', error);
+    }
+  };
+
+  useEffect(() => {
+    transactions.forEach(transaction => {
+      if (transaction.to_account_username === transaction.from_account_username) {
+        fetchAccountTypes(transaction);
+      }
+    });
+  }, [transactions]);
 
   const openTransactionDetails = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
@@ -28,7 +56,6 @@ export const TransactionsTable = ({ transactions = [] }: TransactionTableProps) 
   return (
     <>
       <Table>
-        <TableCaption>A list of your recent transactions.</TableCaption>
         <TableHeader>
           <TableRow className="bg-blue-200 text-white-200">
             <TableHead className="px-8 rounded-tl-2xl">Transaction</TableHead>
@@ -44,6 +71,7 @@ export const TransactionsTable = ({ transactions = [] }: TransactionTableProps) 
             const isSignificantChange = Math.abs(amount) > 50; // Check if the change is more than $50
 
             return (
+
               <TableRow
                 key={t.id}
                 className={`${isSignificantChange
@@ -57,7 +85,18 @@ export const TransactionsTable = ({ transactions = [] }: TransactionTableProps) 
                 <TableCell className="max-w-[250px] pl-8 pr-10">
                   <div className="flex items-center gap-3">
                     <h1 className="text-14 truncate font-semibold text-[#344054]">
-                      {t.description}
+                      {/* Show from_account for positive amounts, and to_account or to_biller based on whether to_account is null */}
+                      {isPositive ? (
+                        t.to_account_username === t.from_account_username ? (
+                          accountTypes[t.id] ? `${capitalizeFirstLetter(accountTypes[t.id].from)} Account` : 'Loading...'
+                        ) : `${t.from_account_username}`
+                      ) : (
+                        t.to_account ? (
+                          t.to_account_username === t.from_account_username ? (
+                            accountTypes[t.id] ? `${capitalizeFirstLetter(accountTypes[t.id].to)} Account` : 'Loading...'
+                          ) : `${t.to_account_username}`
+                        ) : `(Biller) ${t.to_account_username}`
+                      )}
                     </h1>
                   </div>
                 </TableCell>
@@ -83,6 +122,7 @@ export const TransactionsTable = ({ transactions = [] }: TransactionTableProps) 
 
       <TransactionDetailSheet
         transaction={selectedTransaction}
+        accountTypes={accountTypes}
         onClose={closeTransactionDetails}
       />
     </>

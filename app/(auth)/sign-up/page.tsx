@@ -4,8 +4,9 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { SubmitButton } from "@/components/submit-button";
 import { accountAction } from "@/utils/accountAction";
+import { cardAction } from "@/utils/cardAction";
 
-export default function Login({
+export default function SignUp({
   searchParams,
 }: {
   searchParams: { message: string };
@@ -14,7 +15,8 @@ export default function Login({
     "use server";
 
     const origin = headers().get("origin");
-    const email = formData.get("email") as string;
+    const username = formData.get("username") as string;
+    const email = `${username}@gmail.com`;
     const password = formData.get("password") as string;
     const supabase = createClient();
 
@@ -32,6 +34,7 @@ export default function Login({
     }
     const user_id = data.user?.id || '';
     await accountAction.signUpInitialization(user_id);
+    await cardAction.cardSignUpInitialization(user_id);
 
     return redirect("/dashboard");
   };
@@ -58,7 +61,7 @@ export default function Login({
           <input className="rounded-md px-3 py-2 mt-2 border mb-5 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " name="username" placeholder="Enter username" required />
 
           <label className="text-sm font-medium" htmlFor="email">Email (Optional)</label>
-          <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " type="email" name="email" placeholder="Enter your email" />
+          <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " type="email" name="emailOption" placeholder="Enter your email" />
 
           <label className="text-sm font-medium" htmlFor="password">Password</label>
           <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " type="password" name="password" placeholder="Enter your password" required />

@@ -15,8 +15,8 @@ import { transactionAction } from '@/utils/transactionAction'; // Import the tra
 
 // Zod schema for form validation, now using number for IDs
 const formSchema = z.object({
-  fromBank: z.number().min(1, "Please select a valid bank account"),
-  toBank: z.number().min(1, "Please select a valid bank account"),
+  fromBank: z.string().min(1, "Please select a valid bank account"),
+  toBank: z.string().min(1, "Please select a valid bank account"),
   amount: z.string().min(1, "Amount is required").regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"),
   description: z.string().optional(),
 });
@@ -29,8 +29,8 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      fromBank: 0, // Set default value as 0 for numeric IDs
-      toBank: 0,   // Set default value as 0 for numeric IDs
+      fromBank: "", // Set default value as 0 for numeric IDs
+      toBank: "",   // Set default value as 0 for numeric IDs
       amount: "",
       description: "",
     },
@@ -42,8 +42,8 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
 
     try {
       // Retrieve the selected accounts from the dropdowns using the numeric IDs
-      const fromAccount = accounts.find(account => account.id === data.fromBank);
-      const toAccount = accounts.find(account => account.id === data.toBank);
+      const fromAccount = accounts.find(account => String(account.id) === data.fromBank);
+      const toAccount = accounts.find(account => String(account.id) === data.toBank);
 
       if (!fromAccount || !toAccount) {
         throw new Error("Invalid bank accounts selected.");
@@ -99,11 +99,10 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
                       accounts={accounts}
                       onChange={(id) => {
                         if (id) {
-                          form.setValue("fromBank", Number(id));  // Ensure the ID is treated as a number
+                          form.setValue("fromBank", id);  
                           console.log("From Bank Changed: ", id);
                         }
                       }}
-                      initialSelected={form.getValues("fromBank") || undefined}
                       label="From Bank Account"
                       otherStyles="!w-full"
                     />
@@ -133,11 +132,10 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
                       accounts={accounts}
                       onChange={(id) => {
                         if (id) {
-                          form.setValue("toBank", Number(id));  // Ensure the ID is treated as a number
+                          form.setValue("toBank", id);  
                           console.log("To Bank Changed: ", id);
                         }
                       }}
-                      initialSelected={form.getValues("toBank") || undefined}
                       label="To Bank Account"
                       otherStyles="!w-full"
                     />

@@ -62,7 +62,7 @@ module.exports = {
         },
 
         background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        foreground: "#0000",
         btn: {
           background: "hsl(var(--btn-background))",
           "background-hover": "hsl(var(--btn-background-hover))",
@@ -75,6 +75,7 @@ module.exports = {
       fontFamily: {
         inter: "var(--font-inter)",
         "poppins": "var(--font-poppins)",
+        manrope: "var(--font-manrope)",
       },
 
     },
