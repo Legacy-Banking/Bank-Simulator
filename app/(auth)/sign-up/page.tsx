@@ -33,7 +33,7 @@ export default function SignUp({
       return redirect(`/sign-up?message=${error}`);
     }
     const user_id = data.user?.id || '';
-    await accountAction.signUpInitialization(user_id);
+    await accountAction.signUpInitialization(user_id, username);
     await cardAction.cardSignUpInitialization(user_id);
 
     return redirect("/dashboard");

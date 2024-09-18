@@ -5,10 +5,12 @@ import React, { useEffect, useState } from 'react'
 import AccountBox from '@/components/AccountBox';
 import { useAppSelector } from '@/app/store/hooks';
 import { accountAction } from '@/utils/accountAction';
+import UserState from '@/components/dev/UserState'
+import BillForm from '@/components/dev/BillForm';
 
 
 const Dashboard = () => {
-    const user =  useAppSelector(state => state.user);
+    const user = useAppSelector(state => state.user);
     const user_id = (user.user_id)?.toString();
     const [accounts, setAccounts] = useState<Account[]>([]);
     useEffect(() => {
@@ -26,6 +28,8 @@ const Dashboard = () => {
     return (
         <section className="flex w-full flex-row max-xl:max-h-screen font-inter">
             <div className="flex w-full flex-1 flex-col gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen">
+                <UserState />
+                <BillForm />
                 {/* Header */}
                 <header className="home-header">
                     <HeaderBox

@@ -1,6 +1,6 @@
 import { createClient } from "./supabase/client";
 import { accbsbGenerator } from "./accbsbGenerator";
-import { transactionAction } from "./transactionAction";
+import { billAction } from "./billAction";
 import { billerAction } from './billerAction';
 
 enum AccountType {
@@ -98,9 +98,30 @@ export const accountAction = {
             throw new Error(error.message);
         }
     },
-    signUpInitialization: async (user_id: string): Promise<void> => {
+    signUpInitialization: async (user_id: string, owner_username:string): Promise<void> => {
         const { bsb: perbsb, acc: peracc } = accbsbGenerator();
         const { bsb: savbsb, acc: savacc } = accbsbGenerator();
+        const bills = [
+            {
+                biller: {
+                    id: '1',
+                    name:'Melbourne Electricity',
+                    biller_code: '2513',
+                }as Biller,
+                amount: 100,
+                description: 'Electricity Bill'
+            },
+            {
+                biller:{
+                    id:'2',
+                    name:'Daily News',
+                    biller_code:'8351'
+
+                }as Biller,
+                amount: 28.8,
+                description: 'Monthly Subscription'
+            }
+        ]
 
         const accounts: Partial<Account>[] = [
             {
@@ -110,6 +131,7 @@ export const accountAction = {
                 bsb: savbsb,
                 acc: savacc,
                 opening_balance: 1000,
+                owner_username: owner_username
             },
             {
                 type: AccountType.PERSONAL,
@@ -118,11 +140,18 @@ export const accountAction = {
                 bsb: perbsb,
                 acc: peracc,
                 opening_balance: 1000,
+                owner_username: owner_username
             }
-        ];
+        ]
+
+        bills.forEach(async (bill) => {
+            await billAction.createBill(user_id,bill.biller,bill.amount,bill.description);
+        })
+        
         accounts.forEach(async (account) => {
             await accountAction.createAccount(account as Account);
         });
+
         await billerAction.createDefaultSavedBillers(user_id);
 
         //Need to also generate Cards with their number and CSV
