@@ -16,6 +16,7 @@ import { BillerDropdown } from './BillerDropDown';
 import { useAppSelector } from '@/app/store/hooks';
 import { billerAction } from '@/utils/billerAction';
 import { bpayAction } from '@/utils/bpayAction';
+import { billAction } from '@/utils/billAction';
 
 const formSchema = z.object({
   toBiller: z.string().optional(),
@@ -306,6 +307,15 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
 
       }
 
+      const bills = await billAction.fetchAssignedBills(user_id, finalBillerName);
+
+      // Check if no bills are assigned to the user
+      if (bills.length === 0) {
+        setError("No bills are assigned to you for this biller.");
+        setIsLoading(false);
+        return;
+      }
+
       // Call the createBPAYTransaction action
       await bpayAction.payBills(
         user_id,
@@ -315,6 +325,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
         finalReferenceNum,
         amountF,
         data.description || '',
+        bills,
       );
 
       if (data.saveBiller) {
