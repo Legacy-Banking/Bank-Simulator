@@ -15,8 +15,6 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
     const supabase = createClient();
     const dispatch = useAppDispatch();
 
-
-    // Simulated unread messages count for demonstration
     const unreadMessageCount = 5;
 
     const handleLinkClick = () => {

@@ -4,8 +4,8 @@ import { useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "@/app/store/hooks";
 import { updateUserId } from "@/app/store/userSlice";
 import { redirect } from "next/navigation";
-import BankNavbar from "@/components/BankNavbar";
 import RootNavbar from "@/components/RootNavbar";
+import SpecialNavbar from "@/components/SpecialNavbar";
 
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const user = useAppSelector((state) => state.user);
@@ -36,7 +36,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <html lang="en">
       <body className="bg-background text-foreground">
-        {user_id ? <BankNavbar /> : <RootNavbar />}
+        {user_id ? <SpecialNavbar /> : <RootNavbar />}
         
         <main>
           {children}
