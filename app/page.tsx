@@ -1,9 +1,37 @@
-import React from 'react'
+'use client'
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import RootLayout from './(root)/layout'
+import { createClient } from '@/utils/supabase/client'
 
 const Home = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
+  const supabase = createClient();
+
+  useEffect(() => {
+    // Check if the user is authenticated
+    const checkAuthStatus = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (session) {
+        setIsAuthenticated(true); // User is authenticated
+      }
+    };
+
+    checkAuthStatus();
+  }, [supabase]);
+
+  // If the user is authenticated, redirect them to the dashboard
+  const handleAuthRedirect = (event: React.MouseEvent) => {
+    if (isAuthenticated) {
+      event.preventDefault(); // Prevent the default navigation
+      router.push('/dashboard'); // Redirect to the dashboard
+    }
+  };
+
   return (
     <RootLayout>
       <div className="flex flex-col min-h-screen items-center bg-white-200">
@@ -24,18 +52,24 @@ const Home = () => {
 
             {/* Subtitle 2 */}
             <p className="text-l md:text-base lg:text-lg font-semibold leading-none text-[#535351]">
-              Login Or Sign Up to START NOW !
+              Login Or Sign Up to START NOW!
             </p>
 
             {/* Buttons for Login & Signup*/}
             <div className="flex flex-col md:flex-row place-items-start space-x-0 space-y-4 md:space-x-10 md:space-y-0">
               <Link href="/login">
-                <button className="w-full md:w-auto px-6 md:px-8 py-2 md:py-3 text-base md:text-lg font-medium text-[#FFFFFF] bg-gradient-to-r from-[#468DC6] to-[#1A70B8] rounded-lg hover:text-gray-600 shadow-2xl">
+                <button
+                  className="w-full md:w-auto px-6 md:px-8 py-2 md:py-3 text-base md:text-lg font-medium text-[#FFFFFF] bg-gradient-to-r from-[#468DC6] to-[#1A70B8] rounded-lg hover:text-gray-600 shadow-2xl"
+                  onClick={handleAuthRedirect} // Redirect if authenticated
+                >
                   → Login
                 </button>
               </Link>
               <Link href="/sign-up">
-                <button className="w-full md:w-auto px-6 md:px-8 py-2 md:py-3 text-base md:text-lg font-medium text-[#FFFFFF] bg-gradient-to-r from-[#468DC6] to-[#1A70B8] rounded-lg hover:text-gray-600 shadow-2xl">
+                <button
+                  className="w-full md:w-auto px-6 md:px-8 py-2 md:py-3 text-base md:text-lg font-medium text-[#FFFFFF] bg-gradient-to-r from-[#468DC6] to-[#1A70B8] rounded-lg hover:text-gray-600 shadow-2xl"
+                  onClick={handleAuthRedirect} // Redirect if authenticated
+                >
                   → Sign up
                 </button>
               </Link>
