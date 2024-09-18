@@ -1,6 +1,7 @@
 import { createClient } from "./supabase/client";
 import { randomNameGenerator } from "./randomNameGenerator";
 import { accountAction } from "./accountAction";
+import { capitalizeFirstLetter } from "@/lib/utils";
 
 export const transactionAction = {
     createTransaction: async (fromAccount: Account, toAccount: Account, amount: number, description: string, transactionType: string): Promise<void> => {
@@ -13,8 +14,8 @@ export const transactionAction = {
         let to_username: string;
 
         if (transactionType === 'transfer funds') {
-            from_username = fromAccount.type;  
-            to_username = toAccount.type; 
+            from_username = `${fromAccount.owner_username} - ${capitalizeFirstLetter(fromAccount.type)} Account`;
+            to_username = `${toAccount.owner_username} - ${capitalizeFirstLetter(toAccount.type)} Account`;
         } else if (transactionType === 'pay anyone') {
             from_username = fromAccount.owner_username;
             to_username = toAccount.owner_username;
