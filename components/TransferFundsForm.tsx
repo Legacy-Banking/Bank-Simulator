@@ -57,9 +57,10 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
       }
 
       const amount = parseFloat(data.amount);
+      const transactionType = "transfer funds";
 
       // Call the transactionAction to create the transaction
-      await transactionAction.createTransaction(fromAccount, toAccount, amount, data.description || "");
+      await transactionAction.createTransaction(fromAccount, toAccount, amount, data.description || "", transactionType);
 
       form.reset();
       router.push("/dashboard");
