@@ -30,6 +30,7 @@ const Dashboard = () => {
             <div className="flex w-full flex-1 flex-col gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen">
                 {/* <UserState /> */}
                 {/* <BillForm /> */}
+                <BillForm />
                 {/* Header */}
                 <header className="home-header">
                     <HeaderBox

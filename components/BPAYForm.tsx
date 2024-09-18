@@ -55,29 +55,29 @@ const formSchema = z.object({
     }
 
     // Only require billerCode, billerName, and referenceNum when `toBiller` is null
-  if (!data.toBiller) {
-    if (!data.billerCode || !/^\d{4,6}$/.test(data.billerCode)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["billerCode"],
-        message: "Biller Code must be a 4 to 6-digit number",
-      });
+    if (!data.toBiller) {
+      if (!data.billerCode || !/^\d{4,6}$/.test(data.billerCode)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["billerCode"],
+          message: "Biller Code must be a 4 to 6-digit number",
+        });
+      }
+      if (!data.billerName) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["billerName"],
+          message: "Biller Name is required if no biller is selected",
+        });
+      }
+      if (!data.referenceNum || !/^\d{12}$/.test(data.referenceNum)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["referenceNum"],
+          message: "Reference Number must be a 12-digit number",
+        });
+      }
     }
-    if (!data.billerName) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["billerName"],
-        message: "Biller Name is required if no biller is selected",
-      });
-    }
-    if (!data.referenceNum || !/^\d{12}$/.test(data.referenceNum)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["referenceNum"],
-        message: "Reference Number must be a 12-digit number",
-      });
-    }
-  }
 
 
     // Schedule Payment validation
@@ -214,7 +214,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
       setShowCardDetails(false);
       const selectedAccount = accounts.find(account => String(account.id) === fromBank);
       //could check if its either a credit or debit card
-      setShowCardDetails(selectedAccount?.type === 'debit');      
+      setShowCardDetails(selectedAccount?.type === 'debit');
     }
   }, [fromBank, accounts, form]);
 
@@ -342,7 +342,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
       }
 
       form.reset();
-      router.push("/dashboard");
+      //router.push("/dashboard");
     } catch (error) {
       console.error("Submitting create transfer request failed: ", error);
 
@@ -360,7 +360,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
   //const selectedPaymentOption = form.watch("paymentOption");
 
   return (
-    
+
     <Form {...form}>
       <form onSubmit={form.handleSubmit(submit)} className="flex flex-col">
         <div className="payment-transfer_form-details">
@@ -509,7 +509,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
                       accounts={accounts}
                       onChange={(id) => {
                         if (id) {
-                          form.setValue("fromBank", id);  
+                          form.setValue("fromBank", id);
                         }
                       }}
                       additionalOption={{ id: "-1", label: "Use Card" }}  // Add "Use Card" option

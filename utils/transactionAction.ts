@@ -94,8 +94,6 @@ export const transactionAction = {
 
         try {
             // Update the 'from' account balance
-            await transactionAction.updateAccounts(fromAccount, fromNewBalance);
-
             // Construct the detailed description including biller details
             const detailedDescription = `${description} | Biller: ${billerName}, Code: ${billerCode}, Ref: ${referenceNum}`;
 
@@ -119,14 +117,12 @@ export const transactionAction = {
                 .insert(newTransaction);
 
             if (insertError) {
-                await transactionAction.updateAccounts(fromAccount, fromAccount.balance);
-
                 console.error('Failed to insert the BPAY transaction:', insertError);
                 throw new Error('Transaction failed, reverting operations.');
             }
         } catch (error) {
+            
             console.error('Transaction error:', error);
-            await transactionAction.updateAccounts(fromAccount, fromAccount.balance);
             throw error;
         }
     },
