@@ -33,13 +33,13 @@ const SpecialNavbar = () => {
         <nav className="flexBetween py-3 px-6 gap-10 relative z-10 bg-white-200 text-black shadow-md">
             <div className='flex-1 flexStart gap-12'>
                 <Link href="/" className="flex items-center gap-0.5" onClick={handleLinkClick}>
-                    <Image
+                    <Image className='w-10 h-10 sm:w-12 sm:h-12'
                         src="/logo.png"
                         width={56}
                         height={56}
                         alt="LearntoBank"
                     />
-                    <span className="font-poppins font-medium text-[36px]">
+                    <span className="font-poppins font-medium text-[28px] sm:text-[36px]">
                         <span className="text-yellow-500">Learnto</span>
                         <span className="text-blue-25">Bank</span>
                     </span>
