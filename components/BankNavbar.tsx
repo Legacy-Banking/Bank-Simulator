@@ -160,17 +160,32 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
             {/* Mobile Menu */}
             {isMobileMenuOpen && (
                 <ul className='absolute top-full left-0 mt-0.5 bg-white-100 shadow-lg rounded-lg w-full py-4 z-20'>
-                    {bankNavLinks.map((link) => (
+                    {bankNavLinks.map((link) => {
+                    if (link.route === '/transaction-history') {
+                        return (
+                        <li key={link.route} className='font-inter text-left'>
+                            <button
+                            onClick={handleTransactionHistoryClick}
+                            className='block px-10 py-4 hover:text-blue-25 hover:underline underline-blue-25'
+                            >
+                            {link.label}
+                            </button>
+                        </li>
+                        );
+                    } else {
+                        return (
                         <li key={link.route} className='font-inter text-left'>
                             <Link
-                                href={link.route}
-                                className='block px-10 py-4 hover:text-blue-25 hover:underline underline-blue-25'
-                                onClick={handleLinkClick}
+                            href={link.route}
+                            className='block px-10 py-4 hover:text-blue-25 hover:underline underline-blue-25'
+                            onClick={handleLinkClick}
                             >
-                                {link.label}
+                            {link.label}
                             </Link>
                         </li>
-                    ))}
+                        );
+                    }
+                    })}
                     {session && (
                         <li className='font-inter text-left'>
                             <Link
