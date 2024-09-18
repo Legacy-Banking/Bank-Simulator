@@ -79,8 +79,10 @@ const PayAnyoneForm = ({ accounts }: { accounts: Account[] }) => {
         return;
       }
 
+      const transactionType = "pay anyone";
+
       // Call the transactionAction to create the transaction
-      await transactionAction.createTransaction(fromAccount, toAccount, amount, data.description || "");
+      await transactionAction.createTransaction(fromAccount, toAccount, amount, data.description || "", transactionType);
 
       form.reset();
       router.push("/dashboard");

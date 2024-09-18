@@ -3,11 +3,25 @@ import { randomNameGenerator } from "./randomNameGenerator";
 import { accountAction } from "./accountAction";
 
 export const transactionAction = {
-    createTransaction: async (fromAccount: Account, toAccount: Account, amount: number, description: string): Promise<void> => {
+    createTransaction: async (fromAccount: Account, toAccount: Account, amount: number, description: string, transactionType: string): Promise<void> => {
         const supabase = createClient();
 
         const fromNewBalance = fromAccount.balance - amount;
         const toNewBalance = toAccount.balance + amount;
+
+        let from_username: string;
+        let to_username: string;
+
+        if (transactionType === 'transfer funds') {
+            from_username = fromAccount.type;  
+            to_username = toAccount.type; 
+        } else if (transactionType === 'pay anyone') {
+            from_username = fromAccount.owner_username;
+            to_username = toAccount.owner_username;
+        } else {
+            throw new Error(`Unsupported transaction type: ${transactionType}`);
+        }
+
 
         if (fromNewBalance < 0) {
             throw new Error('Insufficient funds');
@@ -26,10 +40,10 @@ export const transactionAction = {
                 amount: amount,
                 paid_on: new Date(),
                 from_account: fromAccount.id,
-                from_account_username: fromAccount.owner_username,
+                from_account_username: from_username,
                 to_account: toAccount.id,
-                to_account_username: toAccount.owner_username,
-                transaction_type: fromAccount.type,
+                to_account_username: to_username,
+                transaction_type: transactionType,
             };
 
             const { error: insertError } = await supabase
@@ -96,6 +110,7 @@ export const transactionAction = {
                 //card_number: cardDetails?.cardNumber || null,  // Optional card details
                 //expiry_date: cardDetails?.expiryDate || null,
                 //cvv: cardDetails?.cvv || null,
+                transaction_type: "bpay",
             };
 
             const { error: insertError } = await supabase
