@@ -100,13 +100,13 @@ const SpecialNavbar = () => {
                     ))}
 
                     {/* Log In button for mobile */}
-                    <li className='font-inter text-left px-3 py-2'>
+                    <li className='font-inter text-left px-9 py-2'>
                         <Link href="/login">
                             <button
                                 onClick={handleLogout}
                                 className="bg-yellow-gradient text-blackText-100 font-inter font-bold py-2 px-7 rounded-2xl inline-flex items-center justify-center shadow-md hover:text-blue-25 hover:underline underline-blue-25"
                             >
-                                Log In
+                                Log Out
                             </button>
                         </Link>
                     </li>
