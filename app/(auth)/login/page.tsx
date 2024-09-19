@@ -13,7 +13,13 @@ export default function Login({
     "use server";
 
     const username = formData.get("username") as string;
-    const email = `${username}@gmail.com`;
+
+    // Sanitize username: Replace spaces with dots and remove invalid characters
+    const sanitizedUsername = username
+      .replace(/\s+/g, '.')   // Replace spaces with dots
+      .replace(/[^a-zA-Z0-9._-]/g, ''); // Remove any characters not allowed in an email local part
+
+    const email = `${sanitizedUsername}@gmail.com`;
     const password = formData.get("password") as string;
     const supabase = createClient();
 

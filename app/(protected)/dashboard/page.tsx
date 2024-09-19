@@ -5,14 +5,14 @@ import React, { useEffect, useState } from 'react'
 import AccountBox from '@/components/AccountBox';
 import { useAppSelector } from '@/app/store/hooks';
 import { accountAction } from '@/utils/accountAction';
-import UserState from '@/components/dev/UserState'
-import BillForm from '@/components/dev/BillForm';
-
 
 const Dashboard = () => {
     const user = useAppSelector(state => state.user);
     const user_id = (user.user_id)?.toString();
     const [accounts, setAccounts] = useState<Account[]>([]);
+    const [username, setUsername] = useState<string>('');
+    const [loading, setLoading] = useState(true); // Add loading state
+
     useEffect(() => {
         if (user_id) {
             accountAction.fetchAccountsbyUserId(user_id).then((data) => {
@@ -20,7 +20,22 @@ const Dashboard = () => {
             }).catch((error) => {
                 console.error('Error fetching accounts:', error);
             });
+
+        
+            // Fetch the username based on user_id
+            accountAction.fetchUsernamebyUserId(user_id)
+                .then((fetchedUsername) => {
+                    setUsername(fetchedUsername); // Set the fetched username
+                })
+                .catch((error) => {
+                    console.error('Error fetching username:', error);
+                    setUsername('');
+                })
+                .finally(() => {
+                    setLoading(false); // Set loading false when all data is fetched
+                  });
         }
+
     }, [user_id]);
 
     const totalBalance = accounts.reduce((acc, account) => acc + (account.balance || 0), 0);
@@ -28,15 +43,20 @@ const Dashboard = () => {
     return (
         <section className="flex w-full flex-row max-xl:max-h-screen font-inter">
             <div className="flex w-full flex-1 flex-col gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen">
-                {/* <UserState /> */}
-                {/* <BillForm /> */}
-                {/* <BillForm /> */}
+                {loading ? (
+                // Spinner to show while loading
+                <div className="flex items-center justify-center">
+                    <div className="spinner"></div> {/* Replace this with your actual spinner component */}
+                </div>
+                ) : (
+                // Main content when not loading
+                <>
                 {/* Header */}
                 <header className="home-header">
                     <HeaderBox
                         type="greeting"
                         title="Welcome"
-                        user={user.user_name || 'Guest'}
+                        user={ username|| ''}
                         subtext="View your account summaries"
                     />
                 </header>
@@ -66,7 +86,8 @@ const Dashboard = () => {
                         <AnimatedCounter amount={totalBalance} />
                     </div>
                 </div>
-
+                </>
+                )}
             </div>
         </section>
     )
