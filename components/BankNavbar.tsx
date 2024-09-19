@@ -9,7 +9,7 @@ import { useAppDispatch } from "@/app/store/hooks";
 
 const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const session = null; // Placeholder session object
+    const session = "";
     const router = useRouter(); // Next.js router
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const supabase = createClient();
@@ -131,8 +131,12 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
                 </ul>
 
                 <div className='flexCenter gap-12'>
-                    {session ? (
-                        <Link href="/admin" className='hidden xl:block font-inter hover:text-blue-25 hover:underline underline-blue-25' onClick={handleLinkClick}>
+                    {String(session) === "admin" ? (
+                        <Link 
+                            href="/admin/dashboard" 
+                            className='hidden xl:block font-inter hover:text-blue-25 hover:underline underline-blue-25' 
+                            onClick={handleLinkClick}
+                        >
                             Admin
                         </Link>
                     ) : null}
