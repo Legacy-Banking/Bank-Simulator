@@ -131,8 +131,17 @@ const TransactionHistoryContent = () => {
   }, [accountId, pageFromUrl]);
 
   const handleAccountChange = (value: string) => {
-    setLoading(true);
-    router.push(`/transaction-history?accountid=${value}&page=1`);
+
+  const currentPage = pageFromUrl;
+  // Reset the page to 1 when account is changed or even when selecting the same account
+  if (String(value) === String(accountId) && currentPage === 1) {
+    // If the account is the same and already on page 1, do nothing
+    return;
+  }
+
+  setLoading(true);
+  router.push(`/transaction-history?accountid=${value}&page=1`);
+
   };
 
   const handleDownloadStatement = () => {
