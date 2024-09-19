@@ -11,6 +11,7 @@ const Dashboard = () => {
     const user_id = (user.user_id)?.toString();
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [username, setUsername] = useState<string>('');
+    const [loading, setLoading] = useState(true); // Add loading state
 
     useEffect(() => {
         if (user_id) {
@@ -29,7 +30,10 @@ const Dashboard = () => {
                 .catch((error) => {
                     console.error('Error fetching username:', error);
                     setUsername('');
-                });
+                })
+                .finally(() => {
+                    setLoading(false); // Set loading false when all data is fetched
+                  });
         }
 
     }, [user_id]);
@@ -39,7 +43,14 @@ const Dashboard = () => {
     return (
         <section className="flex w-full flex-row max-xl:max-h-screen font-inter">
             <div className="flex w-full flex-1 flex-col gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen">
-
+                {loading ? (
+                // Spinner to show while loading
+                <div className="flex items-center justify-center">
+                    <div className="spinner"></div> {/* Replace this with your actual spinner component */}
+                </div>
+                ) : (
+                // Main content when not loading
+                <>
                 {/* Header */}
                 <header className="home-header">
                     <HeaderBox
@@ -75,7 +86,8 @@ const Dashboard = () => {
                         <AnimatedCounter amount={totalBalance} />
                     </div>
                 </div>
-
+                </>
+                )}
             </div>
         </section>
     )
