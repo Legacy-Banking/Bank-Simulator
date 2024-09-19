@@ -2,6 +2,7 @@ import { createClient } from "./supabase/client";
 import { accbsbGenerator } from "./accbsbGenerator";
 import { billAction } from "./billAction";
 import { billerAction } from './billerAction';
+import { cardAction } from "./cardAction";
 
 enum AccountType {
     SAVINGS = 'savings',
@@ -125,15 +126,6 @@ export const accountAction = {
 
         const accounts: Partial<Account>[] = [
             {
-                type: AccountType.SAVINGS,
-                balance: 1000,
-                owner: user_id,
-                bsb: savbsb,
-                acc: savacc,
-                opening_balance: 1000,
-                owner_username: owner_username
-            },
-            {
                 type: AccountType.PERSONAL,
                 balance: 1000,
                 owner: user_id,
@@ -141,22 +133,30 @@ export const accountAction = {
                 acc: peracc,
                 opening_balance: 1000,
                 owner_username: owner_username
+            },
+            {
+                type: AccountType.SAVINGS,
+                balance: 1000,
+                owner: user_id,
+                bsb: savbsb,
+                acc: savacc,
+                opening_balance: 1000,
+                owner_username: owner_username
             }
         ]
 
-        bills.forEach(async (bill) => {
-            await billAction.createBill(user_id,bill.biller,bill.amount,bill.description);
-        })
-        
-        accounts.forEach(async (account) => {
+        for (const account of accounts) {
             await accountAction.createAccount(account as Account);
-        });
+        }        
+        await cardAction.cardSignUpInitialization(user_id);
 
         await billerAction.createDefaultSavedBillers(user_id);
 
-        //Need to also generate Cards with their number and CSV
-        //Generate their bills
-        //Generate default transaction history
+        for (const bill of bills) {
+            await billAction.createBill(user_id, bill.biller, bill.amount, bill.description);
+        }        
+        
+
     },
 
     fetchUsernamebyUserId: async (user_id: string): Promise<string> => {
