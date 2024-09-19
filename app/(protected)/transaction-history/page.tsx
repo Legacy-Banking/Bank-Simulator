@@ -26,7 +26,7 @@ const TransactionHistoryContent = () => {
   const [account, setAccount] = useState<Account>({} as Account);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [page, setPage] = useState(pageFromUrl);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const rowsPerPage = 10;
 
   const user = useAppSelector(state => state.user);  
