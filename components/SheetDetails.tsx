@@ -28,7 +28,7 @@ const SheetDetails = (bills: BillDetails) => {
           <p className="text-sm"> Invoice Date: <span className="text-sm font-medium">{formatDateTime(bill.created_at!)}</span></p>
         </div>
         <div className="text-sm text-right leading-2">
-          <h2 className="font-semibold mb-2">{biller.name}</h2>
+          <h2 className="font-semibold text-lg mb-2 text-blue-800">{biller.name}</h2>
           <p>123 Business Ave</p>
           <p>City, State and ZIP</p>
           <p className="break-words"
@@ -84,8 +84,9 @@ const SheetDetails = (bills: BillDetails) => {
       {/* Payment Details */}  {/* NEEDS TO BE IMPLEMENTED */}
       <div className="flex justify-start mb-4 text-sm">
         <div className="text-left">
-          <h3 className="text-sm font-semibold">Payment Details</h3>
+          <h3 className="text-sm font-semibold ">Payment Details</h3>
           <p>Biller Code: {biller.biller_code}</p>
+          <p>Biller Name: {biller.name}</p>
           <p>Reference Number: {bill.reference_number}</p>
         </div>
       </div>
