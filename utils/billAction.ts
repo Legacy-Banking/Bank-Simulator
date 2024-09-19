@@ -3,18 +3,6 @@ import { billerAction } from "./billerAction";
 import { number } from "zod";
 import { referenceNumberGenerator, generateUniqueInvoiceNumber, calculateDueDate } from "./accbsbGenerator"
 
-// Define types (Assuming they are declared elsewhere)
-
-
-interface Biller {
-    name: string;
-}
-
-interface BillDetails {
-    bill: Bill;
-    biller: any; // Define the type according to your biller structure
-}
-
 export const billAction = {
     fetchBillsbyUserId: async (user_id: string): Promise<Bill[]> => {
         const supabase = createClient();

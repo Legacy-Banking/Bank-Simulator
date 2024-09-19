@@ -48,9 +48,9 @@ export const cardAction = {
                 owner_username: owner_username,
             }
         ];
-        cards.forEach(async (card) => {
+        for (const card of cards) {
             await cardAction.createCard(card as Card);
-        });
+        }
     },
     // fetchCardById: async (ownerId: string): Promise<Card[]> => {
     //     const supabase = createClient();

@@ -25,12 +25,12 @@ type BillSheetProps = {
 
 function formatToCurrency(amount: number | undefined): string {
   if (!amount) {
-      return '$0.00';
+    return '$0.00';
   }
   const formattedAmount = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
   }).format(amount);
 
   return formattedAmount;
@@ -107,7 +107,8 @@ const BillSheet: React.FC<BillSheetProps> = ({ bills, onClose }) => {
 
     doc.setFont('helvetica', 'normal');
     doc.text(`Biller Code: ${biller.biller_code}`, 14, finalY + 10);
-    doc.text(`Reference Number: ${bill.reference_number}`, 14, finalY + 20);
+    doc.text(`Biller Name: ${biller.name}`, 14, finalY + 20);
+    doc.text(`Reference Number: ${bill.reference_number}`, 14, finalY + 30);
 
     // Save the created PDF
     doc.save('Print_Invoice.pdf');
@@ -115,16 +116,16 @@ const BillSheet: React.FC<BillSheetProps> = ({ bills, onClose }) => {
 
   return (
     <Dialog open={!!bills} onOpenChange={onClose}>
-      <DialogContent className="bg-white-100 p-6 max-w-lg w-full max-h-screen overflow-auto">
+      <DialogContent className="bg-white-100 p-4 max-w-md w-full max-h-[88vh] overflow-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">Bill Details</DialogTitle>
-          <DialogDescription className="text-sm text-gray-500">
+          <DialogTitle className="hidden sm:block text-lg font-semibold">Bill Details</DialogTitle>
+          <DialogDescription className="hidden sm:block text-sm text-gray-500">
             Detailed information about the selected bill.
           </DialogDescription>
         </DialogHeader>
         <SheetDetails {...bills} />
         <DialogFooter className="w-full flex justify-center items-center">
-          <Button onClick={printBill} className="text-sm bg-slate-200 w-32 m-auto hover:underline">Print Bill</Button> {/*PRINT button needs to be implemented*/}
+          <Button onClick={printBill} className="text-xs bg-slate-200 w-24 m-auto hover:underline">Print Bill</Button> {/*PRINT button needs to be implemented*/}
         </DialogFooter>
       </DialogContent>
     </Dialog>
