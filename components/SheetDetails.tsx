@@ -19,9 +19,9 @@ const SheetDetails = (bills: BillDetails) => {
     return formattedAmount;
   }
   return (
-    <div className="bg-white px-2 rounded-lg shadow-2xl max-w-md mx-auto">
+    <div className="bg-white p-4 rounded-lg shadow-2xl max-w-md mx-auto">
       {/* Header */}
-      <div className="grid grid-cols-2 gap-4 items-start mb-2">
+      <div className="grid grid-cols-2 gap-4 items-start mt-1 mb-2">
         <div>
           <h1 className="text-lg underline underline-offset-1 font-semibold">Invoice</h1>
           <p className="text-xs mt-1">Invoice Number: <span className="text-xs font-medium">{bill.invoice_number?.replace("/", "-") ?? "N/A"}</span></p>
@@ -40,11 +40,11 @@ const SheetDetails = (bills: BillDetails) => {
 
       </div>
 
-      <div className="border-t-2 border-gray-400 mb-3"></div>
+      <div className="border-t-2 border-gray-400 mb-4"></div>
 
       {/* Bill To */}
       <div className="mb-3">
-        <h3 className="text-sm font-semibold">Billed To:</h3>
+        <h3 className="text-sm font-semibold mb-1">Billed To:</h3>
         <p className="text-xs">{user.user_name}</p>
         <p className="text-xs">400 BK St</p>
         <p className="text-xs">Legacy City, 4671</p>
@@ -53,7 +53,7 @@ const SheetDetails = (bills: BillDetails) => {
 
       {/* Description */}
       <div className="mb-3">
-        <h3 className="text-sm font-semibold">Description</h3>
+        <h3 className="text-sm font-semibold mb-1">Description</h3>
         <p className="break-words text-xs"
           style={{
             wordBreak: 'break-word', // Ensures long words break into the next line
@@ -82,9 +82,9 @@ const SheetDetails = (bills: BillDetails) => {
       </div>
 
       {/* Payment Details */}  {/* NEEDS TO BE IMPLEMENTED */}
-      <div className="flex justify-start mb-3 text-xs">
+      <div className="flex justify-start mb-4 text-xs">
         <div className="text-left">
-          <h3 className="text-sm font-semibold ">Payment Details</h3>
+          <h3 className="text-sm font-semibold mb-1 ">Payment Details</h3>
           <p>Biller Code: {biller.biller_code}</p>
           <p>Biller Name: {biller.name}</p>
           <p>Reference Number: {bill.reference_number}</p>
@@ -95,7 +95,7 @@ const SheetDetails = (bills: BillDetails) => {
       <div className="mt-1 border-t-2 border-slate-400 pt-2 text-center">
         {bill.status === "paid" ? (<p className="text-xs mb-1 text-grey-500">Bill is paid, Well done!</p>) : (<p className="text-xs mb-1 text-gray-500">Please make the payment by the due date.</p>)}
 
-        <p className="text-xs font-semibold">Payment is due {formatDateTime(bill.due_date!)}</p>
+        <p className="text-xs  mb-2 font-semibold">Payment is due {formatDateTime(bill.due_date!)}</p>
       </div>
     </div>
   );

@@ -118,8 +118,8 @@ const BillSheet: React.FC<BillSheetProps> = ({ bills, onClose }) => {
     <Dialog open={!!bills} onOpenChange={onClose}>
       <DialogContent className="bg-white-100 p-4 max-w-md w-full max-h-[88vh] overflow-auto">
         <DialogHeader>
-          <DialogTitle className="text-lg font-semibold">Bill Details</DialogTitle>
-          <DialogDescription className="text-sm text-gray-500">
+          <DialogTitle className="hidden sm:block text-lg font-semibold">Bill Details</DialogTitle>
+          <DialogDescription className="hidden sm:block text-sm text-gray-500">
             Detailed information about the selected bill.
           </DialogDescription>
         </DialogHeader>
