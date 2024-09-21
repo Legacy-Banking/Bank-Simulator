@@ -1,11 +1,12 @@
 import { bankNavLinks, transferPayLinks } from '@/constants'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React, { use, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { updateUserId } from '@/app/store/userSlice'
 import { useAppDispatch } from "@/app/store/hooks";
+import { useAppSelector } from '@/app/store/userSlice'
 
 const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -14,6 +15,8 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const supabase = createClient();
     const dispatch = useAppDispatch();
+    const userRole = useAppSelector(state => state.user.user_role);
+
 
     const unreadMessageCount = 0;
 
@@ -57,6 +60,13 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
 
             <div className='flex items-center gap-12'>
                 <ul className='xl:flex hidden text-small gap-12'>
+                    {userRole === 'admin' && (
+                        <li key="/admin" className='font-inter'>
+                            <Link href="/admin/dashboard" className='hover:text-blue-25 hover:underline underline-blue-25' onClick={handleLinkClick}>
+                                Admin
+                            </Link>
+                        </li>
+                    )}
                     <li key="/dashboard" className='font-inter'>
                         <Link href="/dashboard" className='hover:text-blue-25 hover:underline underline-blue-25' onClick={handleLinkClick}>
                             Dashboard
@@ -78,7 +88,7 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
                             Cards
                         </Link>
                     </li>
-                    
+
                     <li className='relative font-inter'>
                         <button
                             className='flex items-center gap-2 hover:text-blue-25 hover:underline underline-blue-25'
@@ -132,9 +142,9 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
 
                 <div className='flexCenter gap-12'>
                     {String(session) === "admin" ? (
-                        <Link 
-                            href="/admin/dashboard" 
-                            className='hidden xl:block font-inter hover:text-blue-25 hover:underline underline-blue-25' 
+                        <Link
+                            href="/admin/dashboard"
+                            className='hidden xl:block font-inter hover:text-blue-25 hover:underline underline-blue-25'
                             onClick={handleLinkClick}
                         >
                             Admin
@@ -165,30 +175,30 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
             {isMobileMenuOpen && (
                 <ul className='absolute top-full left-0 mt-0.5 bg-white-100 shadow-lg rounded-lg w-full py-4 z-20'>
                     {bankNavLinks.map((link) => {
-                    if (link.route === '/transaction-history') {
-                        return (
-                        <li key={link.route} className='font-inter text-left'>
-                            <button
-                            onClick={handleTransactionHistoryClick}
-                            className='block px-10 py-4 hover:text-blue-25 hover:underline underline-blue-25'
-                            >
-                            {link.label}
-                            </button>
-                        </li>
-                        );
-                    } else {
-                        return (
-                        <li key={link.route} className='font-inter text-left'>
-                            <Link
-                            href={link.route}
-                            className='block px-10 py-4 hover:text-blue-25 hover:underline underline-blue-25'
-                            onClick={handleLinkClick}
-                            >
-                            {link.label}
-                            </Link>
-                        </li>
-                        );
-                    }
+                        if (link.route === '/transaction-history') {
+                            return (
+                                <li key={link.route} className='font-inter text-left'>
+                                    <button
+                                        onClick={handleTransactionHistoryClick}
+                                        className='block px-10 py-4 hover:text-blue-25 hover:underline underline-blue-25'
+                                    >
+                                        {link.label}
+                                    </button>
+                                </li>
+                            );
+                        } else {
+                            return (
+                                <li key={link.route} className='font-inter text-left'>
+                                    <Link
+                                        href={link.route}
+                                        className='block px-10 py-4 hover:text-blue-25 hover:underline underline-blue-25'
+                                        onClick={handleLinkClick}
+                                    >
+                                        {link.label}
+                                    </Link>
+                                </li>
+                            );
+                        }
                     })}
                     {session && (
                         <li className='font-inter text-left'>

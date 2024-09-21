@@ -7,11 +7,13 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 interface UserState {
   user_id: string;
   user_name?: string;
+  user_role?: string;
 }
 
 const initialState: UserState = {
   user_id: '',
   user_name: '',
+  user_role: '',
 };
 
 // Helper function to extract the non-Gmail part of an email
@@ -30,6 +32,9 @@ export const userSlice = createSlice({
     updateUserId: (state, action: PayloadAction<string>) => {
       state.user_id = action.payload;
     },
+    updateUserRole: (state, action: PayloadAction<string>) => {
+      state.user_role = action.payload;
+    },
     updateUserName: (state, action: PayloadAction<string>) => {
       const username = extractUsernameFromEmail(action.payload);
       state.user_name = username; 
@@ -37,10 +42,11 @@ export const userSlice = createSlice({
   },
 });
 
-export const { updateUserId, updateUserName } = userSlice.actions;
+export const { updateUserId, updateUserName, updateUserRole} = userSlice.actions;
 
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 export const selectUserId = (state: RootState) => state.user.user_id;
 export const selectUserName = (state: RootState) => state.user.user_name;
+export const selectUserRole = (state: RootState) => state.user.user_role;
 export default userSlice.reducer;
