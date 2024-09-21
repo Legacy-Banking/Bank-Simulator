@@ -8,7 +8,7 @@ import {
     DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { cn, formatDateTime } from "@/lib/utils"
+import { formatDateTime } from "@/lib/utils"
 
 type InboxDetailSheetProps = {
     message: Message | null;
@@ -28,9 +28,10 @@ const InboxDetailSheet: React.FC<InboxDetailSheetProps> = ({ message, onClose}) 
               </DialogDescription>
             </DialogHeader>
             <div >
-              <p><strong>Name:</strong> {message.from_account}</p>
+              <p><strong>Name:</strong> {message.sender_name}</p>
               <p><strong>Date:</strong> {formatDateTime(message.date_received)}</p>
-              <p><strong>Description:</strong> {message.description || 'No description available'}</p>
+              <p><strong>Description:</strong> {message.description || 'No description available'}
+          </p>
             </div>
             <DialogFooter>
               <Button onClick={onClose}>Close</Button>

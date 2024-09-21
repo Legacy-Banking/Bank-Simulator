@@ -2,6 +2,7 @@ import { createClient } from "./supabase/client";
 import { billerAction } from "./billerAction";
 import { number } from "zod";
 import { referenceNumberGenerator, generateUniqueInvoiceNumber, calculateDueDate } from "./accbsbGenerator"
+import { inboxAction } from "./inboxAction";
 
 export const billAction = {
     fetchBillsbyUserId: async (user_id: string): Promise<Bill[]> => {
@@ -77,6 +78,15 @@ export const billAction = {
 
         if (error) {
             throw new Error(`Failed to create bill: ${error.message}`);
+        }
+        const messageDescription = `A new bill of $${amount} has been assigned to you from ${biller.name} for ${description}. Pay by ${newBill.due_date.toLocaleDateString()}.`;
+
+        try {
+            await inboxAction.createMessage(biller.name, user_id, messageDescription);
+            console.log('Message sent to user about new bill');
+        } catch (messageError) {
+            console.error('Failed to send message to user:', messageError);
+            // Handle the message error gracefully if necessary
         }
 
         console.log('Bill created:', data);

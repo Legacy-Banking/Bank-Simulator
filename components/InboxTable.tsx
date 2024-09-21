@@ -11,7 +11,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import InboxDetailSheet from './InboxDetailSheet';
-import { cn, formatDateTime } from '@/lib/utils';
+import { formatDateTime } from '@/lib/utils';
 
 
 export const InboxTable = ({ messages = [] }: InboxTableProps) => {
@@ -28,7 +28,6 @@ export const InboxTable = ({ messages = [] }: InboxTableProps) => {
     return (
       <>
         <Table>
-          <TableCaption>A list of your recent notifications.</TableCaption>
           <TableHeader>
             <TableRow className="bg-blue-200 text-white-200">
               <TableHead className="px-8 rounded-tl-2xl">Name</TableHead>
@@ -37,27 +36,27 @@ export const InboxTable = ({ messages = [] }: InboxTableProps) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {messages.map((m: Message) => {
+            {messages.map((message: Message) => {
                 return (
                     <TableRow
-                    key={m.id}
+                    key={message.id}
                     className="cursor-pointer hover:bg-gray-100"
-                    onClick={() => openMessageDetails(m)} // Open the sheet on row click
+                    onClick={() => openMessageDetails(message)} // Open the sheet on row click
                     >
                     <TableCell className="max-w-[250px] pl-8 pr-10">
                         <div className="flex items-center gap-3">
                             <h1 className="text-14 truncate font-semibold text-[#344054]">
-                                {m.from_account}
+                                {message.sender_name}
                             </h1>
                         </div>
                     </TableCell>
     
                     <TableCell className="pl-4 pr-10">
-                        {m.description}
+                        {message.description}
                     </TableCell>
     
                     <TableCell className="min-w-32 pl-2 pr-10">
-                        {formatDateTime(m.date_received)}
+                        {formatDateTime(message.date_received)}
                     </TableCell>
                     </TableRow>
                 );

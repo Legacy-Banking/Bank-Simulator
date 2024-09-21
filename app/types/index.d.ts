@@ -127,8 +127,8 @@ declare interface Message {
   id: string;
   description: string;
   date_received: Date;
-  from_account: string;
-  to_account: string;
+  sender_name: string;
+  to_user: string;
 }
 
 declare interface Card {
