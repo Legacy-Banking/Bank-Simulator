@@ -5,7 +5,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { updateUserId } from '@/app/store/userSlice'
-import { useAppDispatch } from "@/app/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 
 const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -14,6 +14,7 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const supabase = createClient();
     const dispatch = useAppDispatch();
+    const userRole = useAppSelector(state => state.user.user_role);
 
     const unreadMessageCount = 0;
 
@@ -58,6 +59,13 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
 
                 <div className='flex items-center gap-12'>
                     <ul className='xl:flex hidden text-base gap-12'>
+                        {userRole === 'admin' && (
+                            <li key="/admin" className='font-inter'>
+                                <Link href="/admin/dashboard" className='hover:text-blue-25 hover:underline underline-blue-25' onClick={handleLinkClick}>
+                                    Admin
+                                </Link>
+                            </li>
+                        )}
                         <li key="/dashboard" className='font-inter'>
                             <Link href="/dashboard" className='hover:text-blue-25 hover:underline underline-blue-25' onClick={handleLinkClick}>
                                 Dashboard
