@@ -17,23 +17,23 @@ export default async function Home() {
           {/* Title Section */}
           <div className="flex flex-col space-y-6 mt-[30px] 3xl:space-y-10 3xl:mt-[50px] lg:mr-10 2xl:mr-20">
             {/* Title */}
-            <h1 className="text-4xl lg:text-5xl 2xl:text-7xl 3xl:text-8 xl font-bold leading-none text-[#222223] items-center">
+            <h1 className="text-4xl lg:text-7xl 2xl:text-9xl 3xl:text-9xl font-bold leading-none text-[#222223] items-center">
               {contentEmbeddings?.title || 'Learning made easy'}
             </h1>
 
             {/* Subtitle */}
-            <p className="text-l md:text-base 2xl:text-lg 3xl:text-xl font-normal leading-6 text-[#535354]">
+            <p className="text-l md:text-base lg:text-lg 2xl:text-lg 3xl:text-xl font-normal leading-6 text-[#535354]">
               {contentEmbeddings?.subtitle || 'Simple and modern banking simulator made to make learning easy'}
             </p>
 
             {/* Subtitle 2 */}
-            <p className="text-l md:text-base 2xl:text-lg 3xl:text-xl font-semibold leading-none text-[#535351]">
+            <p className="text-l md:text-base lg:text-lg 2xl:text-lg 3xl:text-xl font-semibold leading-none text-[#535351]">
               {contentEmbeddings?.start_encourage || 'Login Or Sign Up to START NOW!'}
             </p>
 
-              {/* Buttons for Login & Signup */}
-              <HomeAuthLinks />
-            </div>
+            {/* Buttons for Login & Signup */}
+            <HomeAuthLinks />
+          </div>
 
           {/* Image Section */}
           <div className="hidden lg:block left-[100px] top-[100px] 3xl:left-[200px] 3xl:top-[150px]">
@@ -52,10 +52,10 @@ export default async function Home() {
                   <div className="w-full h-[148px] relative 3xl:h-[200px]">
                     <Image src="/demo.png" alt="Learn How to Use this Website" fill style={{ objectFit: 'cover' }} />
                   </div>
-                  <h3 className="text-[20px] 3xl:text-[24px] font-bold text-[#17181A] hover:underline">
-                    {contentEmbeddings?.resource_column1_title || 'Learn How to Use this Website'}
+                  <h3 className="text-2xl 3xl:text-2xl font-bold text-[#17181A] hover:underline">
+                    {contentEmbeddings?.resource_column1_title || 'How to Use this Website'}
                   </h3>
-                  <p className="text-[14px] 3xl:text-[16px] text-[#5F5F64]">
+                  <p className="text-base 3xl:text-lg text-[#5F5F64]">
                     {contentEmbeddings?.resource_column1_description || 'Watch this video demo to learn how to use the website'}
                   </p>
 
@@ -67,10 +67,10 @@ export default async function Home() {
                   <div className="w-full h-[148px] relative 3xl:h-[200px]">
                     <Image src="/phishing.png" alt="Scam Phishing Quiz" fill style={{ objectFit: 'cover' }} />
                   </div>
-                  <h3 className="text-[20px] 3xl:text-[24px] font-bold text-[#17181A] hover:underline">
+                  <h3 className="text-2xl 3xl:text-2xl font-bold text-[#17181A] hover:underline">
                     {contentEmbeddings?.resource_column2_title || 'Scam Phishing Quiz'}
                   </h3>
-                  <p className="text-[14px] 3xl:text-[16px] text-[#5F5F64]">
+                  <p className="text-base 3xl:text-lg text-[#5F5F64]">
                     {contentEmbeddings?.resource_column2_description || 'Take this quiz to test your ability to identify fraudulent emails and websites'}
                   </p>
                 </div>
@@ -81,10 +81,10 @@ export default async function Home() {
                   <div className="w-full h-[148px] relative 3xl:h-[200px]">
                     <Image src="/seniorit.png" alt="SeniorIT Program" fill style={{ objectFit: 'cover' }} />
                   </div>
-                  <h3 className="text-[20px] 3xl:text-[24px] font-bold text-[#17181A] hover:underline">
+                  <h3 className="text-2xl 3xl:text-2xl font-bold text-[#17181A] hover:underline">
                     {contentEmbeddings?.resource_column3_title || 'SeniorIT Program'}
                   </h3>
-                  <p className="text-[14px] 3xl:text-[16px] text-[#5F5F64]">
+                  <p className="text-base 3xl:text-lg text-[#5F5F64]">
                     {contentEmbeddings?.resource_column3_description || 'Learn more about other resources that are available to aid in your online learning'}
                   </p>
                 </div>

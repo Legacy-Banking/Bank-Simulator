@@ -216,7 +216,7 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
             {/* Notice Below Navbar */}
             <div className="bg-yellow-300 text-center py-3">
                 <p className="text-black font-semibold text-base">
-                    PLEASE NTOE: LearnToBank is only a simulation (fake banking website). Transactions are simulations only.
+                    PLEASE NOTE: LearnToBank is only a simulation (fake banking website). Transactions are simulations only.
                 </p>
             </div>
         </>

@@ -46,7 +46,7 @@ export default function Login({
 
 
         <div className="py-6">
-          <div className="text-4xl text-[#101828] font-semibold pb-4">Log in</div>
+          <div className="text-5xl text-[#101828] font-semibold pb-4">Log in</div>
           <div className="text-base text-[#475467]">Welcome back! Please enter your details.</div>
         </div>
 
@@ -57,17 +57,17 @@ export default function Login({
         )}
 
         <form className="flex flex-col w-full rounded-md text-[#344054]">
-          <label className="text-sm font-medium" htmlFor="email">Username</label>
+          <label className="text-base font-medium" htmlFor="email">Username</label>
           <input className="rounded-md px-3 py-2 mt-2 border mb-5 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " name="username" placeholder="Enter username" required />
 
-          <label className="text-sm font-medium" htmlFor="password">Password</label>
+          <label className="text-base font-medium" htmlFor="password">Password</label>
           <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " type="password" name="password" placeholder="Enter your password" required />
 
-          <SubmitButton className="bg-[#3D87C3] rounded-md px-4 py-2 text-white mb-2 drop-shadow-lg"
+          <SubmitButton className="bg-[#3D87C3] text-lg rounded-md px-4 py-2 text-white mb-2 drop-shadow-lg"
             formAction={signIn}
             pendingText="Signing In...">Login</SubmitButton>
         </form>
-        <div className="mt-5 text-xs text-center font-normal text-[#475467]">
+        <div className="mt-5 text-base text-center font-normal text-[#475467]">
           Don't have an account?
           <Link className="text-[#3D87C3] rounded-md px-1 font-semibold"
             href="/sign-up">Sign Up</Link>
