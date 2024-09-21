@@ -1,4 +1,3 @@
-import { createWatchCompilerHost } from "typescript";
 import { createClient } from "./supabase/client";
 
 export const inboxAction = {
@@ -43,6 +42,18 @@ export const inboxAction = {
 
         const messages = data as Message[];
         return messages;
+    },
+    readMessage: async (message:Partial<Message>):Promise<void>=>{
+        const supabase = createClient();
+        const id = message.id;
+        const {data,error} = await supabase
+            .from('messages')
+            .update({read:true})
+            .eq('id', id);
+        if(error){
+            throw error;
+        }
     }
 };
+
 

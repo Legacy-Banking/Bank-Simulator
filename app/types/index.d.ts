@@ -129,6 +129,7 @@ declare interface Message {
   date_received: Date;
   sender_name: string;
   to_user: string;
+  read: boolean;
 }
 
 declare interface Card {
