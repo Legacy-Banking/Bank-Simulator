@@ -82,7 +82,7 @@ const Dashboard = () => {
                         {/* Total Balance Section */}
                         <div className="flex w-full justify-between items-center gap-4 p-4 sm:gap-6 sm:pt-6 pb-16">
                             <h2 className="text-24 lg:text-3xl font-semibold text-blackText-50">Total Balance</h2>
-                            <div className="total-balance-amount lg:text-3xl text-right text-bold">
+                            <div className="total-balance-amount text-right text-bold">
                                 <AnimatedCounter amount={totalBalance} />
                             </div>
                         </div>
