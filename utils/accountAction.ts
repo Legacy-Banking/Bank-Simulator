@@ -142,6 +142,15 @@ export const accountAction = {
                 acc: savacc,
                 opening_balance: 1000,
                 owner_username: owner_username
+            },
+            {
+                type: AccountType.CREDIT,
+                balance: 1000,
+                owner: user_id,
+                bsb: null,
+                acc: null,
+                opening_balance: 1000,
+                owner_username: owner_username
             }
         ]
 

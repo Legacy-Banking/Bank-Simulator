@@ -28,10 +28,10 @@ const Cards = () => {
     }
   }, [ownerId]);
 
-  const [account, setAccounts] = useState<Account>();
+  const [accounts, setAccounts] = useState<Account[]>([]);
     useEffect(() => {
         if (ownerId) {
-            accountAction.fetchPersonalAccountByUserId(ownerId).then((data) => {
+            accountAction.fetchAccountsbyUserId(ownerId).then((data) => {
                 setAccounts(data);
             }).catch((error) => {
                 console.error('Error fetching accounts:', error);
@@ -39,7 +39,6 @@ const Cards = () => {
         }
     }, [ownerId]);
 
-    const totalBalance = account;
 
   return (
     <section className="flex w-full flex-row font-inter">
@@ -71,10 +70,10 @@ const Cards = () => {
                 name={card.owner_username}
                 cardNumber={parseInt(card.card_number)}
                 expirationDate={new Date(card.expiry_date)}
-                maxSpending={card.credit}
+                maxSpending={accounts[0].balance}
                 spending={123} // assuming spending is fetched separately
                 cvc={parseInt(card.cvv)}
-                linkedAccount={account}
+                linkedAccount={accounts[0]}
               />
             ) : (
               <CreditCardModel
@@ -83,9 +82,10 @@ const Cards = () => {
                 name={card.owner_username}
                 cardNumber={parseInt(card.card_number)}
                 expirationDate={new Date(card.expiry_date)}
-                maxSpending={card.credit}
+                maxSpending={accounts[2].balance}
                 spending={0} // assuming spending is fetched separately
                 cvc={parseInt(card.cvv)}
+                linkedAccount={accounts[2]}
               />
             )
           ))}

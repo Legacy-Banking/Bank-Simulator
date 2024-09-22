@@ -16,14 +16,23 @@ const formatAccountNumber = (acc: string = ''): string => {
 
 const AccountBox: React.FC<AccountBoxProps> = ({ account }) => {
     const router = useRouter();
-    const variant = account.type === 'savings' ? 'primary' : 'secondary';
-    const boxStyle = variant === 'primary'
-        ? 'bg-gradient-to-r from-yellow-100 to-yellow-500'  // Lighter yellow to darker yellow
-        : 'bg-gradient-to-r from-[#4C97D1] to-[#1A70B8]';     // Lighter blue to darker blue
+    const variant = account.type;  
 
-    const textColor = variant === 'primary'
+    const boxStyle = variant === 'personal'
+        ? 'bg-gradient-to-r from-[#4C97D1] to-[#1A70B8]'  // Blue gradient for personal
+        : variant === 'savings'
+        ? 'bg-gradient-to-r from-yellow-100 to-yellow-500'  // Yellow gradient for savings
+        : variant === 'credit'
+        ?  'bg-gradient-to-r from-purple-200 to-purple-600' // Purple gradient for credit
+        : 'bg-gradient-to-r from-[#4C97D1] to-[#1A70B8]';  
+
+    const textColor = variant === 'personal'
         ? 'text-blackText-50 hover:text-white-100'
-        : 'text-white-100 hover:text-blackText-50';
+        : variant === 'savings'
+        ? 'text-blackText-50 hover:text-blackText-50'  // You can adjust this if needed for savings
+        : 'text-text-blackText-50 hover:text-blackText-50';
+
+
 
     const parseUpperCase = (str: string) => {
         return str.charAt(0).toUpperCase() + str.slice(1);
@@ -47,9 +56,11 @@ const AccountBox: React.FC<AccountBoxProps> = ({ account }) => {
                     <p className={`text-lg`}>
                         {account?.owner_username}'s {account?.type} Account
                     </p>
-                    <p className="text-lg font-medium tracking-[1.1px] text-blackText-100">
-                        BSB: {account?.bsb ? formatBSB(account.bsb.toString()) : ''} <span className="mx-4"> </span> Account Number: {account?.acc ? formatAccountNumber(account.acc.toString()) : ''}
-                    </p>
+                    {account.type !== 'credit' && (
+                        <p className="text-lg font-medium tracking-[1.1px] text-blackText-100">
+                            BSB: {account?.bsb ? formatBSB(account.bsb.toString()) : ''} <span className="mx-4"> </span> Account Number: {account?.acc ? formatAccountNumber(account.acc.toString()) : ''}
+                        </p>
+                    )}
                 </div>
 
                 <div className='flex-center flex-col gap-2 rounded-md bg-white-100/20 px-8 py-2 text-blackText-100 border border-black'>
