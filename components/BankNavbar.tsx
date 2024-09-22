@@ -1,21 +1,40 @@
 import { bankNavLinks, transferPayLinks } from '@/constants'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { updateUserId } from '@/app/store/userSlice'
 import { useAppDispatch } from "@/app/store/hooks";
+import { inboxAction } from '@/utils/inboxAction'
+import { useAppSelector } from '@/app/store/hooks';
 
 const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) => {
+    const user_id = useAppSelector((state) => state.user.user_id)?.toString();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const session = "";
     const router = useRouter(); // Next.js router
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const supabase = createClient();
     const dispatch = useAppDispatch();
+    const [loading, setLoading] = useState(true);
+    const [unreadMessages, setUnreadMessages] = useState<Number>();
 
-    const unreadMessageCount = 0;
+    useEffect(() => {
+        if (user_id) {
+          inboxAction.getUnreadMessageCount(user_id).then((data) => {
+            setUnreadMessages(data);
+            console.log(data);
+          }).catch((error) => {
+            console.error('Error fetching messages:', error);
+          })
+          .finally(() => {
+            setLoading(false); // Set loading to false when data is fetched
+          });
+        }
+      }, [user_id]);
+
+
 
     const handleLinkClick = () => {
         setIsDropdownOpen(false);
@@ -122,9 +141,9 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
                             Inbox
                         </Link>
 
-                        {unreadMessageCount > 0 && (
+                        {unreadMessages > 0 && (
                             <span className="absolute -top-2 -right-4 bg-yellow-gradient text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                                {unreadMessageCount}
+                                {unreadMessages}
                             </span>
                         )}
                     </li>

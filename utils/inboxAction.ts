@@ -53,7 +53,18 @@ export const inboxAction = {
         if(error){
             throw error;
         }
+    },
+    getUnreadMessageCount: async (userId: string): Promise<Number> =>{
+        const supabase = createClient();
+        const { data, error } = await supabase
+                .from('messages')
+                .select('*')
+                .or(`to_user.eq.${userId}`)
+        if (error) {
+            console.error('Error fetching unread messages:', error);
+            throw error;
+        }
+        const unreadMessages = data.length;
+        return unreadMessages;
     }
 };
-
-

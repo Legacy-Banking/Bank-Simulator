@@ -55,11 +55,11 @@ export const InboxTable = ({ messages = [] }: InboxTableProps) => {
                         </div>
                     </TableCell>
     
-                    <TableCell className={`pl-4 pr-10 ${isRead ? 'text-gray-500' : ''}`}>
+                    <TableCell className={`pl-4 pr-10 ${isRead ? 'font-normal text-gray-500' : 'font-semibold text-[#344054]'}`}>
                         {message.description}
                     </TableCell>
     
-                    <TableCell className={`min-w-32 pl-2 pr-10 ${isRead ? 'text-gray-500' : ''}`}>
+                    <TableCell className={`min-w-32 pl-2 pr-10 ${isRead ? 'font-normal text-gray-500' : 'font-semibold text-[#344054]'}`}>
                         {formatDateTime(message.date_received)}
                     </TableCell>
                     </TableRow>
