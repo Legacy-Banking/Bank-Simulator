@@ -68,7 +68,7 @@ const Cards = () => {
                 key={card.id}
                 type={card.card_type}
                 name={card.owner_username}
-                cardNumber={parseInt(card.card_number)}
+                cardNumber={card.card_number}
                 expirationDate={new Date(card.expiry_date)}
                 maxSpending={accounts[0].balance}
                 cvc={parseInt(card.cvv)}
@@ -79,7 +79,7 @@ const Cards = () => {
                 key={card.id}
                 type={card.card_type}
                 name={card.owner_username}
-                cardNumber={parseInt(card.card_number)}
+                cardNumber={card.card_number}
                 expirationDate={new Date(card.expiry_date)}
                 maxSpending={card.credit}
                 cvc={parseInt(card.cvv)}

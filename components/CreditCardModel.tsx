@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 const CreditCardModel = (
     {type, name, cardNumber, expirationDate, maxSpending, cvc, linkedAccount}: 
-    {type : string, name : string, cardNumber : number, expirationDate : Date, maxSpending : number, cvc:number, linkedAccount : Account}
+    {type : string, name : string, cardNumber : string, expirationDate : Date, maxSpending : number, cvc:number, linkedAccount : Account}
 )  => {
     // State to track the spending amount (you can replace this with real data)
 

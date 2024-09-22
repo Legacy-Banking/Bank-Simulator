@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 const DebitCard = (
     {type, name, cardNumber, expirationDate, maxSpending, cvc, linkedAccount}: 
-    {type : string, name : string, cardNumber : number, expirationDate : Date, maxSpending : number, cvc : number, linkedAccount : Account | undefined}
+    {type : string, name : string, cardNumber : string, expirationDate : Date, maxSpending : number, cvc : number, linkedAccount : Account | undefined}
 )  => {
     // State to track the spending amount (you can replace this with real data)
 

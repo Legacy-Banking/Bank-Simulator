@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import * as z from "zod";
 import { BankDropdown } from "./BankDropDown";
+import CardSidebar from './CardSideBar';
 import { Button } from "./ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
@@ -252,9 +253,12 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
           throw new Error("Please provide valid card details.");
         }
   
+        // Create a sanitized card number by removing all spaces
+        const sanitizedCardNumber = cardNumber.replace(/\s+/g, "");
+
         // Fetch the account linked to the card
         fromAccount = await cardAction.fetchCardAccountId({
-          cardNumber,
+          cardNumber: sanitizedCardNumber,
           expiryDate,
           cvv,
         });
@@ -277,16 +281,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
         setIsLoading(false);
         return;
       }
-
-      // Prepare card details if required
-      const cardDetails = showCardDetails
-        ? {
-          cardNumber: data.cardNumber,
-          expiryDate: data.expiryDate,
-          cvv: data.cvv,
-        }
-        : null;
-
+      
       // Variables to hold final biller details
       let finalBillerName: string = '';
       let finalBillerCode: string = '';
@@ -383,6 +378,9 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
   //const selectedPaymentOption = form.watch("paymentOption");
 
   return (
+    <div className="flex">
+      {/* Main Form Section */}
+      <div className="w-4/5 p-4">
 
     <Form {...form}>
       <form onSubmit={form.handleSubmit(submit)} className="flex flex-col">
@@ -646,6 +644,17 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
         </div>
       </form>
     </Form>
+    </div>
+
+      {/* Right Sidebar/Panel - Only show when "Use Card" is selected */}
+      {showCardDetails && (
+      <div className="hidden flex-col justify-between fixed xl:right-8 3xl:right-24 bg-transparent xl:flex w-[320px] h-full">
+          <CardSidebar owner={accounts[0].owner} /> 
+      </div>
+      )}
+
+  </div>
+
   );
 };
 
