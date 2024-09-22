@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
 const CreditCardModel = (
-    {type, name, cardNumber, expirationDate, maxSpending, spending, cvc}: 
-    {type : string, name : string, cardNumber : number, expirationDate : Date, maxSpending : number, spending : number, cvc:number, linkedAccount : Account | undefined}
+    {type, name, cardNumber, expirationDate, maxSpending, cvc, linkedAccount}: 
+    {type : string, name : string, cardNumber : number, expirationDate : Date, maxSpending : number, cvc:number, linkedAccount : Account}
 )  => {
     // State to track the spending amount (you can replace this with real data)
 
@@ -83,14 +83,14 @@ const CreditCardModel = (
                 <div className="mt-4">
                     <div className="flex justify-between text-sm text-gray-700 font-inter ">
                         <span className="font-medium">Credit Available</span>
-                        <span>{formatToCurrency(maxSpending - spending)}</span>
+                        <span>{formatToCurrency(linkedAccount.balance)}</span>
                     </div>
 
                     {/* Spending Progress */}
                     <div className="relative h-2 mt-2 bg-gray-200 rounded-full">
                         <div
                             className="absolute top-0 left-0 h-2 bg-gradient-to-r from-[#4A1FFB] to-[#381AB7] rounded-full"
-                            style={{ width: `${((maxSpending - spending) / maxSpending) * 100}%` }}
+                            style={{ width: `${(linkedAccount.balance / maxSpending) * 100}%` }}
                         ></div>
                     </div>
                 </div>

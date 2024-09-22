@@ -17,6 +17,7 @@ import { useAppSelector } from '@/app/store/hooks';
 import { billerAction } from '@/utils/billerAction';
 import { bpayAction } from '@/utils/bpayAction';
 import { billAction } from '@/utils/billAction';
+import { cardAction } from '@/utils/cardAction';
 
 const formSchema = z.object({
   toBiller: z.string().optional(),
@@ -176,8 +177,8 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      toBiller: "", // Set default value as 0 for numeric IDs
-      fromBank: "", // Set default value as 0 for numeric IDs
+      toBiller: "", 
+      fromBank: "", 
       billerCode: "",
       billerName: "",
       referenceNum: "",
@@ -240,11 +241,33 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
     setIsLoading(true);
 
     try {
-      const fromAccount = accounts.find(account => String(account.id) === data.fromBank);
+      let fromAccount = accounts.find(account => String(account.id) === data.fromBank);
 
-      if (!fromAccount) {
-        throw new Error("Invalid bank account selected.");
+      // If no bank account is selected, check for card details and fetch the corresponding account
+      if (!fromAccount && showCardDetails) {
+        const { cardNumber, expiryDate, cvv } = data;
+  
+        // Ensure that card details are not undefined
+        if (!cardNumber || !expiryDate || !cvv) {
+          throw new Error("Please provide valid card details.");
+        }
+  
+        // Fetch the account linked to the card
+        fromAccount = await cardAction.fetchCardAccountId({
+          cardNumber,
+          expiryDate,
+          cvv,
+        });
+  
+        if (!fromAccount) {
+          throw new Error("Invalid card details or card not linked to an account.");
+        }
       }
+  
+      if (!fromAccount) {
+        throw new Error("Please select a bank account or provide valid card details.");
+      }
+  
 
       const amountF = parseFloat(data.amount);
 

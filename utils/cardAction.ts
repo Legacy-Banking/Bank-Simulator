@@ -8,6 +8,12 @@ enum AccountType {
     DEBIT = 'debit',
 }
 
+type CardDetails = {
+    cardNumber: string;
+    expiryDate: string;
+    cvv: string;
+  };
+
 export const cardAction = {
 
     createCard: async (card: Card): Promise<void> => {
@@ -95,7 +101,51 @@ export const cardAction = {
         }));
     
         return enrichedCards;
-    }
+    },
+
+    fetchCardAccountId: async ({cardNumber, expiryDate, cvv}: CardDetails) => {
+        try {
+          const supabase = createClient();
+
+          const [month, year] = expiryDate.split('/');
+          const expiryYear = parseInt('20' + year); 
+          const expiryMonth = parseInt(month);
+
+         const expiry = new Date(expiryYear, expiryMonth, 1); 
+         const formattedExpiryDate = expiry.toISOString().split('T')[0];
+    
+          // Query the database for the account linked to the provided card details
+          const { data, error } = await supabase
+            .from('cards')
+            .select('linked_to')
+            .eq('card_number', cardNumber)
+            .eq('expiry_date', formattedExpiryDate)
+            .eq('cvv', cvv)
+            .single();
+    
+          if (error || !data) {
+            throw new Error("Card details not found or not linked to any account.");
+          }
+
+          console.log(data.linked_to)
+    
+          // Fetch the account using the account ID linked to the card
+          const { data: accountData, error: accountError } = await supabase
+            .from('account')
+            .select('*')
+            .eq('id', data.linked_to)
+            .single();
+    
+          if (accountError || !accountData) {
+            throw new Error("Account not found for the given card.");
+          }
+    
+          return accountData;
+        } catch (error) {
+          console.error("Error fetching account for card:", error);
+          throw error;
+        }
+      },
     
     
 

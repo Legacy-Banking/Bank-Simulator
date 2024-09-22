@@ -71,7 +71,6 @@ const Cards = () => {
                 cardNumber={parseInt(card.card_number)}
                 expirationDate={new Date(card.expiry_date)}
                 maxSpending={accounts[0].balance}
-                spending={123} // assuming spending is fetched separately
                 cvc={parseInt(card.cvv)}
                 linkedAccount={accounts[0]}
               />
@@ -82,8 +81,7 @@ const Cards = () => {
                 name={card.owner_username}
                 cardNumber={parseInt(card.card_number)}
                 expirationDate={new Date(card.expiry_date)}
-                maxSpending={accounts[2].balance}
-                spending={0} // assuming spending is fetched separately
+                maxSpending={card.credit}
                 cvc={parseInt(card.cvv)}
                 linkedAccount={accounts[2]}
               />

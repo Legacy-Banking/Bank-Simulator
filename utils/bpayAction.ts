@@ -34,7 +34,7 @@ export const bpayAction = {
                 if (billcredit >= bill.amount) {
                     // Full payment
                     await transactionAction.createBPAYTransaction(
-                        account, biller_name, biller_code, reference_number, bill.amount, description, null
+                        account, biller_name, biller_code, reference_number, bill.amount, description
                     );
                     await billAction.updateBillStatus(bill, 'paid');
                     console.log(`Bill ${bill.id} fully paid with ${bill.amount}`);
@@ -42,7 +42,7 @@ export const bpayAction = {
                 } else {
                     // Partial payment
                     await transactionAction.createBPAYTransaction(
-                        account, biller_name, biller_code, reference_number, billcredit, description, null
+                        account, biller_name, biller_code, reference_number, billcredit, description
                     );
                     const newAmount = bill.amount - billcredit;
                     await billAction.updateBillStatus(bill, 'partial');

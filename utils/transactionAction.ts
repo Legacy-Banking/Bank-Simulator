@@ -82,7 +82,6 @@ export const transactionAction = {
         referenceNum: string,
         amount: number,
         description: string,
-        cardDetails: { cardNumber: string | undefined; expiryDate: string | undefined; cvv: string | undefined } | null
     ): Promise<void> => {
         const supabase = createClient();
 
@@ -95,7 +94,7 @@ export const transactionAction = {
         try {
             // Update the 'from' account balance
             // Construct the detailed description including biller details
-            const detailedDescription = `${description} | Biller: ${billerName}, Code: ${billerCode}, Ref: ${referenceNum}`;
+            const detailedDescription = `${description} Bill Details | Biller: ${billerName}, Code: ${billerCode}, Ref: ${referenceNum}`;
 
             // Insert the new BPAY transaction
             const newTransaction: Partial<Transaction> = {
@@ -105,10 +104,6 @@ export const transactionAction = {
                 from_account: fromAccount.id,
                 from_account_username: fromAccount.owner_username,
                 to_account_username: billerName,
-                //reference_number: referenceNum,
-                //card_number: cardDetails?.cardNumber || null,  // Optional card details
-                //expiry_date: cardDetails?.expiryDate || null,
-                //cvv: cardDetails?.cvv || null,
                 transaction_type: "bpay",
             };
 
