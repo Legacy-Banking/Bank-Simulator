@@ -22,7 +22,9 @@ const BPAY = () => {
         console.log("Fetching accounts for user ID:", user_id); // Debug: Check user ID
         const accounts = await accountAction.fetchAccountsbyUserId(user_id);
         console.log("Fetched accounts data:", accounts); // Debug: Check fetched accounts
-        setAccountsData(accounts);
+        // Filter out accounts with type "savings" and "credit"
+        const filteredAccounts = accounts.filter((account) => account.type !== 'savings' && account.type !== 'credit');
+        setAccountsData(filteredAccounts); // Store filtered accounts
 
         // Fetch billers
         console.log("Fetching billers"); // Debug: Check biller fetch
