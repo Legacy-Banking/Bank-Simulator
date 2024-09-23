@@ -207,16 +207,18 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
 
   const fromBank = useWatch({ control: form.control, name: "fromBank" });
   // Show card details if "Use Card" is selected
+
   useEffect(() => {
+    console.log("Check if card", fromBank);
     if (fromBank === "-1") {
       // If "Use Card" is selected, show the card details
       setShowCardDetails(true);
     } else {
       // Otherwise, only show card details if the selected account type is "debit"
       setShowCardDetails(false);
-      const selectedAccount = accounts.find(account => String(account.id) === fromBank);
+      //const selectedAccount = accounts.find(account => String(account.id) === fromBank);
       //could check if its either a credit or debit card
-      setShowCardDetails(selectedAccount?.type === 'debit');
+      //setShowCardDetails(selectedAccount?.type === 'debit');
     }
   }, [fromBank, accounts, form]);
 
@@ -647,11 +649,15 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
     </div>
 
       {/* Right Sidebar/Panel - Only show when "Use Card" is selected */}
-      {showCardDetails && (
-      <div className="hidden flex-col justify-between fixed xl:right-8 3xl:right-24 bg-transparent xl:flex w-[320px] h-full">
-          <CardSidebar owner={accounts[0].owner} /> 
+      <div
+        className={`hidden xl:bottom-0 3xl:top-48 fixed bg-transparent xl:flex w-[380px] h-full transform transition-transform duration-500 ${
+          showCardDetails ? 'translate-x-0 xl:right-0 2xl:right-10 3xl:right-24' : 'translate-x-full xl:right-0'
+        }  xl:overflow-y-scroll 3xl:overflow-hidden overflow-x-hidden`}
+        style={{ transitionTimingFunction: 'ease-in-out' }}
+      >
+        {<CardSidebar owner={accounts[0].owner} />}
       </div>
-      )}
+
 
   </div>
 

@@ -38,7 +38,7 @@ const CardSidebar: React.FC<CardSidebarProps> = ({ owner }) => {
   }, [owner]);
 
   return (
-    <div className="flex-col">
+    <div className="flex-col p-4">
       <h2 className="text-lg font-semibold mb-4">Your Cards</h2>
       {loading ? (
         <div className="flex items-center justify-center">
