@@ -79,7 +79,7 @@ export default async function Home() {
               <Link href="https://www.seniorsit.com.au/" target="_blank" rel="noreferrer">
                 <div className="flex flex-col items-start space-y-2 w-[280px] 3xl:w-[350px]">
                   <div className="w-full h-[148px] relative 3xl:h-[200px]">
-                    <Image src="/seniorit.png" alt="SeniorIT Program" fill style={{ objectFit: 'cover' }} />
+                    <Image src="/oldlady.png" alt="SeniorIT Program" fill style={{ objectFit: 'cover' }} />
                   </div>
                   <h3 className="text-2xl 3xl:text-2xl font-bold text-[#17181A] hover:underline">
                     {contentEmbeddings?.resource_column3_title || 'SeniorIT Program'}

@@ -31,9 +31,8 @@ const AccountBox: React.FC<AccountBoxProps> = ({ account }) => {
     const textColor = variant === 'personal'
         ? 'text-blackText-50 hover:text-white-100'
         : variant === 'savings'
-        ? 'text-blackText-50 hover:text-white-100'  // You can adjust this if needed for savings
+        ? 'text-blackText-50 hover:text-white-100' 
         : 'text-text-blackText-50 hover:text-white-100';
-
 
 
     const parseUpperCase = (str: string) => {
