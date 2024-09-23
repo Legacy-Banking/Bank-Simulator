@@ -20,17 +20,47 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
     const [loading, setLoading] = useState(true);
     const [unreadMessages, setUnreadMessages] = useState<Number>();
 
-    useEffect(() => {
+    const fetchUnreadMessages = async () => {
         if (user_id) {
-          inboxAction.getUnreadMessageCount(user_id).then((data) => {
-            setUnreadMessages(data);
-            console.log(data);
-          }).catch((error) => {
-            console.error('Error fetching messages:', error);
-          })
-          .finally(() => {
-            setLoading(false); // Set loading to false when data is fetched
-          });
+          try {
+            const count = await inboxAction.getUnreadMessageCount(user_id);
+            setUnreadMessages(count);  // Update state
+            console.log(`Unread Messages: ${count}`);  // Log count to console
+          } catch (error) {
+            console.error('Error fetching unread messages:', error);
+          } finally {
+            setLoading(false);
+          }
+        }
+      };
+    
+      useEffect(() => {
+        if (user_id) {
+          // Initial fetch
+          fetchUnreadMessages();
+    
+          // Set up the real-time subscription
+          const subscription = supabase
+            .channel('custom-messages-channel') // Unique channel name
+            .on(
+              'postgres_changes',
+              {
+                event: '*', // Listen for all changes (INSERT, UPDATE, DELETE)
+                schema: 'public',
+                table: 'messages',
+                filter: `to_user=eq.${user_id}`, // Filter by user ID
+              },
+              () => {
+                // Refetch unread messages count whenever there's a change
+                fetchUnreadMessages();
+              }
+            )
+            .subscribe();
+    
+          // Clean up the subscription when the component unmounts
+          return () => {
+            supabase.removeChannel(subscription);
+          };
         }
       }, [user_id]);
 

@@ -59,7 +59,8 @@ export const inboxAction = {
         const { data, error } = await supabase
                 .from('messages')
                 .select('*')
-                .or(`to_user.eq.${userId}`)
+                .eq('to_user', userId)
+                .eq('read', false)
         if (error) {
             console.error('Error fetching unread messages:', error);
             throw error;
