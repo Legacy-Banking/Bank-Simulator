@@ -130,6 +130,7 @@ declare interface Message {
   sender_name: string;
   to_user: string;
   read: boolean;
+  type: string;
 }
 
 declare interface Card {

@@ -82,7 +82,7 @@ export const billAction = {
         const messageDescription = `A new bill of $${amount} has been assigned to you from ${biller.name}. Please pay by ${newBill.due_date.toLocaleDateString()}.`;
 
         try {
-            await inboxAction.createMessage(biller.name, user_id, messageDescription);
+            await inboxAction.createMessage(biller.name, user_id, messageDescription, 'bill');
             console.log('Message sent to user about new bill');
         } catch (messageError) {
             console.error('Failed to send message to user:', messageError);
