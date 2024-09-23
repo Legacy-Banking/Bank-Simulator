@@ -23,7 +23,7 @@ const AccountBox: React.FC<AccountBoxProps> = ({ account }) => {
 
     const textColor = variant === 'primary'
         ? 'text-blackText-50 hover:text-white-100'
-        : 'text-white-100 hover:text-blackText-50';
+        : 'text-blackText-50 hover:text-white-100';
 
     const parseUpperCase = (str: string) => {
         return str.charAt(0).toUpperCase() + str.slice(1);
