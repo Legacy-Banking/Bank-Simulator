@@ -210,15 +210,11 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
 
   useEffect(() => {
     console.log("Check if card", fromBank);
+    // If "Use Card" is selected, show the card details
     if (fromBank === "-1") {
-      // If "Use Card" is selected, show the card details
       setShowCardDetails(true);
     } else {
-      // Otherwise, only show card details if the selected account type is "debit"
       setShowCardDetails(false);
-      //const selectedAccount = accounts.find(account => String(account.id) === fromBank);
-      //could check if its either a credit or debit card
-      //setShowCardDetails(selectedAccount?.type === 'debit');
     }
   }, [fromBank, accounts, form]);
 
