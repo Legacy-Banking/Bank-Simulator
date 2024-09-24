@@ -27,10 +27,6 @@ export const bankNavLinks = [
     route: "/view-bills",
     label: "Bills",
   },
-  {
-    route: "/inbox",
-    label: "Inbox",
-  },
 ];
 
 export const transferPayLinks = [

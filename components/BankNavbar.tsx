@@ -172,7 +172,7 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
                             Inbox
                         </Link>
 
-                        {unreadMessages && (unreadMessages > 0) && (
+                        {typeof unreadMessages === 'number' && unreadMessages > 0 && (
                             <span className="absolute -top-2 -right-4 bg-yellow-gradient text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
                                 {unreadMessages}
                             </span>
@@ -240,6 +240,24 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
                         );
                     }
                     })}
+                    {/* Inbox with Notification for Mobile Menu */}
+                    <li key="/inbox" className='font-inter text-left'>
+                        <div className="relative inline-block">
+                            <Link
+                                href="/inbox"
+                                className='block px-10 py-4 hover:text-blue-25 hover:underline underline-blue-25'
+                                onClick={handleLinkClick}
+                            >
+                                Inbox
+                            </Link>
+
+                            {typeof unreadMessages === 'number' && unreadMessages > 0 && (
+                                <span className="absolute top-2 right-6 bg-yellow-gradient text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                                    {unreadMessages}
+                                </span>
+                            )}
+                        </div>
+                    </li>
                     {session && (
                         <li className='font-inter text-left'>
                             <Link
