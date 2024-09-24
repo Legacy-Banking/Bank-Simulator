@@ -9,7 +9,6 @@ import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 
 const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const session = "";
     const router = useRouter(); // Next.js router
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const supabase = createClient();
@@ -59,13 +58,6 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
 
                 <div className='flex items-center gap-12'>
                     <ul className='xl:flex hidden text-base gap-12'>
-                        {userRole === 'admin' && (
-                            <li key="/admin" className='font-inter'>
-                                <Link href="/admin/dashboard" className='hover:text-blue-25 hover:underline underline-blue-25' onClick={handleLinkClick}>
-                                    Admin
-                                </Link>
-                            </li>
-                        )}
                         <li key="/dashboard" className='font-inter'>
                             <Link href="/dashboard" className='hover:text-blue-25 hover:underline underline-blue-25' onClick={handleLinkClick}>
                                 Dashboard
@@ -140,7 +132,7 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
                     </ul>
 
                     <div className='flexCenter gap-12'>
-                        {String(session) === "admin" ? (
+                        {userRole === 'admin' && (
                             <Link
                                 href="/admin/dashboard"
                                 className='hidden xl:block font-inter hover:text-blue-25 hover:underline underline-blue-25'
@@ -148,7 +140,7 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
                             >
                                 Admin
                             </Link>
-                        ) : null}
+                        ) }
 
                         <button
                             onClick={handleLogout}
@@ -199,7 +191,7 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
                                 );
                             }
                         })}
-                        {session && (
+                        {userRole === 'admin' && (
                             <li className='font-inter text-left'>
                                 <Link
                                     href="/admin"
