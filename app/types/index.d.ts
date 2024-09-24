@@ -131,6 +131,7 @@ declare interface Message {
   to_user: string;
   read: boolean;
   type: string;
+  bill_id: string;
 }
 
 declare interface Card {

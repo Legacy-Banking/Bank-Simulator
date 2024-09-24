@@ -20,8 +20,12 @@ const InboxDetailSheet: React.FC<InboxDetailSheetProps> = ({ message, onClose })
 
     if (!message) return null;
 
+    // This function will redirect to the corresponding bill's invoice number
     const handleViewBill = () => {
-        router.push('/view-bills');
+        if (message.bill_id) {
+            // Redirect to /view-bills with the corresponding bill's invoice number
+            router.push(`/view-bills?invoice_id=${message.bill_id}`);
+        }
     };
 
     const handlePayNow = () => {

@@ -1,7 +1,7 @@
 import { createClient } from "./supabase/client";
 
 export const inboxAction = {
-    createMessage: async (fromName: string, user_id: string, description: string, type: string): Promise<void> => {
+    createMessage: async (fromName: string, user_id: string, description: string, type: string, bill_id: string): Promise<void> => {
         const supabase = createClient();
 
         try {
@@ -11,6 +11,7 @@ export const inboxAction = {
                 sender_name: fromName,
                 to_user: user_id,
                 type: type,
+                bill_id: bill_id,
             };
             const { error: insertError } = await supabase
                 .from('messages')
