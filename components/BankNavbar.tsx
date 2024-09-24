@@ -1,21 +1,68 @@
 import { bankNavLinks, transferPayLinks } from '@/constants'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { updateUserId } from '@/app/store/userSlice'
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
+import { inboxAction } from '@/utils/inboxAction'
 
 const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) => {
+    const user_id = useAppSelector((state) => state.user.user_id)?.toString();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const router = useRouter(); // Next.js router
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const supabase = createClient();
     const dispatch = useAppDispatch();
     const userRole = useAppSelector(state => state.user.user_role);
+    const [loading, setLoading] = useState(true);
+    const [unreadMessages, setUnreadMessages] = useState<number | undefined>(undefined);
 
-    const unreadMessageCount = 0;
+    const fetchUnreadMessages = async () => {
+        if (user_id) {
+          try {
+            const count = await inboxAction.getUnreadMessageCount(user_id);
+            console.log(`Fetched unread message count: ${count}`);
+            setUnreadMessages(count);  // Update state
+            console.log(`Unread Messages: ${count}`);  // Log count to console
+          } catch (error) {
+            console.error('Error fetching unread messages:', error);
+          } finally {
+            setLoading(false);
+          }
+        }
+      };
+    
+      useEffect(() => {
+        if (user_id) {
+          // Initial fetch
+          fetchUnreadMessages();
+    
+          // Set up the real-time subscription
+          const subscription = supabase
+            .channel('custom-messages-channel') // Unique channel name
+            .on(
+              'postgres_changes',
+              {
+                event: '*', // Listen for all changes (INSERT, UPDATE, DELETE)
+                schema: 'public',
+                table: 'messages',
+                filter: `to_user=eq.${user_id}`, // Filter by user ID
+              },
+              () => {
+                // Refetch unread messages count whenever there's a change
+                fetchUnreadMessages();
+              }
+            )
+            .subscribe();
+    
+          // Clean up the subscription when the component unmounts
+          return () => {
+            supabase.removeChannel(subscription);
+          };
+        }
+      }, [user_id]);
 
     const handleLinkClick = () => {
         setIsDropdownOpen(false);
@@ -123,9 +170,9 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
                                 Inbox
                             </Link>
 
-                            {unreadMessageCount > 0 && (
+                            {typeof unreadMessages === 'number' && unreadMessages > 0 && (
                                 <span className="absolute -top-2 -right-4 bg-yellow-gradient text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                                    {unreadMessageCount}
+                                    {unreadMessages}
                                 </span>
                             )}
                         </li>
@@ -191,6 +238,25 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
                                 );
                             }
                         })}
+                        {/* Inbox with Notification for Mobile Menu */}
+                        <li key="/inbox" className='font-inter text-left'>
+                            <div className="relative inline-block">
+                                <Link
+                                    href="/inbox"
+                                    className='block px-10 py-4 hover:text-blue-25 hover:underline underline-blue-25'
+                                    onClick={handleLinkClick}
+                                >
+                                    Inbox
+                                </Link>
+
+                                {typeof unreadMessages === 'number' && unreadMessages > 0 && (
+                                    <span className="absolute top-2 right-6 bg-yellow-gradient text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                                        {unreadMessages}
+                                    </span>
+                                )}
+                            </div>
+                        </li>
+                        
                         {userRole === 'admin' && (
                             <li className='font-inter text-left'>
                                 <Link
