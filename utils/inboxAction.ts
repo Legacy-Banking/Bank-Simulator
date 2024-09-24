@@ -56,7 +56,7 @@ export const inboxAction = {
             throw error;
         }
     },
-    getUnreadMessageCount: async (userId: string): Promise<Number> =>{
+    getUnreadMessageCount: async (userId: string): Promise<number> =>{
         const supabase = createClient();
         const { data, error } = await supabase
                 .from('messages')

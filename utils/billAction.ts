@@ -79,7 +79,7 @@ export const billAction = {
         if (error) {
             throw new Error(`Failed to create bill: ${error.message}`);
         }
-        const messageDescription = `A new bill of $${amount} has been assigned to you from ${biller.name}. Please pay by ${newBill.due_date.toLocaleDateString()}.`;
+        const messageDescription = `A new bill of $${amount} has been assigned to you from ${biller.name}. Please pay by ${newBill.due_date!.toLocaleDateString()}.`;
 
         try {
             await inboxAction.createMessage(biller.name, user_id, messageDescription, 'bill', invoiceNumber);

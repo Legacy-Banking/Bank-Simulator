@@ -18,12 +18,13 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
     const supabase = createClient();
     const dispatch = useAppDispatch();
     const [loading, setLoading] = useState(true);
-    const [unreadMessages, setUnreadMessages] = useState<Number>();
+    const [unreadMessages, setUnreadMessages] = useState<number | undefined>(undefined);
 
     const fetchUnreadMessages = async () => {
         if (user_id) {
           try {
             const count = await inboxAction.getUnreadMessageCount(user_id);
+            console.log(`Fetched unread message count: ${count}`);
             setUnreadMessages(count);  // Update state
             console.log(`Unread Messages: ${count}`);  // Log count to console
           } catch (error) {
@@ -171,7 +172,7 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
                             Inbox
                         </Link>
 
-                        {unreadMessages > 0 && (
+                        {unreadMessages && (unreadMessages > 0) && (
                             <span className="absolute -top-2 -right-4 bg-yellow-gradient text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
                                 {unreadMessages}
                             </span>
