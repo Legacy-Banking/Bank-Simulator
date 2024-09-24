@@ -34,9 +34,9 @@ export const TransactionsTable = ({ transactions = [] }: TransactionTableProps) 
       <Table>
         <TableHeader>
           <TableRow className="bg-blue-200 text-white-200">
-            <TableHead className="px-8 rounded-tl-2xl">Transaction</TableHead>
-            <TableHead className="px-2">Date</TableHead>
-            <TableHead className="px-2 rounded-tr-2xl">Amount</TableHead>
+            <TableHead className="text-lg px-8 rounded-tl-2xl">Transaction</TableHead>
+            <TableHead className="text-lg px-2">Date</TableHead>
+            <TableHead className="text-lg px-2 rounded-tr-2xl">Amount</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -48,7 +48,7 @@ export const TransactionsTable = ({ transactions = [] }: TransactionTableProps) 
             >
               <TableCell className="max-w-[250px] pl-8 pr-10">
                 <div className="flex items-center gap-3">
-                  <h1 className="text-14 truncate font-semibold text-[#344054]">
+                  <h1 className="text-sm truncate font-semibold text-[#344054]">
                     {transaction.amount > 0 ? `${transaction.from_account_username}` : `${transaction.to_account_username}`}
                     {/* {transaction.amount > 0
                       ? `${transaction.from_account_username} - ${transaction.from_account_type}`
@@ -56,10 +56,10 @@ export const TransactionsTable = ({ transactions = [] }: TransactionTableProps) 
                   </h1>
                 </div>
               </TableCell>
-              <TableCell className="min-w-32 pl-2 pr-10">
+              <TableCell className="text-sm min-w-32 pl-2 pr-10">
                 {formatDateTime(transaction.paid_on)}
               </TableCell>
-              <TableCell className={`pl-2 pr-10 font-semibold ${transaction.amount > 0 ? 'text-green-100' : 'text-red-200'}`}>
+              <TableCell className={`text-sm pl-2 pr-10 font-semibold ${transaction.amount > 0 ? 'text-green-100' : 'text-red-200'}`}>
                 {transaction.amount > 0 ? `+${formatAmount(transaction.amount)}` : `-${formatAmount(Math.abs(transaction.amount))}`}
               </TableCell>
             </TableRow>

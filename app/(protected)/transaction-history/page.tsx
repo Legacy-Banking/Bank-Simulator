@@ -27,22 +27,22 @@ const TransactionHistoryContent = () => {
   const [page, setPage] = useState(pageFromUrl);
   const [loading, setLoading] = useState(true);
   const rowsPerPage = 10;
-  
-// Inside the main component
-useEffect(() => {
-  if (user_id) {
-    setLoading(true);
-    
-    // Fetch accounts
-    accountAction.fetchAccountsbyUserId(user_id).then((data) => {
-      setAccounts(data);
-    }).catch((error) => {
-      console.error('Error fetching accounts:', error);
-    }).finally(() => {
-      setLoading(false);
-    });
-  }
-}, [user_id]);
+
+  // Inside the main component
+  useEffect(() => {
+    if (user_id) {
+      setLoading(true);
+
+      // Fetch accounts
+      accountAction.fetchAccountsbyUserId(user_id).then((data) => {
+        setAccounts(data);
+      }).catch((error) => {
+        console.error('Error fetching accounts:', error);
+      }).finally(() => {
+        setLoading(false);
+      });
+    }
+  }, [user_id]);
 
 
   // Fetch account and transactions when accountId or page changes
@@ -54,101 +54,101 @@ useEffect(() => {
         console.error('Error fetching account:', error);
       });
 
- // Fetch transactions for the account
- transactionAction.getTransactionsByAccountId(accountId).then((data) => {
-  // Fetch the username and combine it with dummy data
-  accountAction.fetchUsernamebyUserId(user_id).then((fetchedUsername) => {
-    const updatedDummyData: Transaction[] = [
-      {
-        id: "1",
-        description: "Rent Payment",
-        amount: 1200.0,
-        paid_on: new Date("2024-09-16T14:00:00.000Z"),
-        from_account: "",
-        from_account_username: "Jack Smith",
-        to_account: user_id,
-        to_biller: "",
-        to_account_username: fetchedUsername,
-        transaction_type: 'pay anyone',
-      },
-      {
-        id: "2",
-        description: "Food for lunch",
-        amount: 25.50,
-        paid_on: new Date("2024-09-17T09:15:00.000Z"),
-        from_account: "",
-        from_account_username: "Linda Rose",
-        to_account: user_id,
-        to_biller: "",
-        to_account_username: fetchedUsername,
-        transaction_type: 'pay anyone',
-      },
-      {
-        id: "3",
-        description: "| Biller: Gas Service, Code: 1234, Ref: 567834512452",
-        amount: -45.67,
-        paid_on: new Date("2024-09-15T10:00:00.000Z"),
-        from_account: user_id,
-        from_account_username: fetchedUsername,
-        to_account: "",
-        to_biller: "100",
-        to_account_username: "Gas Service",
-        transaction_type: 'bpay',
-      },
-      {
-        id: "4",
-        description: "Funds Transfer to Savings",
-        amount: -500.0,
-        paid_on: new Date("2024-09-15T12:30:00.000Z"),
-        from_account: user_id,
-        from_account_username: fetchedUsername,
-        to_account: "100",
-        to_biller: "",
-        to_account_username: "Jon Doe",
-        transaction_type: 'pay anyone',
-      },
-      {
-        id: "5",
-        description: "| Biller: Internet Service, Code: 8765, Ref: 432132861542",
-        amount: -79.99,
-        paid_on: new Date("2024-09-14T08:45:00.000Z"),
-        from_account: user_id,
-        from_account_username: fetchedUsername,
-        to_account: "",
-        to_biller: "101",
-        to_account_username: "Internet Service",
-        transaction_type: 'bpay',
-      },
-    ];
+      // Fetch transactions for the account
+      transactionAction.getTransactionsByAccountId(accountId).then((data) => {
+        // Fetch the username and combine it with dummy data
+        accountAction.fetchUsernamebyUserId(user_id).then((fetchedUsername) => {
+          const updatedDummyData: Transaction[] = [
+            {
+              id: "1",
+              description: "Rent Payment",
+              amount: 1200.0,
+              paid_on: new Date("2024-09-16T14:00:00.000Z"),
+              from_account: "",
+              from_account_username: "Jack Smith",
+              to_account: user_id,
+              to_biller: "",
+              to_account_username: fetchedUsername,
+              transaction_type: 'pay anyone',
+            },
+            {
+              id: "2",
+              description: "Food for lunch",
+              amount: 25.50,
+              paid_on: new Date("2024-09-17T09:15:00.000Z"),
+              from_account: "",
+              from_account_username: "Linda Rose",
+              to_account: user_id,
+              to_biller: "",
+              to_account_username: fetchedUsername,
+              transaction_type: 'pay anyone',
+            },
+            {
+              id: "3",
+              description: "| Biller: Gas Service, Code: 1234, Ref: 567834512452",
+              amount: -45.67,
+              paid_on: new Date("2024-09-15T10:00:00.000Z"),
+              from_account: user_id,
+              from_account_username: fetchedUsername,
+              to_account: "",
+              to_biller: "100",
+              to_account_username: "Gas Service",
+              transaction_type: 'bpay',
+            },
+            {
+              id: "4",
+              description: "Funds Transfer to Savings",
+              amount: -500.0,
+              paid_on: new Date("2024-09-15T12:30:00.000Z"),
+              from_account: user_id,
+              from_account_username: fetchedUsername,
+              to_account: "100",
+              to_biller: "",
+              to_account_username: "Jon Doe",
+              transaction_type: 'pay anyone',
+            },
+            {
+              id: "5",
+              description: "| Biller: Internet Service, Code: 8765, Ref: 432132861542",
+              amount: -79.99,
+              paid_on: new Date("2024-09-14T08:45:00.000Z"),
+              from_account: user_id,
+              from_account_username: fetchedUsername,
+              to_account: "",
+              to_biller: "101",
+              to_account_username: "Internet Service",
+              transaction_type: 'bpay',
+            },
+          ];
 
-    // Combine fetched transactions with dummy data
-    const combinedData = (data || []).concat(updatedDummyData);
-    setTransactions(combinedData);
-    setLoading(false); // Set loading to false after fetching data
-  }).catch((error) => {
-    console.error('Error fetching username:', error);
-    setLoading(false);
-  });
-  }).catch((error) => {
-    console.error('Error fetching transactions:', error);
-    setLoading(false);
-  });
+          // Combine fetched transactions with dummy data
+          const combinedData = (data || []).concat(updatedDummyData);
+          setTransactions(combinedData);
+          setLoading(false); // Set loading to false after fetching data
+        }).catch((error) => {
+          console.error('Error fetching username:', error);
+          setLoading(false);
+        });
+      }).catch((error) => {
+        console.error('Error fetching transactions:', error);
+        setLoading(false);
+      });
 
-    setPage(pageFromUrl);
+      setPage(pageFromUrl);
     }
   }, [accountId, pageFromUrl, user_id]);
 
   const handleAccountChange = (value: string) => {
 
-  const currentPage = pageFromUrl;
-  // Reset the page to 1 when account is changed or even when selecting the same account
-  if (String(value) === String(accountId) && currentPage === 1) {
-    // If the account is the same and already on page 1, do nothing
-    return;
-  }
+    const currentPage = pageFromUrl;
+    // Reset the page to 1 when account is changed or even when selecting the same account
+    if (String(value) === String(accountId) && currentPage === 1) {
+      // If the account is the same and already on page 1, do nothing
+      return;
+    }
 
-  setLoading(true);
-  router.push(`/transaction-history?accountid=${value}&page=1`);
+    setLoading(true);
+    router.push(`/transaction-history?accountid=${value}&page=1`);
 
   };
 
@@ -179,8 +179,8 @@ useEffect(() => {
     const tableRows: any[] = [];
     transactions.forEach((transaction) => {
       const transactionData = [
-        transaction.amount > 0 
-        ? transaction.from_account_username : transaction.to_account_username, 
+        transaction.amount > 0
+          ? transaction.from_account_username : transaction.to_account_username,
         new Date(transaction.paid_on).toLocaleDateString('en-GB'),
         `${transaction.amount > 0 ? `+$${transaction.amount.toFixed(2)}` : `-$${Math.abs(transaction.amount).toFixed(2)}`}`,
       ];
@@ -221,7 +221,7 @@ useEffect(() => {
             <div className="flex justify-end">
               <Select onValueChange={handleAccountChange} value={accountId ?? accounts[0]?.id}>
                 <SelectTrigger className="w-52 bg-white-100 hover:bg-gray-100">
-                  <span className="mx-auto text-center">{`${capitalizeFirstLetter(String(account.type))} Account`}</span>
+                  <span className="text-base mx-auto text-center">{`${capitalizeFirstLetter(String(account.type))} Account`}</span>
                 </SelectTrigger>
                 <SelectContent className="bg-white-100">
                   {accounts.map((acc) => (
@@ -236,10 +236,10 @@ useEffect(() => {
             <AccountBox account={account} />
 
             <div className="flex justify-between items-center">
-              <h2 className="py-2 text-18 font-semibold text-gray-900">
+              <h2 className="py-2 text-xl font-semibold text-gray-900">
                 Recent Transactions
               </h2>
-              <Button onClick={handleDownloadStatement} className="ml-auto border text-14 font-normal border-gray-300 px-8 bg-white-100 hover:bg-gray-100">
+              <Button onClick={handleDownloadStatement} className="text-base ml-auto border font-normal border-gray-300 px-8 bg-white-100 hover:bg-gray-100">
                 Download Statement
               </Button>
             </div>

@@ -50,8 +50,8 @@ declare interface Account {
   type: AccountType;
   balance: number;
   owner: string;
-  bsb: string;
-  acc: string;
+  bsb: string | null;
+  acc: string | null;
   opening_balance: number;
   owner_username: string;
 }

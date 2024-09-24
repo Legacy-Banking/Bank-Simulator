@@ -72,9 +72,9 @@ const PayAnyoneForm = ({ accounts }: { accounts: Account[] }) => {
         return;
       }
 
-      // Check if the same account is selected for both from and to
-      if (fromAccount.id === toAccount.id) {
-        setError("You cannot transfer funds between the same account.");
+      // Check if the user is trying to pay themselves
+      if (toAccount.owner_username === fromAccount.owner_username) {
+        setError("You cannot pay to your own account. Do this in the Transfer Funds page.");
         setIsLoading(false);
         return;
       }

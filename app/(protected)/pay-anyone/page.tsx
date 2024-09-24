@@ -23,7 +23,12 @@ const PayAnyone = () => {
 
         console.log("Fetched accounts data:", data); // Debug: Check fetched accounts
 
-        setAccountsData(data); // Store fetched accounts
+        // Filter out accounts with type "savings" and "credit"
+        const filteredAccounts = data.filter((account) => account.type !== 'savings' && account.type !== 'credit');
+
+        console.log("Filtered accounts data (excluding savings and credit):", filteredAccounts); // Debug: Check filtered accounts
+
+        setAccountsData(filteredAccounts); // Store only filtered accounts
       } catch (err) {
         console.error("Error fetching accounts:", err);
         setError("Unable to fetch accounts");
