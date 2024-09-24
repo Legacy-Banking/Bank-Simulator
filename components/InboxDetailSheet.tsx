@@ -55,7 +55,7 @@ const InboxDetailSheet: React.FC<InboxDetailSheetProps> = ({ message, onClose })
                 {/* Divider below message details */}
                 <div className="h-0.5 bg-blue-200 my-2"></div>
 
-                <DialogFooter className="flex justify-between">
+                <DialogFooter className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row justify-between">
                     {message.type === 'bill' ? (
                         <>
                             <Button onClick={handleViewBill} className="bg-blue-200 text-white-200">
