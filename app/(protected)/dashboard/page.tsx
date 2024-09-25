@@ -21,7 +21,7 @@ const Dashboard = () => {
                 console.error('Error fetching accounts:', error);
             });
 
-        
+
             // Fetch the username based on user_id
             accountAction.fetchUsernamebyUserId(user_id)
                 .then((fetchedUsername) => {
@@ -33,7 +33,7 @@ const Dashboard = () => {
                 })
                 .finally(() => {
                     setLoading(false); // Set loading false when all data is fetched
-                  });
+                });
         }
 
     }, [user_id]);
@@ -44,49 +44,49 @@ const Dashboard = () => {
         <section className="flex w-full flex-row max-xl:max-h-screen font-inter">
             <div className="flex w-full flex-1 flex-col gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen">
                 {loading ? (
-                // Spinner to show while loading
-                <div className="flex items-center justify-center">
-                    <div className="spinner"></div> {/* Replace this with your actual spinner component */}
-                </div>
-                ) : (
-                // Main content when not loading
-                <>
-                {/* Header */}
-                <header className="home-header">
-                    <HeaderBox
-                        type="greeting"
-                        title="Welcome"
-                        user={ username|| ''}
-                        subtext="View your account summaries"
-                    />
-                </header>
-
-                {/* Divider */}
-                <div className="border-t border-gray-200 my-1 sm:my-4"></div>
-
-                <div className="subheader mt-2 sm:mt-4 mb-4 sm:mb-6">
-                    <h2 className="text-20 lg:text-24 font-semibold text-blackText-50">Accounts:</h2>
-                </div>
-
-                {/* Accounts */}
-
-                {accounts.map((account) => (
-                    <AccountBox key={account.id} account={account} />
-                ))}
-
-
-
-                {/* Divider */}
-                <div className="border-t-2 border-blackText-100 my-2 sm:my-4"></div>
-
-                {/* Total Balance Section */}
-                <div className="flex w-full justify-between items-center gap-4 p-4 sm:gap-6 sm:pt-6 pb-16">
-                    <h2 className="text-24 lg:text-26 font-bold text-blackText-50">Total Balance</h2>
-                    <div className="total-balance-amount text-right text-bold">
-                        <AnimatedCounter amount={totalBalance} />
+                    // Spinner to show while loading
+                    <div className="flex items-center justify-center">
+                        <div className="spinner"></div> {/* Replace this with your actual spinner component */}
                     </div>
-                </div>
-                </>
+                ) : (
+                    // Main content when not loading
+                    <>
+                        {/* Header */}
+                        <header className="home-header">
+                            <HeaderBox
+                                type="greeting"
+                                title="Welcome"
+                                user={username || ''}
+                                subtext="View your account summaries"
+                            />
+                        </header>
+
+                        {/* Divider */}
+                        <div className="border-t border-gray-200 my-1 sm:my-4"></div>
+
+                        <div className="subheader mt-2 sm:mt-4 mb-4 sm:mb-6">
+                            <h2 className="text-xl lg:text-4xl font-semibold text-blackText-50">Accounts:</h2>
+                        </div>
+
+                        {/* Accounts */}
+
+                        {accounts.map((account) => (
+                            <AccountBox key={account.id} account={account} />
+                        ))}
+
+
+
+                        {/* Divider */}
+                        <div className="border-t-2 border-blackText-100 my-2 sm:my-4"></div>
+
+                        {/* Total Balance Section */}
+                        <div className="flex w-full justify-between items-center gap-4 p-4 sm:gap-6 sm:pt-6 pb-16">
+                            <h2 className="text-24 lg:text-3xl font-semibold text-blackText-50">Total Balance</h2>
+                            <div className="total-balance-amount text-right text-bold">
+                                <AnimatedCounter amount={totalBalance} />
+                            </div>
+                        </div>
+                    </>
                 )}
             </div>
         </section>

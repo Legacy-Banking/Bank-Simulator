@@ -50,7 +50,7 @@ export const BankDropdown = ({
     if (id === "reset") {
       console.log("here1");
       setSelected(null);
-      onChange("");
+      onChange("reset");
     } else if (id === additionalOption?.id) {
       console.log("here2");
       setSelected(null);

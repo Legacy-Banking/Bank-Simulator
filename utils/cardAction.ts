@@ -8,6 +8,12 @@ enum AccountType {
     DEBIT = 'debit',
 }
 
+type CardDetails = {
+    cardNumber: string;
+    expiryDate: string;
+    cvv: string;
+  };
+
 export const cardAction = {
 
     createCard: async (card: Card): Promise<void> => {
@@ -26,7 +32,7 @@ export const cardAction = {
         const { card_num: debit_card_num, expiry: debit_expiry, cvv: debit_cvv } = card_detailGenerator();
         const { card_num: credit_card_num, expiry: credit_expiry, cvv: credit_cvv } = card_detailGenerator();
         const owner_username = await accountAction.fetchUsernamebyUserId(user_id);
-        const personalAccount = await accountAction.fetchPersonalAccountByUserId(user_id);
+        const userAccount = await accountAction.fetchAccountsbyUserId(user_id);
         const cards: Partial<Card>[] = [
             {
                 card_type: AccountType.DEBIT,
@@ -36,16 +42,17 @@ export const cardAction = {
                 expiry_date: debit_expiry,
                 cvv: debit_cvv,
                 owner_username: owner_username,
-                linked_to: personalAccount.id,
+                linked_to: userAccount[0].id,
             },
             {
                 card_type: AccountType.CREDIT,
-                credit: 5000, // Assign some default credit limit for the credit card
+                credit: userAccount[2].balance, // Assign some default credit limit for the credit card
                 owner: user_id,
                 card_number: credit_card_num,
                 expiry_date: credit_expiry,
                 cvv: credit_cvv,
                 owner_username: owner_username,
+                linked_to: userAccount[2].id,
             }
         ];
         for (const card of cards) {
@@ -94,7 +101,51 @@ export const cardAction = {
         }));
     
         return enrichedCards;
-    }
+    },
+
+    fetchCardAccountId: async ({cardNumber, expiryDate, cvv}: CardDetails) => {
+        try {
+          const supabase = createClient();
+
+          const [month, year] = expiryDate.split('/');
+          const expiryYear = parseInt('20' + year); 
+          const expiryMonth = parseInt(month);
+
+         const expiry = new Date(expiryYear, expiryMonth, 1); 
+         const formattedExpiryDate = expiry.toISOString().split('T')[0];
+    
+          // Query the database for the account linked to the provided card details
+          const { data, error } = await supabase
+            .from('cards')
+            .select('linked_to')
+            .eq('card_number', cardNumber)
+            .eq('expiry_date', formattedExpiryDate)
+            .eq('cvv', cvv)
+            .single();
+    
+          if (error || !data) {
+            throw new Error("Card details not found or not linked to any account.");
+          }
+
+          console.log(data.linked_to)
+    
+          // Fetch the account using the account ID linked to the card
+          const { data: accountData, error: accountError } = await supabase
+            .from('account')
+            .select('*')
+            .eq('id', data.linked_to)
+            .single();
+    
+          if (accountError || !accountData) {
+            throw new Error("Account not found for the given card.");
+          }
+    
+          return accountData;
+        } catch (error) {
+          console.error("Error fetching account for card:", error);
+          throw error;
+        }
+      },
     
     
 
