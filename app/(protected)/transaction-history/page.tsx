@@ -14,6 +14,18 @@ import { useAppSelector } from '@/app/store/hooks';
 import { capitalizeFirstLetter, formatAmount } from '@/lib/utils';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import { addDays, format } from "date-fns"
+import { Calendar as CalendarIcon } from "lucide-react"
+import { DateRange } from "react-day-picker"
+ 
+import { cn } from "@/lib/utils"
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import "react-day-picker/dist/style.css";
 
 const TransactionHistoryContent = () => {
   const searchParams = useSearchParams();
@@ -27,6 +39,11 @@ const TransactionHistoryContent = () => {
   const [page, setPage] = useState(pageFromUrl);
   const [loading, setLoading] = useState(true);
   const rowsPerPage = 10;
+
+  const [date, setDate] = React.useState<DateRange | undefined>({
+    from: addDays(new Date(), -20), // 20 days before today
+    to: new Date(), // Today
+  })
 
   // Inside the main component
   useEffect(() => {
@@ -174,7 +191,14 @@ const TransactionHistoryContent = () => {
 
             // Combine fetched transactions with dummy data
 
-            const combinedData = (data || []).concat(updatedDummyData);
+            var combinedData = (data || []).concat(updatedDummyData);
+            console.log(combinedData);
+            // Filter combined data based on the selected date range
+            combinedData = combinedData.filter(
+              (transaction) =>
+                new Date(transaction.paid_on) >= (date?.from || new Date(0)) &&
+                new Date(transaction.paid_on) <= (date?.to || new Date())
+            );
             setTransactions(combinedData);
             setLoading(false); // Set loading to false after fetching data
 
@@ -193,7 +217,7 @@ const TransactionHistoryContent = () => {
 
       setPage(pageFromUrl);
     }
-  }, [accountId, pageFromUrl, user_id]);
+  }, [accountId, pageFromUrl, user_id, date]);
 
   const handleAccountChange = (value: string) => {
 
@@ -292,13 +316,66 @@ const TransactionHistoryContent = () => {
 
             <AccountBox account={account} />
 
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center flex-wrap">
               <h2 className="py-2 text-xl font-semibold text-gray-900">
                 Recent Transactions
               </h2>
-              <Button onClick={handleDownloadStatement} className="text-base ml-auto border font-normal border-gray-300 px-8 bg-white-100 hover:bg-gray-100">
-                Download Statement
-              </Button>
+              <div className="flex flex-row gap-5 items-center flex-wrap">
+            <div className="grid gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    id="date"
+                    variant={"outline"}
+                    className={cn(
+                      "w-[270px] justify-start text-left font-normal bg-white border border-gray-300 font-poppins", // Ensuring proper button background and border
+                      !date && "text-gray-500" // Text contrast when no date is selected
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4 text-gray-600" /> {/* Ensuring icon visibility */}
+                    {date?.from ? (
+                      date.to ? (
+                        <>
+                          {format(date.from, "LLL dd, y")} -{" "}
+                          {format(date.to, "LLL dd, y")}
+                        </>
+                      ) : (
+                        format(date.from, "LLL dd, y")
+                      )
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-white-100 border border-gray-200 shadow-lg"> {/* Adding a solid background and shadow to make it non-transparent */}
+                  <Calendar
+                    initialFocus
+                    mode="range"
+                    defaultMonth={date?.from}
+                    selected={date}
+                    onSelect={setDate}
+                    numberOfMonths={2}
+                    className="p-4 text-gray-800" // Ensuring visible text inside the calendar
+                    
+                    modifiersClassNames={{
+                      range_start: "bg-blue-500 text-white", // Start of range
+                      range_end: "bg-blue-500 text-white", // End of range
+                      range_middle: "bg-blue-200 text-blue-700", // Middle of range
+                      hover: "bg-gray-200", // Hover effect for the dates
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <Button
+              onClick={handleDownloadStatement}
+              className="ml-auto border font-normal border-gray-300 px-8 bg-gray-100 hover:bg-gray-200 text-black" // Text contrast on button and hover effect
+            >
+              Download Statement
+            </Button>
+          </div>
+
             </div>
 
             <section className="flex w-full flex-col gap-6">
