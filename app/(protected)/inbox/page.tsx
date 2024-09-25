@@ -3,14 +3,28 @@
 import React, { useState, useEffect } from 'react';
 import HeaderBox from '@/components/HeaderBox';
 import { InboxTable } from '@/components/InboxTable';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { accountAction } from '@/utils/accountAction';
-import { useSearchParams } from 'next/navigation';
-import AccountBox from '@/components/AccountBox';
+import { inboxAction } from '@/utils/inboxAction';
+import { useAppSelector } from '@/app/store/hooks';
+
 
 const Inbox = () => {
+  const [loading, setLoading] = useState(true);
+  const user_id = useAppSelector((state) => state.user.user_id)?.toString();
   const [messages, setMessages] = useState<Message[]>([]);
+
+  useEffect(() => {
+    if (user_id) {
+      inboxAction.getMessageByUserId(user_id).then((data) => {
+        setMessages(data);
+      }).catch((error) => {
+        console.error('Error fetching messages:', error);
+      })
+      .finally(() => {
+        setLoading(false); // Set loading to false when data is fetched
+      });
+    }
+  }, [user_id]);
+
   return (
     
     <><section className="flex w-full flex-row max-xl:max-h-screen max-xl:overflow-y-scroll font-inter">
