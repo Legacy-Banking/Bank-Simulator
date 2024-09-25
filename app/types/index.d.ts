@@ -1,4 +1,5 @@
 declare type SearchParamProps = {
+
   params: { [key: string]: string };
   searchParams: { [key: string]: string | string[] | undefined };
 };
@@ -170,6 +171,12 @@ declare interface BillerAccount {
 //   senderBankId: string;
 //   receiverBankId: string;
 // };
+
+type AccountsTableProps = {
+  accounts: Account[];
+  setShowUpdatePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowDeletePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
 type TransactionTableProps = {
   transactions: Transaction[];
