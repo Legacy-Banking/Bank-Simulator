@@ -1,12 +1,28 @@
 import { createClient } from "./supabase/client";
 import { randomNameGenerator } from "./randomNameGenerator";
+import { accountAction } from "./accountAction";
+import { capitalizeFirstLetter } from "@/lib/utils";
 
 export const transactionAction = {
-    createTransaction: async (fromAccount: Account, toAccount: Account, amount: number, description: string): Promise<void> => {
+    createTransaction: async (fromAccount: Account, toAccount: Account, amount: number, description: string, transactionType: string): Promise<void> => {
         const supabase = createClient();
 
         const fromNewBalance = fromAccount.balance - amount;
         const toNewBalance = toAccount.balance + amount;
+
+        let from_username: string;
+        let to_username: string;
+
+        if (transactionType === 'transfer funds') {
+            from_username = `${fromAccount.owner_username} - ${capitalizeFirstLetter(fromAccount.type)} Account`;
+            to_username = `${toAccount.owner_username} - ${capitalizeFirstLetter(toAccount.type)} Account`;
+        } else if (transactionType === 'pay anyone') {
+            from_username = fromAccount.owner_username;
+            to_username = toAccount.owner_username;
+        } else {
+            throw new Error(`Unsupported transaction type: ${transactionType}`);
+        }
+
 
         if (fromNewBalance < 0) {
             throw new Error('Insufficient funds');
@@ -25,9 +41,10 @@ export const transactionAction = {
                 amount: amount,
                 paid_on: new Date(),
                 from_account: fromAccount.id,
-                from_account_username: fromAccount.owner_username,
+                from_account_username: from_username,
                 to_account: toAccount.id,
-                to_account_username: toAccount.owner_username,
+                to_account_username: to_username,
+                transaction_type: transactionType,
             };
 
             const { error: insertError } = await supabase
@@ -65,7 +82,6 @@ export const transactionAction = {
         referenceNum: string,
         amount: number,
         description: string,
-        cardDetails: { cardNumber: string | undefined; expiryDate: string | undefined; cvv: string | undefined} | null
     ): Promise<void> => {
         const supabase = createClient();
 
@@ -77,10 +93,8 @@ export const transactionAction = {
 
         try {
             // Update the 'from' account balance
-            await transactionAction.updateAccounts(fromAccount, fromNewBalance);
-
             // Construct the detailed description including biller details
-            const detailedDescription = `${description} | Biller: ${billerName}, Code: ${billerCode}, Ref: ${referenceNum}`;
+            const detailedDescription = `${description} Bill Details | Biller: ${billerName}, Code: ${billerCode}, Ref: ${referenceNum}`;
 
             // Insert the new BPAY transaction
             const newTransaction: Partial<Transaction> = {
@@ -88,11 +102,9 @@ export const transactionAction = {
                 amount: amount,
                 paid_on: new Date(),
                 from_account: fromAccount.id,
+                from_account_username: fromAccount.owner_username,
                 to_account_username: billerName,
-                //reference_number: referenceNum,
-                //card_number: cardDetails?.cardNumber || null,  // Optional card details
-                //expiry_date: cardDetails?.expiryDate || null,
-                //cvv: cardDetails?.cvv || null,
+                transaction_type: "bpay",
             };
 
             const { error: insertError } = await supabase
@@ -100,14 +112,12 @@ export const transactionAction = {
                 .insert(newTransaction);
 
             if (insertError) {
-                await transactionAction.updateAccounts(fromAccount, fromAccount.balance);
-
                 console.error('Failed to insert the BPAY transaction:', insertError);
                 throw new Error('Transaction failed, reverting operations.');
             }
         } catch (error) {
+            
             console.error('Transaction error:', error);
-            await transactionAction.updateAccounts(fromAccount, fromAccount.balance);
             throw error;
         }
     },
@@ -147,12 +157,13 @@ export const transactionAction = {
     processTransactionsForAccount: (transactions: Transaction[], accountId: string): void => {
         transactions.forEach((t) => {
             t.amount = t.from_account.toString() === accountId ? -t.amount : t.amount;
-            if(!t.from_account_username){
-                t.from_account_username = randomNameGenerator();
-            }
-            if(!t.to_account_username){
-                t.to_account_username = randomNameGenerator();
-            }
+            // if (!t.from_account_username) {
+            //     t.from_account_username = randomNameGenerator();
+            // }
+            // if (!t.to_account_username) {
+            //     t.to_account_username = randomNameGenerator();
+            // }
+
         });
     },
 };

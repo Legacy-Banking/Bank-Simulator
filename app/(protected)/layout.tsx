@@ -1,18 +1,21 @@
-'use client'
+'use client';
 import { createClient } from "@/utils/supabase/client";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useAppDispatch, updateUserId, updateUserName } from "../store/userSlice";
-import { useAppSelector } from '@/app/store/hooks'
+import { toast } from "react-hot-toast";
+import { useAppDispatch, updateUserId, updateUserName, updateUserRole } from "../store/userSlice";
+import { useAppSelector } from '@/app/store/hooks';
 import BankNavbar from "@/components/BankNavbar";
 import { accountAction } from "@/utils/accountAction";
+import { userAction } from "@/utils/userAction";
+import { Toaster } from "react-hot-toast";
 
 const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const user = useAppSelector(state => state.user);
     const user_id = user.user_id;
-    const user_name = user.user_name;
     const dispatch = useAppDispatch();
     const [personalAccount, setPersonalAccount] = useState(null); // Store personal account
+    const router = useRouter(); // useRouter for client-side redirect
 
     // Fetch the personal account using the utility function
     const fetchUserPersonalAccount = async () => {
@@ -28,31 +31,41 @@ const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children
         if (!user_id) {
             const supabase = createClient();
             const { data, error } = await supabase.auth.getUser();
-            if (error) {
+            if (error || !data?.user) {
                 console.log(error);
-                return redirect("/login");
+                toast.error("Not logged in, redirecting..."); // Show toast notification
+                router.push('/')
             } else {
-                dispatch(updateUserId(data?.user?.id));
-                dispatch(updateUserName(data?.user?.email!));
+                dispatch(updateUserId(data.user.id));
+                dispatch(updateUserName(data.user.email!));
             }
         }
     };
+    const userRoleUpdate = async () => {
+        if (user_id) {
+            const userRole = await userAction.fetchUserRole(user_id);
+            dispatch(updateUserRole(userRole));
+        }
+    }
 
     useEffect(() => {
         const fetchUserData = async () => {
             await userStateUpdate();
+            await userRoleUpdate();
             if (user_id) {
                 await fetchUserPersonalAccount(); // Fetch personal account after user ID is set
             }
         };
         fetchUserData();
+
     }, [user_id]); // Watch for changes in user_id
 
     return (
         <div>
-            <BankNavbar personalAccount={personalAccount}/>
+            <Toaster />
+            <BankNavbar personalAccount={personalAccount} />
             <main>
-            {children}
+                {children}
             </main>
         </div>
     );

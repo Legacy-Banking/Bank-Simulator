@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { createClient as supabaseClient } from './supabase/client';
 export const userAction = {
     //this should be admin only
     fetchAllUsers: async (): Promise<User[]> => {
@@ -20,5 +21,10 @@ export const userAction = {
         
         return aggregateUsers || [];
     },
+    fetchUserRole: async (user_id: string): Promise<string> => {
+        const supabase = supabaseClient();
+        const { data, error } = await supabase.from('admin_users').select('role').eq('id', user_id).single();
+        return data?.role || 'default';
+    }
 
 }

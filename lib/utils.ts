@@ -42,8 +42,15 @@ export function formUrlQuery({ params, key, value }: UrlQueryParams) {
 };
 
 
-export const capitalizeFirstLetter = (string: string) => {
-  return string.charAt(0).toUpperCase() + string.slice(1);
+// export const capitalizeFirstLetter = (string: string) => {
+//   return string.charAt(0).toUpperCase() + string.slice(1);
+// };
+
+export const capitalizeFirstLetter = (string: string | null | undefined) => {
+  if (string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+  return ''; // or return a default string or the original input as needed
 };
 
 

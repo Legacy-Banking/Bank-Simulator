@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import HeaderBox from '@/components/HeaderBox';
 import { TransactionsTable } from '@/components/TransactionsTable';
 import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
@@ -12,132 +12,268 @@ import AccountBox from '@/components/AccountBox';
 import { Pagination } from '@/components/Pagination';
 import { useAppSelector } from '@/app/store/hooks';
 import { capitalizeFirstLetter, formatAmount } from '@/lib/utils';
-
-// Import jsPDF and autoTable
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import { addDays, format } from "date-fns"
+import { Calendar as CalendarIcon } from "lucide-react"
+import { DateRange } from "react-day-picker"
+ 
+import { cn } from "@/lib/utils"
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import "react-day-picker/dist/style.css";
 
-const TransactionHistory = () => {
+const TransactionHistoryContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const accountId = searchParams.get('accountid');
-  const pageFromUrl = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1; // Get page from URL or default to 1
+  const pageFromUrl = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1;
   const user_id = useAppSelector((state) => state.user.user_id)?.toString();
-
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [account, setAccount] = useState<Account>({} as Account);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [page, setPage] = useState(pageFromUrl); // Set initial page from URL
-  const [loading, setLoading] = useState(false); // Add loading state
+  const [page, setPage] = useState(pageFromUrl);
+  const [loading, setLoading] = useState(true);
   const rowsPerPage = 10;
 
-  // Fetch accounts by user_id
+  const [date, setDate] = React.useState<DateRange | undefined>({
+    from: addDays(new Date(), -20), // 20 days before today
+    to: new Date(), // Today
+  })
+
+  // Inside the main component
   useEffect(() => {
     if (user_id) {
-      setLoading(true); // Set loading to true when data is being fetched
+      setLoading(true);
+
+      // Fetch accounts
       accountAction.fetchAccountsbyUserId(user_id).then((data) => {
         setAccounts(data);
-        setLoading(false); // Set loading to false after fetching data
       }).catch((error) => {
         console.error('Error fetching accounts:', error);
-        setLoading(false); // Set loading to false if there's an error
+      }).finally(() => {
+        setLoading(false);
       });
     }
   }, [user_id]);
 
+
   // Fetch account and transactions when accountId or page changes
   useEffect(() => {
     if (accountId) {
-
-      // Fetch account details
-      accountAction.fetchAccountById(accountId).then((data) => {
+      accountAction.fetchAccountById(accountId)
+      .then((data) => {
         setAccount(data);
-      }).catch((error) => {
+        
+      })
+      .catch((error) => {
         console.error('Error fetching account:', error);
       });
 
-      // Fetch transaction history for the selected account
-      transactionAction.getTransactionsByAccountId(accountId).then((data) => {
-        setTransactions(data);
-        setLoading(false); // Set loading to false after fetching data
-      }).catch((error) => {
+      // Fetch transactions for the account
+      transactionAction.getTransactionsByAccountId(accountId)
+      .then((data) => {
+        // Fetch the username and combine it with dummy data
+        accountAction.fetchUsernamebyUserId(user_id)
+        .then((fetchedUsername) => {
+          var updatedDummyData: Transaction[] = [];
+
+          accountAction.fetchAccountTypebyId(accountId)
+          .then((fetchedType) => {
+            console.log(fetchedType);
+            if (fetchedType == 'personal') {
+              updatedDummyData = [
+                {
+                  id: "1",
+                  description: "Rent Payment",
+                  amount: 1200.0,
+                  paid_on: new Date("2024-09-16T14:00:00.000Z"),
+                  from_account: "",
+                  from_account_username: "Jack Smith",
+                  to_account: user_id,
+                  to_biller: "",
+                  to_account_username: fetchedUsername,
+                  transaction_type: 'pay anyone',
+                },
+                {
+                  id: "2",
+                  description: "Food for lunch",
+                  amount: 25.50,
+                  paid_on: new Date("2024-09-17T09:15:00.000Z"),
+                  from_account: "",
+                  from_account_username: "Linda Rose",
+                  to_account: user_id,
+                  to_biller: "",
+                  to_account_username: fetchedUsername,
+                  transaction_type: 'pay anyone',
+                },
+                {
+                  id: "3",
+                  description: "| Biller: Gas Service, Code: 1234, Ref: 567834512452",
+                  amount: -45.51,
+                  paid_on: new Date("2024-09-15T10:00:00.000Z"),
+                  from_account: user_id,
+                  from_account_username: fetchedUsername,
+                  to_account: "",
+                  to_biller: "100",
+                  to_account_username: "Gas Service",
+                  transaction_type: 'bpay',
+                },
+                {
+                  id: "4",
+                  description: "Funds Transfer to Savings",
+                  amount: -100.0,
+                  paid_on: new Date("2024-09-15T12:30:00.000Z"),
+                  from_account: user_id,
+                  from_account_username: fetchedUsername,
+                  to_account: "100",
+                  to_biller: "",
+                  to_account_username: "Jon Doe",
+                  transaction_type: 'pay anyone',
+                },
+                {
+                  id: "5",
+                  description: "| Biller: Internet Service, Code: 8765, Ref: 432132861542",
+                  amount: -79.99,
+                  paid_on: new Date("2024-09-14T08:45:00.000Z"),
+                  from_account: user_id,
+                  from_account_username: fetchedUsername,
+                  to_account: "",
+                  to_biller: "101",
+                  to_account_username: "Internet Service",
+                  transaction_type: 'bpay',
+                },
+              ];
+            } else if (fetchedType == 'credit') {
+              // updatedDummyData = [
+              //   {
+              //     id: "3",
+              //     description: "| Biller: Gas Service, Code: 1234, Ref: 567834512452",
+              //     amount: -45.51,
+              //     paid_on: new Date("2024-09-15T10:00:00.000Z"),
+              //     from_account: user_id,
+              //     from_account_username: fetchedUsername,
+              //     to_account: "",
+              //     to_biller: "100",
+              //     to_account_username: "Gas Service",
+              //     transaction_type: 'bpay',
+              //   },
+              //   {
+              //     id: "4",
+              //     description: "Funds Transfer to Savings",
+              //     amount: -100.0,
+              //     paid_on: new Date("2024-09-15T12:30:00.000Z"),
+              //     from_account: user_id,
+              //     from_account_username: fetchedUsername,
+              //     to_account: "100",
+              //     to_biller: "",
+              //     to_account_username: "Jon Doe",
+              //     transaction_type: 'pay anyone',
+              //   },
+              //   {
+              //     id: "5",
+              //     description: "| Biller: Internet Service, Code: 8765, Ref: 432132861542",
+              //     amount: -79.99,
+              //     paid_on: new Date("2024-09-14T08:45:00.000Z"),
+              //     from_account: user_id,
+              //     from_account_username: fetchedUsername,
+              //     to_account: "",
+              //     to_biller: "101",
+              //     to_account_username: "Internet Service",
+              //     transaction_type: 'bpay',
+              //   },
+              // ];
+            }
+
+            // Combine fetched transactions with dummy data
+
+            var combinedData = (data || []).concat(updatedDummyData);
+            console.log(combinedData);
+            // Filter combined data based on the selected date range
+            combinedData = combinedData.filter(
+              (transaction) =>
+                new Date(transaction.paid_on) >= (date?.from || new Date(0)) &&
+                new Date(transaction.paid_on) <= (date?.to || new Date())
+            );
+            setTransactions(combinedData);
+            setLoading(false); // Set loading to false after fetching data
+
+           });
+        })
+
+        .catch((error) => {
+          console.error('Error fetching username:', error);
+          setLoading(false);
+        });
+      })
+      .catch((error) => {
         console.error('Error fetching transactions:', error);
-        setLoading(false); // Set loading to false if there's an error
+        setLoading(false);
       });
 
-      // Set page from URL
       setPage(pageFromUrl);
     }
-  }, [accountId, pageFromUrl]); // Add pageFromUrl as a dependency
+  }, [accountId, pageFromUrl, user_id, date]);
 
-  // Handle account change in dropdown
   const handleAccountChange = (value: string) => {
-    // Set loading to true before navigating
+
+    const currentPage = pageFromUrl;
+    // Reset the page to 1 when account is changed or even when selecting the same account
+    if (String(value) === String(accountId) && currentPage === 1) {
+      // If the account is the same and already on page 1, do nothing
+      return;
+    }
+
     setLoading(true);
-    // Update URL with both accountId and page=1 in one step, avoiding intermediate renders
     router.push(`/transaction-history?accountid=${value}&page=1`);
+
   };
 
   const handleDownloadStatement = () => {
-    // Create a new jsPDF document
     const doc = new jsPDF();
-
-    // Add title
     doc.text('Transaction History', 14, 20);
-
-    // Set smaller font size for the account details
     doc.setFontSize(12);
-
-    // Add Account Information
     const accountType = capitalizeFirstLetter(account.type);
     const openingBalance = formatAmount(account.opening_balance);
     const currentBalance = formatAmount(account.balance);
 
-    // Add account details to the PDF
     doc.text(`Account: ${accountType} Account`, 14, 30);
     doc.text(`Opening Balance: ${openingBalance}`, 14, 40);
     doc.text(`Current Balance: ${currentBalance}`, 14, 50);
 
     doc.setFontSize(10);
-
-    // Get current date and time for the download timestamp
     const currentDate = new Date();
     const formattedDate = currentDate.toLocaleDateString('en-GB');
     const formattedTime = currentDate.toLocaleTimeString();
-
-
-    // Add the timestamp, right-aligned
-    const pageWidth = 210; // A4 page width in mm
-    const marginRight = 14; // Right margin
+    const pageWidth = 210;
+    const marginRight = 14;
     const textWidth = doc.getTextWidth(`Downloaded on: ${formattedDate} at ${formattedTime}`);
     const xPosition = pageWidth - textWidth - marginRight;
 
     doc.text(`Downloaded on: ${formattedDate} at ${formattedTime}`, xPosition, 55);
 
-
-    // Add table with transactions
     const tableColumn = ['Transaction', 'Date', 'Amount'];
     const tableRows: any[] = [];
-
-    // Loop through the transactions and add to tableRows
     transactions.forEach((transaction) => {
       const transactionData = [
-        transaction.from_account_username,
+        transaction.amount > 0
+          ? transaction.from_account_username : transaction.to_account_username,
         new Date(transaction.paid_on).toLocaleDateString('en-GB'),
-        `${transaction.amount > 0 ? `+$${transaction.amount.toFixed(2)}` : `-$${Math.abs(transaction.amount).toFixed(2)}`}
-`,
+        `${transaction.amount > 0 ? `+$${transaction.amount.toFixed(2)}` : `-$${Math.abs(transaction.amount).toFixed(2)}`}`,
       ];
       tableRows.push(transactionData);
     });
 
-    // Create the table in the PDF
     (doc as any).autoTable({
       head: [tableColumn],
       body: tableRows,
       startY: 60,
     });
 
-    // Save the PDF
     doc.save('transaction_history.pdf');
   };
 
@@ -147,15 +283,11 @@ const TransactionHistory = () => {
   const currentTransactions = transactions.slice(indexOfFirstTransaction, indexOfLastTransaction);
 
   return (
-
     <section className="flex w-full flex-col max-xl:max-h-screen font-inter">
       <div className="flex w-full flex-1 flex-col gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen">
-       
-
-        {/* Show loading spinner when loading */}
         {loading ? (
           <div className="flex items-center justify-center">
-            <div className="spinner"></div> {/* Spinner shown while loading */}
+            <div className="spinner"></div>
           </div>
         ) : (
           <>
@@ -167,16 +299,15 @@ const TransactionHistory = () => {
               />
             </header>
 
-            {/* Account Select Dropdown */}
             <div className="flex justify-end">
               <Select onValueChange={handleAccountChange} value={accountId ?? accounts[0]?.id}>
-                <SelectTrigger className="w-52 bg-white-100 hover:bg-gray-100 ">
-                  <span className="mx-auto text-center">{`${capitalizeFirstLetter(String(account.type))} Account`}</span> {/* Capitalizing the first letter */}
+                <SelectTrigger className="w-52 bg-white-100 hover:bg-gray-100">
+                  <span className="text-base mx-auto text-center">{`${capitalizeFirstLetter(String(account.type))} Account`}</span>
                 </SelectTrigger>
-                <SelectContent className="bg-white-100 ">
+                <SelectContent className="bg-white-100">
                   {accounts.map((acc) => (
                     <SelectItem key={acc.id} value={acc.id} className='hover:bg-gray-100'>
-                      {`${capitalizeFirstLetter(String(acc.type))} Account`} {/* Capitalizing the first letter */}
+                      {`${capitalizeFirstLetter(String(acc.type))} Account`}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -185,20 +316,70 @@ const TransactionHistory = () => {
 
             <AccountBox account={account} />
 
-            {/* Recent Transactions Title and Download Button */}
-            <div className="flex justify-between items-center">
-              <h2 className="py-2 text-18 font-semibold text-gray-900">
+            <div className="flex justify-between items-center flex-wrap">
+              <h2 className="py-2 text-xl font-semibold text-gray-900">
                 Recent Transactions
               </h2>
-              <Button onClick={handleDownloadStatement} className="ml-auto border text-14 font-normal border-gray-300 px-8 bg-white-100 hover:bg-gray-100">
-                Download Statement
-              </Button>
+              <div className="flex flex-row gap-5 items-center flex-wrap">
+            <div className="grid gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    id="date"
+                    variant={"outline"}
+                    className={cn(
+                      "w-[270px] justify-start text-left font-normal bg-white border border-gray-300 font-poppins", // Ensuring proper button background and border
+                      !date && "text-gray-500" // Text contrast when no date is selected
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4 text-gray-600" /> {/* Ensuring icon visibility */}
+                    {date?.from ? (
+                      date.to ? (
+                        <>
+                          {format(date.from, "LLL dd, y")} -{" "}
+                          {format(date.to, "LLL dd, y")}
+                        </>
+                      ) : (
+                        format(date.from, "LLL dd, y")
+                      )
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-white-100 border border-gray-200 shadow-lg"> {/* Adding a solid background and shadow to make it non-transparent */}
+                  <Calendar
+                    initialFocus
+                    mode="range"
+                    defaultMonth={date?.from}
+                    selected={date}
+                    onSelect={setDate}
+                    numberOfMonths={2}
+                    className="p-4 text-gray-800" // Ensuring visible text inside the calendar
+                    
+                    modifiersClassNames={{
+                      range_start: "bg-blue-500 text-white", // Start of range
+                      range_end: "bg-blue-500 text-white", // End of range
+                      range_middle: "bg-blue-200 text-blue-700", // Middle of range
+                      hover: "bg-gray-200", // Hover effect for the dates
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
-            
-            {/* Transaction History Table */}
+
+            <Button
+              onClick={handleDownloadStatement}
+              className="ml-auto border font-normal border-gray-300 px-8 bg-gray-100 hover:bg-gray-200 text-black" // Text contrast on button and hover effect
+            >
+              Download Statement
+            </Button>
+          </div>
+
+            </div>
+
             <section className="flex w-full flex-col gap-6">
               <TransactionsTable transactions={currentTransactions} />
-
               {totalPages > 1 && (
                 <div className="my-4 w-full pb-2">
                   <Pagination totalPages={totalPages} page={page} setPage={setPage} />
@@ -209,8 +390,14 @@ const TransactionHistory = () => {
         )}
       </div>
     </section>
-
   );
-}
+};
+
+// Wrap in Suspense on export
+const TransactionHistory = () => (
+  <Suspense fallback={<div>Loading transaction history...</div>}>
+    <TransactionHistoryContent />
+  </Suspense>
+);
 
 export default TransactionHistory;

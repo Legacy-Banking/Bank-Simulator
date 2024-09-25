@@ -32,7 +32,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${poppins.variable} ${manrope.variable}`}>
+      <body className={`${inter.variable} ${poppins.variable} ${manrope.variable} bg-[#FFFFFF]`}>
         <StoreProvider>
           {children}
         </StoreProvider>

@@ -7,26 +7,29 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import * as z from "zod";
 import { BankDropdown } from "./BankDropDown";
+import CardSidebar from './CardSidebar';
 import { Button } from "./ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { Checkbox } from "@/components/ui/checkbox"; // Import Checkbox from shadcn
 import { PaymentWhenOptions } from "./PaymentWhenOptions";
 import { BillerDropdown } from './BillerDropDown';
-import { transactionAction } from '@/utils/transactionAction';
+import { useAppSelector } from '@/app/store/hooks';
 import { billerAction } from '@/utils/billerAction';
+import { bpayAction } from '@/utils/bpayAction';
+import { billAction } from '@/utils/billAction';
+import { cardAction } from '@/utils/cardAction';
 
 const formSchema = z.object({
-  toBiller: z.number().optional(),
-  fromBank: z.union([z.number().min(1, "Please select a valid bank account"), z.literal(-1)]),
+  toBiller: z.string().optional(),
+  fromBank: z.string().min(1, "Please select a valid bank account"),
   billerCode: z.string().optional(),
   billerName: z.string().optional(),
   referenceNum: z.string().optional(),
   amount: z.string().min(1, "Amount is required").regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"),
   description: z.string().optional(),
   saveBiller: z.number().optional(),
-  paymentOption: z.enum(["payNow", "schedule", "recurring"]).default("payNow"), // Payment options
-  fromBankType: z.enum(["debit", "credit", "personal", "savings"]), // Payment options
+  paymentOption: z.enum(["payNow", "schedule", "recurring"]).default("payNow"),
   scheduleDate: z.date().optional(),
   frequency: z.string().optional(),
   recurringStartDate: z.date().optional(),
@@ -39,12 +42,13 @@ const formSchema = z.object({
 })
   .superRefine((data, ctx) => {
 
+    console.log("Form VALIDATION started", data);
+
     // If `billerCode`, `billerName`, and `referenceNum` are all filled, skip `toBiller` validation
-    const hasManualBillerInfo =
-      data.billerCode && data.billerName && data.referenceNum;
+    const hasManualBillerInfo = data.billerCode && data.billerName && data.referenceNum;
 
     // Only validate `toBiller` if manual biller fields are not filled
-    if (!hasManualBillerInfo && data.toBiller === 0) {
+    if (!hasManualBillerInfo && !data.toBiller) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["toBiller"],
@@ -53,12 +57,12 @@ const formSchema = z.object({
     }
 
     // Only require billerCode, billerName, and referenceNum when `toBiller` is null
-    if (data.toBiller === 0) {
-      if (!data.billerCode || !/^\d{4}$/.test(data.billerCode)) {
+    if (!data.toBiller) {
+      if (!data.billerCode || !/^\d{4,6}$/.test(data.billerCode)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["billerCode"],
-          message: "Biller Code must be a 4-digit number",
+          message: "Biller Code must be a 4 to 6-digit number",
         });
       }
       if (!data.billerName) {
@@ -136,7 +140,7 @@ const formSchema = z.object({
         }
 
         // Validation for debit card details
-        if (data.fromBankType === "debit") {  // Check if the selected account type is 'debit'
+        if (data.fromBank === "-1") {  // Check if the selected account type is "Use Card"
           if (!data.cardNumber || !/^\d{16}$/.test(data.cardNumber)) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
@@ -169,12 +173,13 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null); // State to manage error messages
   const [showCardDetails, setShowCardDetails] = useState(false); // State to control visibility of card details section
+  const user_id = useAppSelector(state => state.user.user_id);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      toBiller: 0, // Set default value as 0 for numeric IDs
-      fromBank: 0, // Set default value as 0 for numeric IDs
+      toBiller: "", 
+      fromBank: "", 
       billerCode: "",
       billerName: "",
       referenceNum: "",
@@ -202,31 +207,30 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
 
   const fromBank = useWatch({ control: form.control, name: "fromBank" });
   // Show card details if "Use Card" is selected
+
   useEffect(() => {
-    if (fromBank === -1) {
-      // If "Use Card" is selected, show the card details
+    console.log("Check if card", fromBank);
+    // If "Use Card" is selected, show the card details
+    if (fromBank === "-1") {
       setShowCardDetails(true);
     } else {
-      // Otherwise, only show card details if the selected account type is "debit"
-      const selectedAccount = accounts.find(account => Number(account.id) === fromBank);
-      form.setValue("fromBankType", selectedAccount?.type);
-      setShowCardDetails(selectedAccount?.type === 'debit');
+      setShowCardDetails(false);
     }
   }, [fromBank, accounts, form]);
 
   // Clear manual biller fields if a toBiller is selected
   useEffect(() => {
-    if (toBiller && toBiller !== 0) {
+    if (toBiller && toBiller !== "") {
       form.setValue("billerCode", "");
       form.setValue("billerName", "");
       form.setValue("referenceNum", "");
     }
-  }, [toBiller, form]);
+  }, [toBiller, form])
 
   useEffect(() => {
     if (billerCode || billerName || referenceNum) {
       // Reset selected biller if any manual field is filled
-      form.setValue("toBiller", 0);
+      form.setValue("toBiller", "");
     }
   }, [billerCode, billerName, referenceNum, form]);
 
@@ -236,11 +240,36 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
     setIsLoading(true);
 
     try {
-      const fromAccount = accounts.find(account => Number(account.id) === data.fromBank);
+      let fromAccount = accounts.find(account => String(account.id) === data.fromBank);
 
-      if (!fromAccount) {
-        throw new Error("Invalid bank account selected.");
+      // If no bank account is selected, check for card details and fetch the corresponding account
+      if (!fromAccount && showCardDetails) {
+        const { cardNumber, expiryDate, cvv } = data;
+  
+        // Ensure that card details are not undefined
+        if (!cardNumber || !expiryDate || !cvv) {
+          throw new Error("Please provide valid card details.");
+        }
+  
+        // Create a sanitized card number by removing all spaces
+        const sanitizedCardNumber = cardNumber.replace(/\s+/g, "");
+
+        // Fetch the account linked to the card
+        fromAccount = await cardAction.fetchCardAccountId({
+          cardNumber: sanitizedCardNumber,
+          expiryDate,
+          cvv,
+        });
+  
+        if (!fromAccount) {
+          throw new Error("Invalid card details or card not linked to an account.");
+        }
       }
+  
+      if (!fromAccount) {
+        throw new Error("Please select a bank account or provide valid card details.");
+      }
+  
 
       const amountF = parseFloat(data.amount);
 
@@ -250,78 +279,74 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
         setIsLoading(false);
         return;
       }
-
-      // Prepare card details if required
-      const cardDetails = showCardDetails
-        ? {
-          cardNumber: data.cardNumber,
-          expiryDate: data.expiryDate,
-          cvv: data.cvv,
-        }
-        : null;
-
-    // Variables to hold final biller details
-    let finalBillerName: string = '';
-    let finalBillerCode: string = '';
-    let finalReferenceNum: string = '';
-
-
-    // Check if toBiller is selected
-    if (data.toBiller != 0) {
-      // Fetch the biller details from the billers table using the toBiller ID
-      const biller = await billerAction.fetchBillerById(String(data.toBiller));
-      finalBillerName = biller.name;
-      finalBillerCode = biller.biller_code;
-      // Fetch the reference number from the user_billers table
-      const referenceNum = await billerAction.fetchReferenceNumberByBillerName(fromAccount.owner, biller.name);
-      if (referenceNum) {
-        finalReferenceNum = referenceNum;
-      }
-
-    } else {
-      // Use manually entered biller details
-      finalBillerName = data.billerName!;
-      finalBillerCode = data.billerCode!;
-      finalReferenceNum = data.referenceNum!;
-
-      // Verify if manually entered biller details exist in the billers table
-      const billers = await billerAction.fetchBillerByName(finalBillerName);
-      // Ensure there's at least one biller matching the name
-      if (billers.length === 0 || String(billers[0].biller_code) !== String(finalBillerCode)) {
-        console.log(billers[0]);
-        console.log(finalBillerCode);
-        setError("Invalid biller name or biller code.");
-        setIsLoading(false);
-        return;
-      }
-
-      // Check if the reference number matches the one in biller_reference
-      const referenceNum = await billerAction.fetchReferenceNumberByBillerName(fromAccount.owner, finalBillerName);
-      if (referenceNum !== finalReferenceNum) {
-        setError("Invalid reference number.");
-        setIsLoading(false);
-        return;
-      }
       
-    }
+      // Variables to hold final biller details
+      let finalBillerName: string = '';
+      let finalBillerCode: string = '';
+      let finalReferenceNum: string = '';
 
 
-      console.log("Creating transaction with the following details:")
+      // Check if toBiller is selected
+      if (data.toBiller != "") {
+        // Fetch the biller details from the billers table using the toBiller ID
+        const biller = await billerAction.fetchBillerById(String(data.toBiller));
+        finalBillerName = biller.name;
+        finalBillerCode = biller.biller_code;
+        // Fetch the reference number from the user_billers table
+        const referenceNum = await billerAction.fetchReferenceNumberByBillerName(fromAccount.owner, biller.name);
+        if (referenceNum) {
+          finalReferenceNum = referenceNum;
+        }
+
+      } else {
+        // Use manually entered biller details
+        finalBillerName = data.billerName!;
+        finalBillerCode = data.billerCode!;
+        finalReferenceNum = data.referenceNum!;
+
+        // Verify if manually entered biller details exist in the billers table
+        const billers = await billerAction.fetchBillerByName(finalBillerName);
+        // Ensure there's at least one biller matching the name
+        if (billers.length === 0 || String(billers[0].biller_code) !== String(finalBillerCode)) {
+          setError("Invalid biller name or biller code.");
+          setIsLoading(false);
+          return;
+        }
+
+        // Check if the reference number matches the one in biller_reference
+        const referenceNum = await billerAction.fetchReferenceNumberByBillerName(fromAccount.owner, finalBillerName);
+        if (referenceNum !== finalReferenceNum) {
+          setError("Invalid reference number.");
+          setIsLoading(false);
+          return;
+        }
+
+      }
+
+      const bills = await billAction.fetchAssignedBills(user_id, finalBillerName);
+
+      // Check if no bills are assigned to the user
+      if (bills.length === 0) {
+        setError("No bills are assigned to you for this biller.");
+        setIsLoading(false);
+        return;
+      }
+
       // Call the createBPAYTransaction action
-      await transactionAction.createBPAYTransaction(
+      await bpayAction.payBills(
+        user_id,
         fromAccount,
         finalBillerName,
         finalBillerCode,
         finalReferenceNum,
         amountF,
         data.description || '',
-        cardDetails,
+        bills,
       );
 
-      if(data.saveBiller) {
+      if (data.saveBiller) {
         // Check if billerName, billerCode, and referenceNum are filled
         if (data.billerName && data.billerCode && data.referenceNum) {
-          console.log("Biller will be saved for future transactions.");
           try {
             await billerAction.addNewBiller(data.billerName, data.billerCode, data.referenceNum, fromAccount.owner);
           } catch (err) {
@@ -351,6 +376,10 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
   //const selectedPaymentOption = form.watch("paymentOption");
 
   return (
+    <div className="flex">
+      {/* Main Form Section */}
+      <div className="w-4/5 p-4">
+
     <Form {...form}>
       <form onSubmit={form.handleSubmit(submit)} className="flex flex-col">
         <div className="payment-transfer_form-details">
@@ -376,8 +405,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
                       billerAccounts={billers} // Pass billers array here
                       onChange={(id) => {
                         if (id) {
-                          form.setValue("toBiller", Number(id));  // Ensure the ID is treated as a number
-                          console.log("Biller Selected: ", id);
+                          form.setValue("toBiller", id);  // Ensure the ID is treated as a number
                         }
                       }}
                       initialSelected={(form.getValues("toBiller")) || ''}
@@ -458,19 +486,19 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
             <FormItem className="border-t border-gray-200">
               <div className="payment-transfer_form-item pb-5 pt-6">
                 <div className="payment-transfer_form-content">
-                <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">
-                  Save to my Billers
-                </FormLabel>
-                <FormDescription className="text-14 font-normal text-gray-600">
-                  Save this biller's details for future transactions
-                </FormDescription>
-              </div>
+                  <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">
+                    Save to my Billers
+                  </FormLabel>
+                  <FormDescription className="text-14 font-normal text-gray-600">
+                    Save this biller's details for future transactions
+                  </FormDescription>
+                </div>
                 <FormControl>
-                <Checkbox
-                  className="custom-checkbox"
-                  checked={field.value === 1} // Check if the value is 1 for checked state
-                  onCheckedChange={(checked) => field.onChange(checked ? 1 : 0)} // Toggle between 1 and 0
-                />
+                  <Checkbox
+                    className="custom-checkbox"
+                    checked={field.value === 1} // Check if the value is 1 for checked state
+                    onCheckedChange={(checked) => field.onChange(checked ? 1 : 0)} // Toggle between 1 and 0
+                  />
                 </FormControl>
               </div>
             </FormItem>
@@ -500,16 +528,14 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
                       accounts={accounts}
                       onChange={(id) => {
                         if (id) {
-                          form.setValue("fromBank", Number(id));  // Ensure the ID is treated as a number
-                          console.log("From Bank Changed: ", id);
+                          form.setValue("fromBank", id);
                         }
                       }}
-                      additionalOption={{ id: -1, label: "Use Card" }}  // Add "Use Card" option
-                      initialSelected={(form.getValues("fromBank")) || undefined}
+                      additionalOption={{ id: "-1", label: "Use Card" }}  // Add "Use Card" option
                       label="From Bank Account"
                       otherStyles="!w-full"
                     />
-                    
+
                   </FormControl>
                   <FormMessage className="text-12 text-red-500" />
                 </div>
@@ -616,6 +642,21 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
         </div>
       </form>
     </Form>
+    </div>
+
+      {/* Right Sidebar/Panel - Only show when "Use Card" is selected */}
+      <div
+        className={`hidden xl:bottom-0 3xl:top-48 fixed bg-transparent xl:flex w-[380px] h-full transform transition-transform duration-500 ${
+          showCardDetails ? 'translate-x-0 xl:right-0 2xl:right-10 3xl:right-24' : 'translate-x-full xl:right-0'
+        }  xl:overflow-y-scroll 3xl:overflow-hidden overflow-x-hidden`}
+        style={{ transitionTimingFunction: 'ease-in-out' }}
+      >
+        {<CardSidebar owner={accounts[0].owner} />}
+      </div>
+
+
+  </div>
+
   );
 };
 

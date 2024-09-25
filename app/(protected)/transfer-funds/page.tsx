@@ -18,11 +18,17 @@ const TransferFunds = () => {
       try {
         console.log("Fetching accounts for user ID:", user_id); // Debug: Check user ID
 
-        const data = await accountAction.fetchAccountsbyUserId(user_id); // Use fetchAccountsbyUserId method
+        const data = await accountAction.fetchAccountsbyUserId(user_id);
 
         console.log("Fetched accounts data:", data); // Debug: Check fetched accounts
 
-        setAccountsData(data); // Store fetched accounts
+        // Filter out accounts of type "credit"
+        const nonCreditAccounts = data.filter((account) => account.type !== 'credit');
+
+        console.log("Filtered accounts data (excluding credit):", nonCreditAccounts); // Debug: Check filtered accounts
+
+        setAccountsData(nonCreditAccounts); // Store only non-credit accounts
+
       } catch (err) {
         console.error("Error fetching accounts:", err);
         setError("Unable to fetch accounts");

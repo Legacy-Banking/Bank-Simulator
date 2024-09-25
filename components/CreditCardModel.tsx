@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
 const CreditCardModel = (
-    {type, name, cardNumber, expirationDate, maxSpending, spending, cvc}: 
-    {type : string, name : string, cardNumber : number, expirationDate : Date, maxSpending : number, spending : number, cvc:number}
+    {type, name, cardNumber, expirationDate, maxSpending, cvc, linkedAccount}: 
+    {type : string, name : string, cardNumber : string, expirationDate : Date, maxSpending : number, cvc:number, linkedAccount : Account}
 )  => {
     // State to track the spending amount (you can replace this with real data)
 
@@ -11,9 +11,46 @@ const CreditCardModel = (
         month: '2-digit',
       });
 
+    
+    function formatToCurrency(amount: number | undefined): string {
+        if (!amount) {
+            return '$0.00';
+        }
+        const formattedAmount = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2,
+        }).format(amount);
+    
+        return formattedAmount;
+    }
     const formatCardNumber = (number: string) => {
         return number.replace(/\d{4}(?=\d)/g, "$& ");
     };
+    function abbreviateName(fullName : string) {
+        // Split the full name into an array of words
+        const nameParts = fullName.split(' ');
+      
+        // Handle case where there's only one name part (no first name, middle name)
+        if (nameParts.length === 1) {
+          return fullName; // Return the name as is
+        }
+      
+        // Initialize an array to hold the abbreviated name
+        const abbreviatedParts = nameParts.map((part, index) => {
+          if (index === nameParts.length - 1) {
+            // Return the last name as is
+            return part;
+          } else {
+            // Return the first letter of the first and middle names with a dot
+            return part.charAt(0).toUpperCase() + '.';
+          }
+        });
+      
+        // Join the parts back together into a string
+        return abbreviatedParts.join(' ');
+      }
+
     return (
         <div className="max-w-200 flex gap-10 flex-wrap">
 
@@ -25,18 +62,18 @@ const CreditCardModel = (
                     {/* Card Type */}
                     <div className='relative top-4 left-4 text-white-200 font-semibold text-lg'>{type}</div>
                 
-                    {/* Cardholder Name */}
-                    <div className="relative -bottom-24 left-4 text-white-200 text-sm font-manrope tracking-widest">
-                        {name.toUpperCase()}
-                    </div>
-
                     {/* Card Number */}
-                    <div className="relative -bottom-24 -right-4 text-white-200 text-lg tracking-widest font-manrope">
+                    <div className="relative -bottom-20 -right-4 text-white-200 text-base tracking-widest font-manrope">
                         {formatCardNumber(cardNumber.toString())}    
                     </div>
 
+                    {/* Cardholder Name */}
+                    <div className="relative -bottom-24 left-4 text-white-200 text-sm font-manrope tracking-widest">
+                        {abbreviateName(name)}
+                    </div>
+
                     {/* Expiration Date */}
-                    <div className="relative -bottom-12 -right-44 text-white-200 text-xs font-manrope">
+                    <div className="relative -bottom-20 -right-44 text-white-200 text-xs font-manrope">
                         {formattedExpirationDate}
                     </div>
 
@@ -45,15 +82,15 @@ const CreditCardModel = (
                 {/* Spending Info and Progress Bar */}
                 <div className="mt-4">
                     <div className="flex justify-between text-sm text-gray-700 font-inter ">
-                        <span className="font-medium">Spending this month</span>
-                        <span>${spending.toFixed(2)}</span>
+                        <span className="font-medium">Credit Available</span>
+                        <span>{formatToCurrency(linkedAccount.balance)}</span>
                     </div>
 
                     {/* Spending Progress */}
                     <div className="relative h-2 mt-2 bg-gray-200 rounded-full">
                         <div
-                            className="absolute top-0 left-0 h-2 bg-blue-500 rounded-full"
-                            style={{ width: `${(spending / maxSpending) * 100}%` }}
+                            className="absolute top-0 left-0 h-2 bg-gradient-to-r from-[#4A1FFB] to-[#381AB7] rounded-full"
+                            style={{ width: `${(linkedAccount.balance / maxSpending) * 100}%` }}
                         ></div>
                     </div>
                 </div>

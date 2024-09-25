@@ -2,29 +2,7 @@ import { createClient } from "./supabase/client";
 import { billerAction } from "./billerAction";
 import { number } from "zod";
 import { referenceNumberGenerator, generateUniqueInvoiceNumber, calculateDueDate } from "./accbsbGenerator"
-
-// Define types (Assuming they are declared elsewhere)
-interface Bill {
-    billed_user: string;
-    from: string;
-    description: string;
-    amount: number;
-    paid_on: Date;
-    status: string;
-    created_at: Date;
-    due_date: Date;
-    invoice_number: string;
-    reference_number: string;
-}
-
-interface Biller {
-    name: string;
-}
-
-interface BillDetails {
-    bill: Bill;
-    biller: any; // Define the type according to your biller structure
-}
+import { inboxAction } from "./inboxAction";
 
 export const billAction = {
     fetchBillsbyUserId: async (user_id: string): Promise<Bill[]> => {
@@ -37,7 +15,36 @@ export const billAction = {
         if (error) {
             throw new Error(error.message);
         }
-        return data || [];
+        const sortedBills = billAction.sortBill(data);
+        
+        return sortedBills;
+    },
+    sortBill: (bills: Bill[]): Bill[] => {
+        const statusPriority: { [key: string]: number } = {
+            unpaid: 1,
+            partial: 2,
+            pending: 3,
+            paid: 4
+          };
+          
+          const sortedBills = bills.sort((a: Bill, b: Bill) => {
+            // Sort by status based on the defined priority (lower number has higher priority)
+            const statusA = statusPriority[a.status] || 5; // Default to 5 if status is unknown
+            const statusB = statusPriority[b.status] || 5;
+          
+            if (statusA !== statusB) {
+              return statusA - statusB;
+            }
+          
+            // Ensure due_date is a Date object before comparing
+            const dueDateA = new Date(a.due_date);
+            const dueDateB = new Date(b.due_date);
+          
+            // Sort by due date (earliest first)
+            return dueDateA.getTime() - dueDateB.getTime();
+          });
+          
+        return sortedBills;
     },
 
     createBill: async (user_id: string, biller: Biller, amount: number, description: string): Promise<void> => {
@@ -54,7 +61,7 @@ export const billAction = {
 
         const invoiceNumber = await generateUniqueInvoiceNumber();
 
-        const newBill: Bill = {
+        const newBill: Partial<Bill> = {
             billed_user: user_id,
             from: biller.name,
             description: description,
@@ -71,6 +78,15 @@ export const billAction = {
 
         if (error) {
             throw new Error(`Failed to create bill: ${error.message}`);
+        }
+        const messageDescription = `A new bill of $${amount} has been assigned to you from ${biller.name}. Please pay by ${newBill.due_date!.toLocaleDateString()}.`;
+
+        try {
+            await inboxAction.createMessage(biller.name, user_id, messageDescription, 'bill', invoiceNumber);
+            console.log('Message sent to user about new bill');
+        } catch (messageError) {
+            console.error('Failed to send message to user:', messageError);
+            // Handle the message error gracefully if necessary
         }
 
         console.log('Bill created:', data);
@@ -115,7 +131,42 @@ export const billAction = {
         items.push(parseFloat(remainingAmount.toFixed(2)));
       
         return items;
-      }
+    },
+    fetchAssignedBills: async (user_id:string,biller_name:string):Promise<Partial<Bill>[]>=>{
+        const supabase = createClient();
+        const {data,error} = await supabase
+        .from('bills')
+        .select('*')
+        .eq('billed_user',user_id)
+        .eq('from',biller_name)
+        .neq('status','paid')
+        .neq('status','pending');
+        if (error){
+            throw error;
+        } 
+        return data;
+    },
       
-      
+    updateBillStatus: async (bill:Partial<Bill>,status:string):Promise<void>=>{
+        const invoice_number = bill.invoice_number;
+        const supabase = createClient();
+        const {data,error} = await supabase
+        .from('bills')
+        .update({status})
+        .eq('invoice_number',invoice_number);
+        if (error){
+            throw error;
+        }
+    },
+    updateBillAmount: async (bill:Partial<Bill>,amount:number):Promise<void>=>{
+        const invoice_number = bill.invoice_number;
+        const supabase = createClient();
+        const {data,error} = await supabase
+        .from('bills')
+        .update({amount})
+        .eq('invoice_number',invoice_number);
+        if (error){
+            throw error;
+        }
+    }      
 };
