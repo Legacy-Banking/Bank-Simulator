@@ -14,10 +14,12 @@ const AdminDashboard = () => {
 
   const [activePage, setActivePage] = useState('accounts');
   const userRole = useAppSelector(state => state.user.user_role);
+  console.log('hello');
+  console.log(userRole);
   const router = useRouter();
-  if (userRole !== 'admin') {
-    router.push('/'); // Redirect to home if not admin
-  }
+  // if (userRole !== 'admin') {
+  //   router.push('/'); // Redirect to home if not admin
+  // }
 
 
 
