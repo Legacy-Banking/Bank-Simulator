@@ -66,7 +66,21 @@ export const accountAction = {
         }
         return data || null;
     },
+    fetchAccountTypebyId: async (id: string): Promise<string> => {
+        const supabase = createClient();
+        const { data, error } = await supabase
+            .from('account')
+            .select('type')
+            .eq('id', id);
 
+        if (error) {
+            console.error('Error fetching Account Type:', error);
+            throw error;
+        }
+
+        const accountType = data?.[0]?.type;
+        return accountType;
+    },
     fetchPersonalAccountByUserId: async (user_id: string) => {
         const supabase = createClient();
 
