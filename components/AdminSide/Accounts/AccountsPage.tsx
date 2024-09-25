@@ -15,6 +15,14 @@ const AccountsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Search Bar
+  const [inputValue, setInputValue] = useState('');
+
+  // Filter the accounts based on the input value
+  const filteredAccounts = accounts.filter((account) =>
+    (account.owner_username ?? '').toLowerCase().includes((inputValue ?? '').toLowerCase())
+  );
+
   // Pagination
   const searchParams = useSearchParams();
 
@@ -22,10 +30,10 @@ const AccountsPage = () => {
   const pageFromUrl = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1; // Get page from URL or default to 1
   const [page, setPage] = useState(pageFromUrl); // Set initial page from URL
 
-  const totalPages = Math.ceil(accounts.length / rowsPerPage);
+  const totalPages = Math.ceil(filteredAccounts.length / rowsPerPage);
   const indexOfLastTransaction = page * rowsPerPage;
   const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
-  const currentAccounts = accounts.slice(indexOfFirstTransaction, indexOfLastTransaction);
+  const currentAccounts = filteredAccounts.slice(indexOfFirstTransaction, indexOfLastTransaction);
 
   // getting data
   const supabase = createClient();
@@ -67,7 +75,7 @@ if (error) return <p>Error: {error}</p>;
             <div className='flex flex-1'>
               <h1 className="text-xl text-black font-semibold">Accounts</h1>
             </div>
-            <SearchBar></SearchBar>
+            <SearchBar inputValue={inputValue} setInputValue={setInputValue}></SearchBar>
 
           </div>
           <section className="flex w-full flex-col mt-6 bg-white-100 rounded-b-3xl">

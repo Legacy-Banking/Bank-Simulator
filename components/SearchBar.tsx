@@ -1,8 +1,11 @@
 "use client"
 import React, { useState, useRef } from 'react';
-
-function SearchBar() {
-    const [inputValue, setInputValue] = useState('');
+import { string } from 'zod';
+interface SearchBarProps {
+    inputValue: string;
+    setInputValue: React.Dispatch<React.SetStateAction<string>>;
+  }
+function SearchBar({ inputValue, setInputValue }: SearchBarProps) {
     const inputRef = useRef<HTMLInputElement>(null);
 
     const handleMagnifierClick = () => {
@@ -33,7 +36,7 @@ function SearchBar() {
                 placeholder="Search User"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                className="w-full outline-none focus:ring-0"
+                className="w-full outline-none focus:ring-0 bg-gray-100"
             />
             {inputValue && (
                 <button
