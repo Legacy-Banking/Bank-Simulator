@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react'
 import AccountBox from '@/components/AccountBox';
 import { useAppSelector } from '@/app/store/hooks';
 import { accountAction } from '@/utils/accountAction';
+import ScheduleTransferForm from '@/components/dev/ScheduleTransferForm';
 
 const Dashboard = () => {
     const user = useAppSelector(state => state.user);
@@ -43,6 +44,7 @@ const Dashboard = () => {
     return (
         <section className="flex w-full flex-row max-xl:max-h-screen font-inter">
             <div className="flex w-full flex-1 flex-col gap-8 px-5 sm:px-8 py-6 lg:py-12 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen">
+                <ScheduleTransferForm />
                 {loading ? (
                     // Spinner to show while loading
                     <div className="flex items-center justify-center">

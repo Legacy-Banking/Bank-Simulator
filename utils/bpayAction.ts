@@ -4,7 +4,6 @@ import { accountAction } from "./accountAction";
 
 export const bpayAction = {
     payBills: async (
-        user_id: string, 
         from_account: Account, 
         biller_name: string, 
         biller_code: string, 
