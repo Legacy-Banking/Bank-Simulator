@@ -177,6 +177,11 @@ type AccountsTableProps = {
   setShowUpdatePopUp: React.Dispatch<React.SetStateAction<boolean>>;
   setShowDeletePopUp: React.Dispatch<React.SetStateAction<boolean>>;
 }
+type BillersTableProps = {
+  billers: Biller[];
+  setShowUpdatePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowDeletePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
 type TransactionTableProps = {
   transactions: Transaction[];

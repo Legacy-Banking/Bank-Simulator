@@ -4,7 +4,7 @@ import AccountsPage from '@/components/AdminSide/Accounts/AccountsPage';
 import AdditionalFundsPage from '@/components/AdminSide/AdditionalFundsPage';
 import AdminSideBar from '@/components/AdminSide/AdminSideBar'
 import CreateBillPage from '@/components/AdminSide/CreateBillPage';
-import PresetsPage from '@/components/AdminSide/PresetsPage';
+import PresetsPage from '@/components/AdminSide/Presets/PresetsPage';
 import { useAppSelector } from '@/app/store/userSlice';
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation';
@@ -20,8 +20,6 @@ const AdminDashboard = () => {
   // if (userRole !== 'admin') {
   //   router.push('/'); // Redirect to home if not admin
   // }
-
-
 
   const renderActivePage = () => {
     switch (activePage) {
