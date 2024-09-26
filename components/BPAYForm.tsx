@@ -19,6 +19,7 @@ import { billerAction } from '@/utils/billerAction';
 import { bpayAction } from '@/utils/bpayAction';
 import { billAction } from '@/utils/billAction';
 import { cardAction } from '@/utils/cardAction';
+import { scheduleAction } from '@/utils/scheduleAction';
 
 const formSchema = z.object({
   toBiller: z.string().optional(),
@@ -131,7 +132,9 @@ const formSchema = z.object({
 
       // Number of Payments is required if "numberOfPayments" is selected
       if (data.endCondition === "numberOfPayments") {
-        if (isNaN(Number(data.numberOfPayments)) || Number(data.numberOfPayments) <= 0) {
+        const numPayments = Number(data.numberOfPayments);
+        // Check if the value is a number, positive, and an integer
+        if (isNaN(numPayments) || numPayments <= 0 || !Number.isInteger(numPayments)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["numberOfPayments"],
@@ -272,9 +275,24 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
   
 
       const amountF = parseFloat(data.amount);
+      let totalAmount = amountF;
+
+      // If "numberOfPayments" is selected, calculate total amount
+      if (data.endCondition === "numberOfPayments") {
+        const numPayments = parseInt(data.numberOfPayments!, 10);
+
+        if (!isNaN(numPayments) && numPayments > 0) {
+          totalAmount = amountF * numPayments;
+          console.log("Total Amount with numberOfPayments:", totalAmount);
+        } else {
+          setError("Invalid number of payments entered.");
+          setIsLoading(false);
+          return;
+        }
+      }
 
       // Check for insufficient funds
-      if (fromAccount.balance < amountF) {
+      if (fromAccount.balance < totalAmount) {
         setError("Insufficient funds in selected account.");
         setIsLoading(false);
         return;
@@ -332,9 +350,62 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
         return;
       }
 
+    // Check if the user selected "schedule" or "recurring" payment
+    if (data.paymentOption === "schedule" || data.paymentOption === "recurring") {
+
+      const scheduleDate = data.paymentOption === "schedule" ? data.scheduleDate! : data.recurringStartDate!;
+      const scheduleType = data.paymentOption === "schedule" ? 'bpay_schedule' : 'bpay_recur';
+      
+      console.log("Payment Option Selected:", data.paymentOption);
+      console.log("Schedule Date:", scheduleDate);
+      console.log("Schedule Type:", scheduleType);
+
+
+      if (data.paymentOption === "recurring") {
+        scheduleAction.setScheduleType(scheduleType);
+        scheduleAction.setPayInterval(data.frequency || 'weekly');
+
+        console.log("Recurring Payment Selected");
+        console.log("Payment Interval:", data.frequency || 'weekly');
+
+        // Handle different end conditions
+        switch (data.endCondition) {
+          case "untilFurtherNotice":
+            scheduleAction.setRecurRule('untilFurtherNotice');
+            break;
+          case "setEndDate":
+            scheduleAction.setRecurRule('endDate');
+            scheduleAction.setEndDate(data.endDate!);
+            console.log("End Date:", data.endDate!);
+            break;
+          case "numberOfPayments":
+            scheduleAction.setRecurRule('numberOfPayments');
+            scheduleAction.setRecurCount(parseInt(data.numberOfPayments!, 10));
+            console.log("Parsed Number of Payments:", (parseInt(data.numberOfPayments!, 10)));
+            break;
+        }
+      }
+
+    // Create a scheduled BPAY entry
+    try {
+      const scheduleRef = await scheduleAction.createScheduleEntry(
+        fromAccount,
+        null,
+        finalBillerName,
+        finalBillerCode,
+        finalReferenceNum,
+        amountF,
+        data.description || '',
+        scheduleDate,
+        [fromAccount.owner],
+      );
+      console.log("Scheduled BPAY Entry Created:", scheduleRef);
+    } catch (error) {
+      console.error("Error Creating Schedule Entry:", error);
+    }
+    } else {
       // Call the createBPAYTransaction action
       await bpayAction.payBills(
-        user_id,
         fromAccount,
         finalBillerName,
         finalBillerCode,
@@ -343,6 +414,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
         data.description || '',
         bills,
       );
+    }
 
       if (data.saveBiller) {
         // Check if billerName, billerCode, and referenceNum are filled

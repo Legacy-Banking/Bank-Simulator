@@ -2,8 +2,8 @@ import { createClient } from "./supabase/client";
 import { referenceNumberGenerator } from './accbsbGenerator';
 
 enum ScheduleType {
-    transfer = 'transfer',
-    bpay = 'bpay',
+    transfer = 'transfer_schedule',
+    bpay = 'bpay_schedule',
     transfer_recur = 'transfer_recur',
     bpay_recur = 'bpay_recur'
 }
@@ -43,10 +43,10 @@ class ScheduleAction {
     // Setter to change the schedule type
     public setScheduleType(type: string): void {
         switch(type){
-            case 'transfer':
+            case 'transfer_schedule':
                 this.scheduleType = ScheduleType.transfer;
                 break;
-            case 'bpay':
+            case 'bpay_schedule':
                 this.scheduleType = ScheduleType.bpay;
                 break;
             case 'transfer_recur':
