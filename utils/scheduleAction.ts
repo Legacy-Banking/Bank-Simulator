@@ -18,11 +18,26 @@ class ScheduleAction {
     private supabase: any;
     private scheduleType: ScheduleType;
     private payInterval: PayInterval;
+    private recur_rule: string;
+    private end_date: Date;
+    private recur_count_dec:number;
 
     constructor() {
         this.supabase = createClient();
         this.scheduleType = ScheduleType.transfer; // default
         this.payInterval = PayInterval.monthly; // default
+        this.recur_rule = '';
+        this.end_date = new Date();
+        this.recur_count_dec = 0;
+    }
+    public setRecurRule(rule: string): void {
+        this.recur_rule = rule;
+    }
+    public setEndDate(date: Date): void {
+        this.end_date = date;
+    }
+    public setRecurCount(count: number): void {
+        this.recur_count_dec = count;
     }
 
     // Setter to change the schedule type
@@ -121,47 +136,92 @@ class ScheduleAction {
         const { data:schedule_payment, error } = await this.supabase.from('schedule_payments').select('*').eq('schedule_ref', schedule_ref).single();
         const { data:recur_payment, error:recur_error } = await this.supabase.from('recurring_payments').insert([{
             interval: this.parseFrequencyToInterval(this.payInterval),
-            related_schedule: schedule_payment.id
+            related_schedule: schedule_payment.id,
+            recur_rule: this.recur_rule,
+            end_date: this.end_date,
+            recur_count: this.recur_count_dec
         }]);
         console.log(recur_error);
 
 
     }
 
-    // Fetch payments and execute them if necessary
-    public async checkAndExecuteScheduledPayments(userId: string): Promise<void> {
-        const { data: scheduledPayments, error } = await this.supabase
-            .from('schedule_payments')
-            .select('*')
-            .eq('related_user', userId)
-            .lt('pay_at', new Date()); // Fetch payments that should have already been made
+    // // Fetch payments and execute them if necessary
+    // public async checkAndExecuteScheduledPayments(userId: string): Promise<void> {
+    //     const { data: scheduledPayments, error } = await this.supabase
+    //         .from('schedule_payments')
+    //         .select('*')
+    //         .eq('related_user', userId)
+    //         .lt('pay_at', new Date()); // Fetch payments that should have already been made
 
-        if (error) {
-            console.error('Error fetching scheduled payments:', error);
-            return;
-        }
+    //     if (error) {
+    //         console.error('Error fetching scheduled payments:', error);
+    //         return;
+    //     }
 
-        if (scheduledPayments) {
-            for (const payment of scheduledPayments) {
-                // Execute based on schedule type
-                if (payment.schedule_type === ScheduleType.transfer || payment.schedule_type === ScheduleType.transfer_recur) {
-                    await this.executeTransfer(payment);
-                } else if (payment.schedule_type === ScheduleType.bpay || payment.schedule_type === ScheduleType.bpay_recur) {
-                    await this.executeBpay(payment);
-                }
-            }
-        }
-    }
+    //     if (scheduledPayments) {
+    //         for (const payment of scheduledPayments) {
+    //             // Execute based on schedule type
+    //             if (payment.schedule_type === ScheduleType.transfer || payment.schedule_type === ScheduleType.transfer_recur) {
+    //                 await this.executeTransfer(payment);
+    //             } else if (payment.schedule_type === ScheduleType.bpay || payment.schedule_type === ScheduleType.bpay_recur) {
+    //                 await this.executeBpay(payment);
+    //             }
+    //         }
+    //     }
+    // }
 
-    private async executeTransfer(payment: any): Promise<void> {
-        console.log('Executing transfer:', payment);
-        // Logic to execute the transfer
-    }
+    // public async executeScheduledPayment(user_id:string){
+    //     const supabase = createClient();
+    //     const { data: scheduledPayments, error } = await supabase.from('schedule_payments').select('*')
+    //     scheduledPayments?.filter((payment) => {
+    //         payment.related_user.includes(user_id)
+    //         && payment.pay_at < new Date()
+    //     }).forEach(async (payment) => {
+    //         const schedule_type = payment.schedule_type;
+    //         if (payment.schedule_type === ScheduleType.transfer || payment.schedule_type === ScheduleType.transfer_recur) {
+    //             await this.executeTransfer(payment);
+    //         } else if (payment.schedule_type === ScheduleType.bpay || payment.schedule_type === ScheduleType.bpay_recur) {
+    //             await this.executeBpay(payment);
+    //         }
 
-    private async executeBpay(payment: any): Promise<void> {
-        console.log('Executing BPAY:', payment);
-        // Logic to execute the BPAY
-    }
+    //     })
+    // }
+    // private async incrementRecurEntry(schedule_ref: string): Promise<boolean> {
+    //     const {data:recur_payment, error} = await this.supabase.from('recurring_payments').select('*').eq('related_schedule', schedule_ref).single();
+    //     const interval = recur_payment.interval;
+    //     let nextPayment = new Date();
+    //     switch(interval){
+    //         case '1 week':
+    //             nextPayment.setDate(nextPayment.getDate() + 7);
+    //             break;
+    //         case '2 weeks':
+    //             nextPayment.setDate(nextPayment.getDate() + 14);
+    //             break;
+    //         case '1 month':
+    //             nextPayment.setMonth(nextPayment.getMonth() + 1);
+    //             break;
+    //         case '3 months':
+    //             nextPayment.setMonth(nextPayment.getMonth() + 3);
+    //             break;
+    //         default:
+    //             nextPayment.setMonth(nextPayment.getMonth() + 1);
+    //             break;
+    //     }
+    //     return false;
+
+
+    // }
+
+    // private async executeTransfer(payment: any): Promise<void> {
+    //     console.log('Executing transfer:', payment);
+    //     // Logic to execute the transfer
+    // }
+
+    // private async executeBpay(payment: any): Promise<void> {
+    //     console.log('Executing BPAY:', payment);
+    //     // Logic to execute the BPAY
+    // }
 }
 
 export const scheduleAction = new ScheduleAction();

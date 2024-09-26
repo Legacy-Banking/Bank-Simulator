@@ -23,7 +23,11 @@ const ScheduleTransferForm: React.FC = () => {
     // Recurring fields
     const [isRecurring, setIsRecurring] = useState<boolean>(false);
     const [interval, setInterval] = useState<string>('weekly'); // Default interval is weekly
+    const [recurRule, setRecurRule] = useState<string>('');
+    const [recurEndDate, setRecurEndDate] = useState<Date | null>(null);
+    const [recurCount, setRecurCount] = useState<number>(0);
 
+    //in actual accounts will be passed as props
     useEffect(() => {
         const fetchAccounts = async () => {
             try {
@@ -88,6 +92,9 @@ const ScheduleTransferForm: React.FC = () => {
                     if (isRecurring) {
                         scheduleAction.setScheduleType('bpay_recur');
                         scheduleAction.setPayInterval(interval);
+                        scheduleAction.setRecurRule(recurRule);
+                        scheduleAction.setEndDate(recurEndDate!);
+                        scheduleAction.setRecurCount(recurCount);
                     }
                     const scheduleRef = await scheduleAction.createScheduleEntry(
                         fromAcc,
@@ -185,7 +192,7 @@ const ScheduleTransferForm: React.FC = () => {
                         </label>
                     </div>
 
-                    {isRecurring && (
+                    {isRecurring && (<>
                         <div>
                             <label>Interval:</label>
                             <select
@@ -198,6 +205,31 @@ const ScheduleTransferForm: React.FC = () => {
                                 <option value="quarterly">Quarterly</option>
                             </select>
                         </div>
+                        <div>
+                            <label>Recur Rule:</label>
+                            <input
+                                type="text"
+                                value={recurRule}
+                                onChange={(e) => setRecurRule(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label>Recur End Date:</label>
+                            <input
+                                type="date"
+                                value={recurEndDate}
+                                onChange={(e) => setRecurEndDate(new Date(e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <label>Recur Count:</label>
+                            <input
+                                type="number"
+                                value={recurCount}
+                                onChange={(e) => setRecurCount(parseInt(e.target.value))}
+                            />
+                        </div>
+                    </>
                     )}
 
                     <button type="submit">Schedule Transfer</button>
@@ -285,18 +317,45 @@ const ScheduleTransferForm: React.FC = () => {
                     </div>
 
                     {isRecurring && (
-                        <div>
-                            <label>Interval:</label>
-                            <select
-                                value={interval}
-                                onChange={(e) => setInterval(e.target.value)}
-                            >
-                                <option value="weekly">Weekly</option>
-                                <option value="fortnightly">Fortnightly</option>
-                                <option value="monthly">Monthly</option>
-                                <option value="quarterly">Quarterly</option>
-                            </select>
-                        </div>
+                        <>
+                            <div>
+                                <label>Interval:</label>
+                                <select
+                                    value={interval}
+                                    onChange={(e) => setInterval(e.target.value)}
+                                >
+                                    <option value="weekly">Weekly</option>
+                                    <option value="fortnightly">Fortnightly</option>
+                                    <option value="monthly">Monthly</option>
+                                    <option value="quarterly">Quarterly</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Recur Rule:</label>
+                                <input
+                                    type="text"
+                                    value={recurRule}
+                                    onChange={(e) => setRecurRule(e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <label>Recur End Date:</label>
+                                <input
+                                    type="date"
+                                    value={recurEndDate}
+                                    onChange={(e) => setRecurEndDate(new Date(e.target.value))}
+                                />
+                            </div>
+                            <div>
+                                <label>Recur Count:</label>
+                                <input
+                                    type="number"
+                                    value={recurCount}
+                                    onChange={(e) => setRecurCount(parseInt(e.target.value))}
+                                />
+                            </div>
+                        </>
+
                     )}
 
                     <button type="submit">Schedule BPAY</button>
