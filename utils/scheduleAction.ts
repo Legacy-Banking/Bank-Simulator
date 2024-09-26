@@ -139,7 +139,7 @@ class ScheduleAction {
             related_schedule: schedule_payment.id,
             recur_rule: this.recur_rule,
             end_date: this.end_date,
-            recur_count: this.recur_count_dec
+            recur_count_dec: this.recur_count_dec
         }]);
         console.log(recur_error);
 
