@@ -1,9 +1,11 @@
 import { createClient } from "./supabase/client";
 import { referenceNumberGenerator } from './accbsbGenerator';
+import { bpayAction } from "./bpayAction";
+import { transactionAction } from "./transactionAction";
 
 enum ScheduleType {
-    transfer = 'transfer_schedule',
-    bpay = 'bpay_schedule',
+    transfer_schedule = 'transfer_schedule',
+    bpay_schedule = 'bpay_schedule',
     transfer_recur = 'transfer_recur',
     bpay_recur = 'bpay_recur'
 }
@@ -13,6 +15,31 @@ enum PayInterval{
     monthly = 'monthly',
     quarterly = 'quarterly',
 }
+
+type Schedule= {
+    pay_at: Date,
+    related_user: string[],
+    from_account: string,
+    to_account: string | null,
+    biller_name: string | null,
+    biller_code: string | null,
+    reference_number: string | null,
+    amount: number,
+    description: string,
+    schedule_ref: string,
+    schedule_type: ScheduleType,
+    recurring: Recurring | null
+
+}
+type Recurring = {
+    interval: string,
+    related_schedule: string,
+    recur_rule: string| null,
+    end_date: Date| null,
+    recur_count_dec: number| null,
+}
+
+
 
 class ScheduleAction {
     private supabase: any;
@@ -24,7 +51,7 @@ class ScheduleAction {
 
     constructor() {
         this.supabase = createClient();
-        this.scheduleType = ScheduleType.transfer; // default
+        this.scheduleType = ScheduleType.transfer_schedule; // default
         this.payInterval = PayInterval.monthly; // default
         this.recur_rule = '';
         this.end_date = new Date();
@@ -44,10 +71,10 @@ class ScheduleAction {
     public setScheduleType(type: string): void {
         switch(type){
             case 'transfer_schedule':
-                this.scheduleType = ScheduleType.transfer;
+                this.scheduleType = ScheduleType.transfer_schedule;
                 break;
             case 'bpay_schedule':
-                this.scheduleType = ScheduleType.bpay;
+                this.scheduleType = ScheduleType.bpay_schedule;
                 break;
             case 'transfer_recur':
                 this.scheduleType = ScheduleType.transfer_recur;
@@ -56,7 +83,7 @@ class ScheduleAction {
                 this.scheduleType = ScheduleType.bpay_recur;
                 break;
             default:
-                this.scheduleType = ScheduleType.transfer;
+                this.scheduleType = ScheduleType.transfer_schedule;
                 break;
         }
     }
@@ -92,7 +119,21 @@ class ScheduleAction {
           default:
             throw new Error(`Unsupported frequency: ${frequency}`);
         }
-      }
+    }
+    public parseInterval(interval: string): number {
+        switch (interval) {
+            case "1 week":
+              return 604800000;
+            case "2 weeks":
+              return 1209600000;
+            case "1 month":
+              return 2628000000;
+            case "3 months":
+              return 7884000000;
+            default:
+              throw new Error(`Unsupported interval: ${interval}`);
+          }
+    }
 
 
     // Unified method to create a schedule entry
@@ -111,7 +152,7 @@ class ScheduleAction {
         };
 
         // Modify payload based on the schedule type
-        if (this.scheduleType === ScheduleType.bpay || this.scheduleType === ScheduleType.bpay_recur) {
+        if (this.scheduleType === ScheduleType.bpay_schedule || this.scheduleType === ScheduleType.bpay_recur) {
             payload.biller_name = biller_name;
             payload.biller_code = biller_code;
             payload.reference_number = reference_number;
@@ -140,88 +181,87 @@ class ScheduleAction {
             recur_rule: this.recur_rule,
             end_date: this.end_date,
             recur_count_dec: this.recur_count_dec
-        }]);
-        console.log(recur_error);
+        }]).select('id').single(); 
+        await this.supabase.from('schedule_payments').update({recurring_payment: recur_payment.id}).eq('id', schedule_payment.id);  
+    }
+    public async executeSchedules(): Promise<void> {
+        const {data:schedulePayments,error}=await this.supabase.from('schedule_payments').select('*').lte('pay_at',new Date()).eq('status','pending');
+        if(schedulePayments){
+            for(const schedule of schedulePayments){
+                await this.executeSchedule(schedule);
+            }
+        }
+    }
+    private async executeSchedule(schedule: any): Promise<void> {
+        const schedule_type = schedule.schedule_type;
+        switch (schedule_type) {
+            case ScheduleType.transfer_schedule:
+                await this.executeTransfer(schedule);
+                break;
+            case ScheduleType.bpay_schedule:
+                await this.executeBpay(schedule);
+                break;
+            case ScheduleType.transfer_recur:
+                await this.executeTransferRecur(schedule);
+                break;
+            case ScheduleType.bpay_recur:
+                await this.executeBpayRecur(schedule);
+                break;
+            default:
+                console.error('Unsupported schedule type:', schedule_type);
+                break;
+        }
+    }
+    private async executeTransfer(schedule: any): Promise<void> {
+        const { data:fromAccount, error:fromAccountError } = await this.supabase.from('accounts').select('*').eq('id', schedule.from_account).single();
+        const { data:toAccount, error:toAccountError } = await this.supabase.from('accounts').select('*').eq('id', schedule.to_account).single();
+        if(fromAccount && toAccount){
+            await transactionAction.createTransaction(fromAccount, toAccount, schedule.amount, schedule.description, schedule.schedule_ref);
+            await this.supabase.from('schedule_payments').update({status: 'completed'}).eq('id', schedule.id);
+        }
+    }
+    private async executeBpay(schedule: any): Promise<void> {
+        const { data:biller, error:billerError } = await this.supabase.from('billers').select('*').eq('biller_code', schedule.biller_code).single();
+        if(biller){
+            await bpayAction.payBills(schedule.from_account,schedule.biller_name, schedule.biller_code, schedule.amount, schedule.description, schedule.schedule_ref, schedule.related_user[0]);
+            await this.supabase.from('schedule_payments').update({status: 'completed'}).eq('id', schedule.id);
+        }
+    }
+    private async executeTransferRecur(schedule: any): Promise<void> {
+        const { data:recurringPayment, error:recurringPaymentError } = await this.supabase.from('recurring_payments').select('*').eq('id', schedule.recurring_payment).single();
+        const interval = recurringPayment.interval;
+        const pay_at = new Date(schedule.pay_at);
+        await this.executeRecur(schedule);
+    }
+    private async executeBpayRecur(schedule: any): Promise<void> {
+        const { data:recurringPayment, error:recurringPaymentError } = await this.supabase.from('recurring_payments').select('*').eq('id', schedule.recurring_payment).single();
+        const interval = recurringPayment.interval;
+        const pay_at = new Date(schedule.pay_at);
+        await this.executeRecur(schedule);
+    }
 
+    private async executeRecur(schedule: any): Promise<void> {
+        const { data:recurringPayment, error:recurringPaymentError } = await this.supabase.from('recurring_payments').select('*').eq('id', schedule.recurring_payment).single();
+        const recur_rule = recurringPayment.recur_rule;
+        const interval = recurringPayment.interval;
+        const end_date = new Date(recurringPayment.end_date);
+        const recur_count_dec = recurringPayment.recur_count_dec;
+        const pay_at = new Date(schedule.pay_at);
+        switch (recur_rule) {
+            case 'untilFurtherNotice':
+                //update parent schedule's pay_at, add the interval to the pay_at
+                await this.supabase.from('schedule_payments').update({pay_at: new Date(pay_at.getTime() + this.parseInterval(interval))}).eq('id', schedule.id);
+                break;
+            case 'endDate':
+                //update parent schedule's pay_at, add the interval to the pay_at, check if pay_at is before end_date, if not, set status to completed
+                break;
+            case 'numberOfPayments':
+                //if recur_count_dec > 0, update parent schedule's pay_at, add the interval to the pay_at, decrement recur_count_dec, if recur_count_dec = 0, set status to completed
+                break;   
+        }
 
     }
 
-    // // Fetch payments and execute them if necessary
-    // public async checkAndExecuteScheduledPayments(userId: string): Promise<void> {
-    //     const { data: scheduledPayments, error } = await this.supabase
-    //         .from('schedule_payments')
-    //         .select('*')
-    //         .eq('related_user', userId)
-    //         .lt('pay_at', new Date()); // Fetch payments that should have already been made
-
-    //     if (error) {
-    //         console.error('Error fetching scheduled payments:', error);
-    //         return;
-    //     }
-
-    //     if (scheduledPayments) {
-    //         for (const payment of scheduledPayments) {
-    //             // Execute based on schedule type
-    //             if (payment.schedule_type === ScheduleType.transfer || payment.schedule_type === ScheduleType.transfer_recur) {
-    //                 await this.executeTransfer(payment);
-    //             } else if (payment.schedule_type === ScheduleType.bpay || payment.schedule_type === ScheduleType.bpay_recur) {
-    //                 await this.executeBpay(payment);
-    //             }
-    //         }
-    //     }
-    // }
-
-    // public async executeScheduledPayment(user_id:string){
-    //     const supabase = createClient();
-    //     const { data: scheduledPayments, error } = await supabase.from('schedule_payments').select('*')
-    //     scheduledPayments?.filter((payment) => {
-    //         payment.related_user.includes(user_id)
-    //         && payment.pay_at < new Date()
-    //     }).forEach(async (payment) => {
-    //         const schedule_type = payment.schedule_type;
-    //         if (payment.schedule_type === ScheduleType.transfer || payment.schedule_type === ScheduleType.transfer_recur) {
-    //             await this.executeTransfer(payment);
-    //         } else if (payment.schedule_type === ScheduleType.bpay || payment.schedule_type === ScheduleType.bpay_recur) {
-    //             await this.executeBpay(payment);
-    //         }
-
-    //     })
-    // }
-    // private async incrementRecurEntry(schedule_ref: string): Promise<boolean> {
-    //     const {data:recur_payment, error} = await this.supabase.from('recurring_payments').select('*').eq('related_schedule', schedule_ref).single();
-    //     const interval = recur_payment.interval;
-    //     let nextPayment = new Date();
-    //     switch(interval){
-    //         case '1 week':
-    //             nextPayment.setDate(nextPayment.getDate() + 7);
-    //             break;
-    //         case '2 weeks':
-    //             nextPayment.setDate(nextPayment.getDate() + 14);
-    //             break;
-    //         case '1 month':
-    //             nextPayment.setMonth(nextPayment.getMonth() + 1);
-    //             break;
-    //         case '3 months':
-    //             nextPayment.setMonth(nextPayment.getMonth() + 3);
-    //             break;
-    //         default:
-    //             nextPayment.setMonth(nextPayment.getMonth() + 1);
-    //             break;
-    //     }
-    //     return false;
-
-
-    // }
-
-    // private async executeTransfer(payment: any): Promise<void> {
-    //     console.log('Executing transfer:', payment);
-    //     // Logic to execute the transfer
-    // }
-
-    // private async executeBpay(payment: any): Promise<void> {
-    //     console.log('Executing BPAY:', payment);
-    //     // Logic to execute the BPAY
-    // }
 }
 
 export const scheduleAction = new ScheduleAction();
