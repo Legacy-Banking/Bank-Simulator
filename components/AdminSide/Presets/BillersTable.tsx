@@ -17,15 +17,18 @@ import TrashAccountDetailSheet from '../Accounts/TrashAccountDetailSheet';
 import { boolean } from 'zod';
 import EditAccountDetailSheet from '../Accounts/EditAccountDetailSheet';
 import PopUp from '../Accounts/PopUp';
+import EditBillerDetailSheet from './Editing Items/EditBillerDetailSheet';
+import TrashBillerDetailSheet from './Deleting Items/TrashBillerDetailSheet';
 
 // BillersTable component
-export const BillersTable = ({ billers = [], setShowUpdatePopUp, setShowDeletePopUp }: BillersTableProps) => {
+export const BillersTable = ({ billers = [], setShowUpdatePopUp, setShowDeletePopUp, onEditStatus }: BillersTableProps) => {
   const [selectedBiller, setSelectedBiller] = useState<Biller | null>(null);
   const [deleteBillerWindow, setDeleteBillerWindow] = useState(false);
   const [editBillerWindow, setEditBillerWindow] = useState(false);
 
-  const toggleDeleteBillerWindow = () => {
+  const toggleDeleteBillerWindow = (acc : Biller | null) => {
     setDeleteBillerWindow((prevState) => !prevState);
+    setSelectedBiller(acc);
   };
 
   const toggleEditBillerWindow = (acc : Biller | null) => {
@@ -37,17 +40,21 @@ export const BillersTable = ({ billers = [], setShowUpdatePopUp, setShowDeletePo
 
   const deleteBiller = () => {
     // currently empty but this will delete the selected account
-    toggleDeleteBillerWindow();
+    toggleDeleteBillerWindow(null);
     setShowDeletePopUp(true);
+    onEditStatus();
   }
   const updateBiller = () => {
     toggleEditBillerWindow(null);
     setShowUpdatePopUp(true);
+    onEditStatus();
     // currently empty but this will update the selected account
   }
 
 
-
+  const formatReferenceNumber = (number: string) => {
+    return number.replace(/\d{4}(?=\d)/g, "$& ");
+};
   return (
     <>
       <Table>
@@ -63,8 +70,8 @@ export const BillersTable = ({ billers = [], setShowUpdatePopUp, setShowDeletePo
         <TableBody>
           {billers.map((biller: Biller) => {
             const billerCode = biller.biller_code;
-            const billerName = biller.name;
-            const referenceNumber = biller.biller_details;
+            const billerName = biller.biller_name;
+            const referenceNumber = formatReferenceNumber(biller.reference_number);
 
             return (
               <TableRow
@@ -72,7 +79,7 @@ export const BillersTable = ({ billers = [], setShowUpdatePopUp, setShowDeletePo
               >
                 <TableCell className="max-w-[200px] pl-8 pr-10">
                   <div className="flex items-center gap-3">
-                    <h1 className="font-inter text-16 truncate font-semibold text-[#344054]">
+                    <h1 className="font-inter text-16 truncate font-medium text-[#344054]">
                       {/* Show from_account for positive amounts, and to_account or to_biller based on whether to_account is null */}
                       {billerCode}
                     </h1>
@@ -80,17 +87,17 @@ export const BillersTable = ({ billers = [], setShowUpdatePopUp, setShowDeletePo
                 </TableCell>
 
 
-                <TableCell className="font-inter font-bold">
+                <TableCell className="font-inter text-lg ">
                   {billerName}
                 </TableCell>
 
-                <TableCell className="font-inter min-w-32 pl-2 pr-10 text-[#475467]">
+                <TableCell className="font-inter text-base pl-2 ">
                   {referenceNumber}
                 </TableCell>
                 
                 <TableCell >
                     <Button onClick={() => toggleEditBillerWindow(biller)} className="p-0 ml-4"> <img src="../Edit.png" alt="Edit button" /></Button>
-                    <Button onClick={toggleDeleteBillerWindow} className="p-0 ml-4"> <img src="../Delete.png" alt="Delete button" /></Button>
+                    <Button onClick={() => toggleDeleteBillerWindow(biller)} className="p-0 ml-4"> <img src="../Delete.png" alt="Delete button" /></Button>
                 </TableCell>
               </TableRow>
             );
@@ -98,20 +105,21 @@ export const BillersTable = ({ billers = [], setShowUpdatePopUp, setShowDeletePo
         </TableBody>
       </Table>
 
-      {/* <TrashBillerDetailSheet
-        account={selectedBiller}
+      <TrashBillerDetailSheet
+        biller={selectedBiller}
         status={deleteBillerWindow}
-        onClose={toggleDeleteBillerWindow}
+        onClose={() => toggleDeleteBillerWindow(selectedBiller)}
         deleteBiller={deleteBiller}
       />
       <EditBillerDetailSheet
-        account={selectedBiller}
+        biller={selectedBiller}
         status={editBillerWindow}
         onClose={() => toggleEditBillerWindow(selectedBiller)}
         updateBiller={updateBiller}
-        /> */}
+        />
 
     </>
+    
   );
 };
 export default BillersTable;

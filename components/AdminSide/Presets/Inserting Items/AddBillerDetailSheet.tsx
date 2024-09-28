@@ -15,11 +15,12 @@ import { createClient } from '@/utils/supabase/client';
 type BillerDetailSheetProps = {
   status: boolean;
   onClose: () => void;
+  onAddStatus: () => void;
 };
 
 
 
-const AddBillerDetailSheet: React.FC<BillerDetailSheetProps> = ({ status, onClose}) => {
+const AddBillerDetailSheet: React.FC<BillerDetailSheetProps> = ({ status, onClose, onAddStatus}) => {
   
   if (!status) return null;
   
@@ -29,11 +30,52 @@ const AddBillerDetailSheet: React.FC<BillerDetailSheetProps> = ({ status, onClos
   const [billerName, setBillerName] = useState('');
   const [referenceNumber, setReferenceNumber] = useState('');
 
-  const addBiller = (billerCode : string, billerName : string, referenceNumber : string) => {
-      
-
+  const addBiller = async (billerCode : string, billerName : string, referenceNumber : string) => {
+    // go to supabase and insert into the table
     
+    setError(''); // Reset any existing errors
+
+  // Check if all fields are filled in
+  if (!billerCode || !billerName || !referenceNumber) {
+    setError('Please fill in all fields.');
+    return;
+  }
+
+  try {
+    // Create Supabase client instance
+    const supabase = createClient();
+
+    // Insert the biller into the 'admin_presets_billers' table
+    const { data, error } = await supabase
+      .from('admin_presets_billers')
+      .insert([
+        { 
+          biller_code: billerCode, 
+          biller_name: billerName, 
+          reference_number: referenceNumber,
+          created_at: new Date(), // Optionally add a timestamp if needed
+        }
+      ]);
+
+    if (error) {
+      // Handle any error that occurs during insertion
+      setError(`Failed to add biller: ${error.message}`);
+    } else {
+      // Handle successful insertion (optional)
+      console.log('Biller added successfully:', data);
+      onClose(); // Close the dialog after adding the biller
+      onAddStatus();
+    }
+  } catch (err) {
+    if (err instanceof Error) {
+      setError(`An error occurred: ${err.message}`);
+    } else {
+      setError('An unknown error occurred');
+    }
+  }
   };
+
+
   return (
     <Dialog open={!!status} onOpenChange={onClose}>
       <DialogContent className="bg-white-100 p-6">

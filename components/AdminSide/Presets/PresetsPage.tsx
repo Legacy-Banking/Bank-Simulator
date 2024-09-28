@@ -38,29 +38,31 @@ const PresetsPage = () => {
 
   // Fetch data
   const supabase = createClient();
+
+
+  const fetchUsers = async () => {
+    const { data, error } = await supabase.from('account').select('*');
+
+    if (error) {
+      setError(error.message);
+    } else {
+      setAccounts(data || []);
+    }
+    setLoading(false);
+  };
+
+  const fetchBillers = async () => {
+    const { data, error } = await supabase.from('admin_presets_billers').select('*');
+
+    if (error) {
+      setError(error.message);
+    } else {
+      setBillers(data || []);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const fetchUsers = async () => {
-      const { data, error } = await supabase.from('account').select('*');
-
-      if (error) {
-        setError(error.message);
-      } else {
-        setAccounts(data || []);
-      }
-      setLoading(false);
-    };
-
-    const fetchBillers = async () => {
-      const { data, error } = await supabase.from('admin_presets_billers').select('*');
-
-      if (error) {
-        setError(error.message);
-      } else {
-        setBillers(data || []);
-      }
-      setLoading(false);
-    };
-
     fetchUsers();
     fetchBillers();
   }, []);
@@ -170,6 +172,8 @@ const PresetsPage = () => {
             billers={currentBillers}
             setShowUpdatePopUp={setShowUpdatePopUp}
             setShowDeletePopUp={setShowDeletePopUp}
+            onEditStatus={fetchBillers}
+            
           />
         );
       case 'Constant':
@@ -264,6 +268,7 @@ const PresetsPage = () => {
       <AddBillerDetailSheet
         status={addBillerWindow}
         onClose={() => toggleAddItemDetailSheet()}
+        onAddStatus={fetchBillers}
         
         />
       {showUpdatePopUp && (

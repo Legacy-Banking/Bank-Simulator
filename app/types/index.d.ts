@@ -108,9 +108,9 @@ declare interface BillDetails {
 }
 declare interface Biller {
   id: string;
-  name: string;
+  biller_name: string;
   biller_code: string;
-  biller_details: string;
+  reference_number: string;
 
 }
 declare interface SavedBiller {
@@ -181,6 +181,7 @@ type BillersTableProps = {
   billers: Biller[];
   setShowUpdatePopUp: React.Dispatch<React.SetStateAction<boolean>>;
   setShowDeletePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+  onEditStatus: () => void;
 }
 
 type TransactionTableProps = {
