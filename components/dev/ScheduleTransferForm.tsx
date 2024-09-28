@@ -3,11 +3,11 @@ import { scheduleAction } from '@/utils/scheduleAction';
 import { accountAction } from '@/utils/accountAction';
 import { useAppSelector } from '@/app/store/userSlice';
 
+interface ScheduleTransferProps {
+    user_id: string;
+}
 
-
-const ScheduleTransferForm: React.FC = () => {
-    const user = useAppSelector(state => state.user);
-    const user_id = user.user_id;
+const ScheduleTransferForm: React.FC<ScheduleTransferProps> = ({ user_id }) => {
     const [formType, setFormType] = useState<'transfer' | 'bpay'>('transfer'); // Track the current form
     const [fromAccount, setFromAccount] = useState<string>('');
     const [toAccount, setToAccount] = useState<string>('');

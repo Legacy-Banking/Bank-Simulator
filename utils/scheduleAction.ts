@@ -122,26 +122,30 @@ class ScheduleAction {
     }
     public parseInterval(interval: string): number {
         switch (interval) {
-            case "1 week":
+            case "7 days":
               return 604800000;
-            case "2 weeks":
+            case "14 days":
               return 1209600000;
-            case "1 month":
+            case "1 mon":
               return 2628000000;
-            case "3 months":
+            case "3 mons":
               return 7884000000;
             default:
               throw new Error(`Unsupported interval: ${interval}`);
           }
     }
+    private formatToISOString(date: Date): string {
+        return date.toISOString(); // this gives the date in "YYYY-MM-DDTHH:mm:ss.sssZ" format
+    }
+    
 
 
     // Unified method to create a schedule entry
     public async createScheduleEntry(fromAccount: Account, toAccount: Account | null, biller_name: string | null, biller_code: string | null, reference_number: string | null, amount: number, description: string, schedule: Date, related_user: string[]): Promise<string> {
         const schedule_ref = referenceNumberGenerator();
-
+    
         let payload: any = {
-            pay_at: schedule,
+            pay_at: this.formatToISOString(schedule),
             related_user: related_user,
             from_account: fromAccount.id,
             to_account: toAccount ? toAccount.id : null,
@@ -174,22 +178,28 @@ class ScheduleAction {
 
 
     private async attachRecurEntry(schedule_ref: string): Promise<void> {
-        const { data:schedule_payment, error } = await this.supabase.from('schedule_payments').select('*').eq('schedule_ref', schedule_ref).single();
-        const { data:recur_payment, error:recur_error } = await this.supabase.from('recurring_payments').insert([{
+        const { data: schedule_payment, error } = await this.supabase.from('schedule_payments').select('*').eq('schedule_ref', schedule_ref).single();
+        const { data: recur_payment, error: recur_error } = await this.supabase.from('recurring_payments').insert([{
             interval: this.parseFrequencyToInterval(this.payInterval),
             related_schedule: schedule_payment.id,
             recur_rule: this.recur_rule,
-            end_date: this.end_date,
+            end_date: this.formatToISOString(this.end_date),
             recur_count_dec: this.recur_count_dec
         }]).select('id').single(); 
-        await this.supabase.from('schedule_payments').update({recurring_payment: recur_payment.id}).eq('id', schedule_payment.id);  
+        await this.supabase.from('schedule_payments').update({ recurring_payment: recur_payment.id }).eq('id', schedule_payment.id);  
     }
-
+    
 
     // Method to execute all schedules that are pending and have a pay_at date less than or equal to the current date
     // This method should be called at the start of each day, at a cron job or similar
     public async executeSchedules(): Promise<void> {
-        const {data:schedulePayments,error}=await this.supabase.from('schedule_payments').select('*').lte('pay_at',new Date()).eq('status','pending');
+        const currentTime = new Date();
+        const { data: schedulePayments, error } = await this.supabase
+            .from('schedule_payments')
+            .select('*')
+            .lte('pay_at', this.formatToISOString(currentTime)) // Fetch schedules where pay_at is <= current time
+            .eq('status', 'pending');
+        console.log(schedulePayments);
         if(schedulePayments){
             for(const schedule of schedulePayments){
                 await this.executeSchedule(schedule);
@@ -218,10 +228,11 @@ class ScheduleAction {
         }
     }
     private async executeTransfer(schedule: any): Promise<void> {
-        const { data:fromAccount, error:fromAccountError } = await this.supabase.from('accounts').select('*').eq('id', schedule.from_account).single();
-        const { data:toAccount, error:toAccountError } = await this.supabase.from('accounts').select('*').eq('id', schedule.to_account).single();
+        const { data:fromAccount, error:fromAccountError } = await this.supabase.from('account').select('*').eq('id', schedule.from_account).single();
+        const { data:toAccount, error:toAccountError } = await this.supabase.from('account').select('*').eq('id', schedule.to_account).single();
+        console.log(fromAccount, toAccount);
         if(fromAccount && toAccount){
-            await transactionAction.createTransaction(fromAccount, toAccount, schedule.amount, schedule.description, schedule.schedule_ref);
+            await transactionAction.createTransaction(fromAccount, toAccount, schedule.amount, schedule.description, "pay anyone");
             await this.supabase.from('schedule_payments').update({status: 'completed'}).eq('id', schedule.id);
         }
     }
@@ -278,9 +289,10 @@ class ScheduleAction {
         if (shouldCompleteSchedule) {
             await this.supabase.from('schedule_payments').update({ status: 'completed' }).eq('id', schedule.id);
         } else {
-            await this.supabase.from('schedule_payments').update({ pay_at: next_pay_at }).eq('id', schedule.id);
+            await this.supabase.from('schedule_payments').update({ pay_at: this.formatToISOString(next_pay_at) }).eq('id', schedule.id);
         }
     }
+    
     
 
 }
