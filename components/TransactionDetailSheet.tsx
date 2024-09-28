@@ -21,29 +21,29 @@ const TransactionDetailSheet: React.FC<TransactionDetailSheetProps> = ({ transac
 
   return (
     <Dialog open={!!transaction} onOpenChange={onClose}>
-      <DialogContent className="bg-white-100 p-6">
+      <DialogContent className="bg-white-100 p-8">
         <DialogHeader>
-          <DialogTitle className="text-lg font-semibold">Transaction Details</DialogTitle>
-          <DialogDescription className="text-sm text-gray-500">
+          <DialogTitle className="text-2xl font-semibold">Transaction Details</DialogTitle>
+          <DialogDescription className="text-base text-gray-500">
             Detailed information about the selected transaction.
           </DialogDescription>
         </DialogHeader>
 
         {/* Transaction details */}
         <div className="space-y-4">
-          <p className="text-sm">
+          <p className="text-base">
             <strong>To:</strong> {transaction.to_account ? `${transaction.to_account_username}` : `(Biller) ${transaction.to_account_username}`}
           </p>
-          <p className="text-sm">
+          <p className="text-base">
             <strong>From:</strong> {transaction.from_account_username}
           </p>
-          <p className="text-sm">
+          <p className="text-base">
             <strong>Date:</strong> {formatDateTime(transaction.paid_on)}
           </p>
-          <p className="text-sm">
+          <p className="text-base">
             <strong>Amount:</strong> {formatAmount(transaction.amount)}
           </p>
-          <p className="text-sm break-words" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+          <p className="text-base break-words" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
             <strong>Description:</strong> {transaction.description || 'No description available'}
           </p>
         </div>
