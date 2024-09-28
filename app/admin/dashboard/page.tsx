@@ -6,7 +6,7 @@ import AdminSideBar from '@/components/AdminSide/AdminSideBar'
 import CreateBillPage from '@/components/AdminSide/CreateBillPage';
 import PresetsPage from '@/components/AdminSide/PresetsPage';
 import { useAppSelector } from '@/app/store/userSlice';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation';
 
 
@@ -15,9 +15,11 @@ const AdminDashboard = () => {
   const [activePage, setActivePage] = useState('accounts');
   const userRole = useAppSelector(state => state.user.user_role);
   const router = useRouter();
-  if (userRole !== 'admin') {
-    router.push('/'); // Redirect to home if not admin
-  }
+  useEffect(() => {
+    if (userRole !== 'admin') {
+      router.push('/'); // Redirect to home if not admin
+    }
+  }, [userRole, router]);
 
 
 
