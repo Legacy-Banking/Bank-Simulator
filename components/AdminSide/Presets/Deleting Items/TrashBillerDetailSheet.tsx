@@ -35,7 +35,7 @@ const TrashAccountDetailSheet: React.FC<BillerDetailSheetProps> = ({ biller, sta
       return;
     }
     const { data, error } = await supabase
-      .from('admin_presets_billers') // Replace with your table name
+      .from('billers') // Replace with your table name
       .delete()
       .eq('id', billerId); // Match by biller ID
   

@@ -12,6 +12,7 @@ import { cn, formatAmount, formatDateTime } from "@/lib/utils"
 
 import { createClient } from '@/utils/supabase/client';
 import { create } from 'domain';
+import Switch from '@mui/material/Switch';
 
 
 // Define the props type for the component
@@ -28,7 +29,12 @@ const EditBillerDetailSheet: React.FC<BillerDetailSheetProps> = ({ biller, statu
   if (!status) return null;
   const [billerCode, setBillerCode] = useState(biller?.biller_code);
   const [billerName, setBillerName] = useState(biller?.name);
-  const [referenceNumber, setReferenceNumber] = useState(biller?.reference_number);
+  const [checked, setChecked] = React.useState(biller?.save_biller_status);
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setChecked(event.target.checked);
+  };
+
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -38,7 +44,6 @@ const updateBillerById = async (
   billerId: string | undefined, 
   billerCode: string | undefined, 
   billerName: string | undefined, 
-  referenceNumber: string | undefined
 ) => {
   if (!billerId) {
     return { success: false, message: "No biller is selected" };
@@ -46,11 +51,11 @@ const updateBillerById = async (
 
   // Update the biller in the 'admin_presets_billers' table
   const { error } = await supabase
-    .from('admin_presets_billers')
+    .from('billers')
     .update({
       biller_code: billerCode,
-      biller_name: billerName,
-      reference_number: referenceNumber,
+      name: billerName,
+      save_biller_status: checked,
     })
     .eq('id', billerId); // Make sure to match by the biller's ID
 
@@ -65,7 +70,7 @@ const updateBillerById = async (
 const handleDetailsUpdate = async () => {
   const billerId = biller?.id // Replace with the actual user ID from your app logic
 
-  const result = await updateBillerById(billerId, billerCode, billerName, referenceNumber);
+  const result = await updateBillerById(billerId, billerCode, billerName);
 
   if (result.success) {
     console.log(result.message);
@@ -102,12 +107,12 @@ const handleDetailsUpdate = async () => {
             onChange={(e) => setBillerName(e.target.value)}
             required
           />
-          <label className="">Reference Number</label>
-          <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " 
-                  placeholder="Enter reference number e.g. 1022 1234 2404 1111"
-                  value={referenceNumber}
-                  onChange={(e) => setReferenceNumber(e.target.value)}
-                  required />
+          <label className="">Save Biller Status?</label>
+          <Switch
+              checked={checked}
+              onChange={handleChange}
+              inputProps={{ 'aria-label': 'controlled' }}
+            />
         </form>
 
           {/* Error Message */}

@@ -19,6 +19,7 @@ import EditAccountDetailSheet from '../Accounts/EditAccountDetailSheet';
 import PopUp from '../Accounts/PopUp';
 import EditBillerDetailSheet from './Editing Items/EditBillerDetailSheet';
 import TrashBillerDetailSheet from './Deleting Items/TrashBillerDetailSheet';
+import SavedStatus from './SavedStatus';
 
 // BillersTable component
 export const BillersTable = ({ billers = [], setShowUpdatePopUp, setShowDeletePopUp, onEditStatus }: BillersTableProps) => {
@@ -52,9 +53,6 @@ export const BillersTable = ({ billers = [], setShowUpdatePopUp, setShowDeletePo
   }
 
 
-  const formatReferenceNumber = (number: string) => {
-    return number.replace(/\d{4}(?=\d)/g, "$& ");
-};
   return (
     <>
       <Table>
@@ -62,7 +60,7 @@ export const BillersTable = ({ billers = [], setShowUpdatePopUp, setShowDeletePo
           <TableRow className="bg-blue-200 text-white-200">
             <TableHead className="font-inter px-8 rounded-tl-2xl font-normal tracking-wider">Biller Code</TableHead>
             <TableHead className="font-inter px-4 font-normal tracking-wider">Biller Name</TableHead>
-            <TableHead className="font-inter px-2 font-normal tracking-wider">Reference Number</TableHead>
+            <TableHead className="font-inter px-2 font-normal tracking-wider">Saved Status</TableHead>
             <TableHead className="font-inter px-8 rounded-tr-2xl font-normal tracking-wider">Action</TableHead>
           </TableRow>
         </TableHeader>
@@ -71,7 +69,8 @@ export const BillersTable = ({ billers = [], setShowUpdatePopUp, setShowDeletePo
           {billers.map((biller: Biller) => {
             const billerCode = biller.biller_code;
             const billerName = biller.name;
-            const referenceNumber = formatReferenceNumber(biller.reference_number);
+            const savedStatus = biller.save_biller_status;
+            const referenceNumber = biller.reference_number;
 
             return (
               <TableRow
@@ -92,7 +91,7 @@ export const BillersTable = ({ billers = [], setShowUpdatePopUp, setShowDeletePo
                 </TableCell>
 
                 <TableCell className="font-inter text-base pl-2 ">
-                  {referenceNumber}
+                  <SavedStatus status={savedStatus}></SavedStatus>
                 </TableCell>
                 
                 <TableCell >

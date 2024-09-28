@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn, formatAmount, formatDateTime } from "@/lib/utils"
 import { createClient } from '@/utils/supabase/client';
-
+import Switch from '@mui/material/Switch';
 // Define the props type for the component
 type BillerDetailSheetProps = {
   status: boolean;
@@ -28,15 +28,18 @@ const AddBillerDetailSheet: React.FC<BillerDetailSheetProps> = ({ status, onClos
 
   const [billerCode, setBillerCode] = useState('');
   const [billerName, setBillerName] = useState('');
-  const [referenceNumber, setReferenceNumber] = useState('');
+  const [checked, setChecked] = React.useState(true);
 
-  const addBiller = async (billerCode : string, billerName : string, referenceNumber : string) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setChecked(event.target.checked);
+  };
+  const addBiller = async (billerCode : string, billerName : string) => {
     // go to supabase and insert into the table
     
     setError(''); // Reset any existing errors
 
   // Check if all fields are filled in
-  if (!billerCode || !billerName || !referenceNumber) {
+  if (!billerCode || !billerName) {
     setError('Please fill in all fields.');
     return;
   }
@@ -47,12 +50,12 @@ const AddBillerDetailSheet: React.FC<BillerDetailSheetProps> = ({ status, onClos
 
     // Insert the biller into the 'admin_presets_billers' table
     const { data, error } = await supabase
-      .from('admin_presets_billers')
+      .from('billers')
       .insert([
         { 
           biller_code: billerCode, 
-          biller_name: billerName, 
-          reference_number: referenceNumber,
+          name: billerName, 
+          save_biller_status: checked,
           created_at: new Date(), // Optionally add a timestamp if needed
         }
       ]);
@@ -80,9 +83,7 @@ const AddBillerDetailSheet: React.FC<BillerDetailSheetProps> = ({ status, onClos
     <Dialog open={!!status} onOpenChange={onClose}>
       <DialogContent className="bg-white-100 p-6">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-semibold font-inter mb-10">Add Biller</DialogTitle>
-          <DialogDescription className="text-base font-inter text-[#191919] border-blue-25 border-y-2 py-4">
-          </DialogDescription>
+          <DialogTitle className="text-2xl font-semibold font-inter mb-4">Add Biller</DialogTitle>
         </DialogHeader>
             <form className="flex flex-col w-full rounded-md text-[#344054]">
             <label className="">Biller Code</label>
@@ -93,20 +94,20 @@ const AddBillerDetailSheet: React.FC<BillerDetailSheetProps> = ({ status, onClos
                 onChange={(e) => setBillerCode(e.target.value)}
                 required
             />
-
             <label className="">Biller Name</label>
             <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " 
                     placeholder="Melbourne Hospital" 
                     value={billerName} 
                     onChange={(e) => setBillerName(e.target.value)} 
                     required />
+            <div className="my-3"></div>
 
-            <label className="">Reference Number</label>
-            <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " 
-                    placeholder="1231 1414 1232 1112" 
-                    value={referenceNumber}
-                    onChange={(e) => setReferenceNumber(e.target.value)}
-                    required />
+            <label className="">Save Biller Status?</label>
+            <Switch
+              checked={checked}
+              onChange={handleChange}
+              inputProps={{ 'aria-label': 'controlled' }}
+            />
             </form>
         {/* Error Message */}
         {error && (
@@ -119,7 +120,7 @@ const AddBillerDetailSheet: React.FC<BillerDetailSheetProps> = ({ status, onClos
         {/* Footer with Close button */}
         <DialogFooter className="mt-8 flex ">
             <Button onClick={onClose} className="grow uppercase font-inter border-2 hover:bg-slate-200 tracking-wider">Cancel</Button>
-          <Button onClick={(e) => addBiller(billerCode, billerName, referenceNumber)} className="grow uppercase font-inter tracking-wider bg-blue-25 hover:bg-blue-200 text-white-100">Add</Button>
+          <Button onClick={(e) => addBiller(billerCode, billerName)} className="grow uppercase font-inter tracking-wider bg-blue-25 hover:bg-blue-200 text-white-100">Add</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

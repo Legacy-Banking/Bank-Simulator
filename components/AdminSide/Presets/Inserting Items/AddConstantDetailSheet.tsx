@@ -95,9 +95,7 @@ const AddConstantDetailSheet: React.FC<ConstantDetailSheetProps> = ({ status, on
     <Dialog open={!!status} onOpenChange={onClose}>
       <DialogContent className="bg-white-100 p-6">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-semibold font-inter mb-10">Add Constant</DialogTitle>
-          <DialogDescription className="text-base font-inter text-[#191919] border-blue-25 border-y-2 py-4">
-          </DialogDescription>
+          <DialogTitle className="text-2xl font-semibold font-inter mb-3">Add Constant</DialogTitle>
         </DialogHeader>
             <form className="flex flex-col w-full rounded-md text-[#344054]">
             <label className="">Key</label>

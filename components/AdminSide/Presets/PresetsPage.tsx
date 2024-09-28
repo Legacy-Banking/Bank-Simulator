@@ -55,7 +55,7 @@ const PresetsPage = () => {
   };
 
   const fetchBillers = async () => {
-    const { data, error } = await supabase.from('admin_presets_billers').select('*');
+    const { data, error } = await supabase.from('billers').select('*');
 
     if (error) {
       setError(error.message);
