@@ -6,7 +6,7 @@ import AdminSideBar from '@/components/AdminSide/AdminSideBar'
 import CreateBillPage from '@/components/AdminSide/CreateBillPage';
 import PresetsPage from '@/components/AdminSide/PresetsPage';
 import { useAppSelector } from '@/app/store/userSlice';
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation';
 import BankNavbar from '@/components/BankNavbar';
 import { accountAction } from "@/utils/accountAction";
@@ -18,10 +18,6 @@ const AdminDashboard = () => {
   const [activePage, setActivePage] = useState('accounts');
   const userRole = useAppSelector(state => state.user.user_role);
   const router = useRouter();
-  const user_id = useAppSelector(state => state.user.user_id);
-
-  const [personalAccount, setPersonalAccount] = useState(null); // Store personal account
-
   if (userRole !== 'admin') {
     router.push('/'); // Redirect to home if not admin
   }

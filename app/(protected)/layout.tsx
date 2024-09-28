@@ -9,6 +9,7 @@ import BankNavbar from "@/components/BankNavbar";
 import { accountAction } from "@/utils/accountAction";
 import { userAction } from "@/utils/userAction";
 import { Toaster } from "react-hot-toast";
+import { initializeAuthListeners, cleanupListeners } from "@/utils/hooks/useSignoutOnUnload";
 
 const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const user = useAppSelector(state => state.user);
@@ -57,6 +58,15 @@ const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children
             }
         };
         fetchUserData();
+
+
+        // Initialize auth-related listeners (idle detection, tab close)
+        initializeAuthListeners(router, dispatch);
+
+        // Cleanup listeners and idle timer on component unmount
+        return () => {
+            cleanupListeners();
+        };
 
     }, [user_id]); // Watch for changes in user_id
 
