@@ -182,4 +182,48 @@ export const billAction = {
     
         return data;
       },
+
+    createAdminBill: async (
+        biller_id: string, 
+        amount: number, 
+        due_date: Date, 
+        description: string
+        ): Promise<void> => {
+        const supabase = createClient();
+
+        const { name: biller_name } = await billerAction.fetchBillerById(biller_id);
+
+        const newBill = {
+            biller: biller_name,      // Reference to the biller
+            amount: amount,            // Amount of the bill
+            due_date: due_date,        // Due date of the bill
+            description: description,  // Optional bill description
+            created_at: new Date(),    // Timestamp of when the bill was created
+        };
+
+        const { data, error } = await supabase
+            .from('admin_bills')       // Insert into 'admin_bills' table
+            .insert([newBill]);        // Insert a new bill row
+
+        if (error) {
+            throw new Error(`Failed to create admin bill: ${error.message}`);
+        }
+
+        console.log("Admin bill created:", data);
+    },
+
+    deleteAdminBill: async (billId: string): Promise<void> => {
+        const supabase = createClient();
+    
+        const { error } = await supabase
+          .from('admin_bills')
+          .delete()
+          .eq('id', billId);
+    
+        if (error) {
+          throw new Error(`Failed to delete bill: ${error.message}`);
+        }
+    
+        console.log(`Bill with ID ${billId} deleted successfully`);
+      },
 };

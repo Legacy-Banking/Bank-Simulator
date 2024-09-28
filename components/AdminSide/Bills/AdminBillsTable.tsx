@@ -3,12 +3,15 @@ import { billAction } from '@/utils/billAction'; // Assuming this is the path to
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@/components/ui/table'; 
 import { Button } from '@/components/ui/button';
 import { formatAmount } from "@/lib/utils";
-import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
+import { ChevronUp, ChevronDown, ChevronsUpDown, Trash2Icon,  Plus, Minus } from 'lucide-react';
+import TrashBillDetailSheet from './TrashBillDetialSheet';
 
 const AdminBillsTable = () => {
     const [bills, setBills] = useState<AdminBill[]>([]);
     const [loading, setLoading] = useState(true);
     const [sortConfig, setSortConfig] = useState<{ key: keyof AdminBill; direction: 'ascending' | 'descending' } | null>(null);
+    const [deleteBillId, setDeleteBillId] = useState<string | null>(null);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
     useEffect(() => {
       const fetchData = async () => {
@@ -24,6 +27,19 @@ const AdminBillsTable = () => {
       fetchData();
     }, []);
   
+    // Delete the bill and remove it from the state
+    const handleDelete = async () => {
+        if (deleteBillId) {
+            try {
+              await billAction.deleteAdminBill(deleteBillId); // Call the delete function
+              setBills((prevBills) => prevBills.filter((bill) => bill.id !== deleteBillId));
+              setShowDeleteDialog(false); // Close the dialog after deleting
+            } catch (error) {
+              console.error('Failed to delete bill:', error);
+            }
+          }
+      };
+
     const handleSort = (key: keyof AdminBill) => {
       let direction: 'ascending' | 'descending' = 'ascending';
       if (sortConfig && sortConfig.key === key && sortConfig.direction === 'ascending') {
@@ -130,9 +146,17 @@ const AdminBillsTable = () => {
 
                 <TableCell>
                 <div className="flex flex-col lg:flex-row justify-start gap-4 px-4">
-                  <Button className="bg-white-100 border border-gray-300">Assign User</Button>
-                  <Button className="bg-white-100 border border-gray-300">Unassign</Button>
-                  <Button className="bg-white-100 border border-gray-300">Delete</Button>
+                  <Button className="bg-white-100 border border-gray-300"><Plus className="inline h-4 w-4 mr-1" /> Assign User</Button>
+                  <Button className="bg-white-100 border border-gray-300"><Minus className="inline h-4 w-4 mr-1" /> Unassign User</Button>
+                  <Button
+                      className="bg-white-100 border border-gray-300"
+                      onClick={() => {
+                        setDeleteBillId(bill.id); // Set the bill ID to delete
+                        setShowDeleteDialog(true); // Show the confirmation dialog
+                      }}
+                    >
+                      <Trash2Icon className="inline h-6 w-6" fill="#F87171" stroke="black" strokeWidth={1} />
+                    </Button>
                 </div>
                 </TableCell>
               </TableRow>
@@ -145,6 +169,13 @@ const AdminBillsTable = () => {
         {/* Add Admin Bills Sheet */}
         {/* Add Assign Bill Sheet */}
         {/* Add Unassign Bill Sheet */}
+
+                {/* Delete Confirmation Dialog */}
+        <TrashBillDetailSheet 
+          status={showDeleteDialog} 
+          onClose={() => setShowDeleteDialog(false)} 
+          deleteBill={handleDelete} 
+        />
 
       </>
     );
