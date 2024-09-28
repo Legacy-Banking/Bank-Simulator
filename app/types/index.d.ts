@@ -114,6 +114,17 @@ declare interface Biller {
   reference_number: string;
 
 }
+declare interface AccountPresetType {
+  id: string;
+  account_type: string;
+  starting_balance: number;
+}
+declare interface TransactionPresetType {
+  id: string;
+  recipient: string;
+  amount: number;
+  date_issued: Date;
+}
 declare interface Constant {
   id: string;
   key: string;
@@ -183,6 +194,18 @@ type AccountsTableProps = {
   accounts: Account[];
   setShowUpdatePopUp: React.Dispatch<React.SetStateAction<boolean>>;
   setShowDeletePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+}
+type AccountPresetTableProps = {
+  accountTypes: AccountPresetType[];
+  setShowUpdatePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowDeletePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+  onEditStatus: () => void;
+}
+type TransactionPresetTableProps = {
+  transactionPresets: TransactionPresetType[];
+  setShowUpdatePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowDeletePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+  onEditStatus: () => void;
 }
 type BillersTableProps = {
   billers: Biller[];

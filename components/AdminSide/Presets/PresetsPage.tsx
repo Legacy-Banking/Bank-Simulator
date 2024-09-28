@@ -15,9 +15,13 @@ import PresetOption from './PresetOption';
 import AddButton from './AddButton';
 import AddBillerDetailSheet from './Inserting Items/AddBillerDetailSheet';
 import AddConstantDetailSheet from './Inserting Items/AddConstantDetailSheet';
+import AccountPresetTable from './AccountPresetTable';
+import AddAccountPresetDetailSheet from './Inserting Items/AddAccountPresetDetailSheet';
+import AddTransactionPresetDetailSheet from './Inserting Items/AddTransactionPresetDetailSheet';
 
 const PresetsPage = () => {
-  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [accountTypes, setAccountTypes] = useState<AccountPresetType[]>([]);
+  const [transactionPresets, setTransactionPresets] = useState<TransactionPresetType[]>([]);
   const [billers, setBillers] = useState<Biller[]>([]);
   const [constants, setConstants] = useState<Biller[]>([]);
 
@@ -43,13 +47,24 @@ const PresetsPage = () => {
   const supabase = createClient();
 
 
-  const fetchUsers = async () => {
-    const { data, error } = await supabase.from('account').select('*');
+  const fetchAccountTypes = async () => {
+    const { data, error } = await supabase.from('account_presets').select('*');
 
     if (error) {
       setError(error.message);
     } else {
-      setAccounts(data || []);
+      setAccountTypes(data || []);
+    }
+    setLoading(false);
+  };
+
+  const fetchTransactionsPresets = async () => {
+    const { data, error } = await supabase.from('transaction_presets').select('*');
+
+    if (error) {
+      setError(error.message);
+    } else {
+      setTransactionPresets(data || []);
     }
     setLoading(false);
   };
@@ -77,7 +92,8 @@ const PresetsPage = () => {
   };
 
   useEffect(() => {
-    fetchUsers();
+    fetchAccountTypes();
+    fetchTransactionsPresets();
     fetchBillers();
     fetchConstants();
   }, []);
@@ -111,10 +127,10 @@ const PresetsPage = () => {
     // re fetch the data for dynamic change
     switch (activeTable) {
       case 'Accounts':
-        // 
+        fetchAccountTypes();
         break;
       case 'Transaction':
-        // 
+        fetchTransactionsPresets();
         break;
       case 'Billers':
         fetchBillers();
@@ -146,11 +162,17 @@ const PresetsPage = () => {
   };
 
   // Get current data and total pages for each table
-  const { currentData: currentAccounts, totalPages: accountsTotalPages } = paginateAndFilter(
-    accounts,
+  const { currentData: currentAccountTypes, totalPages: accountsTotalPages } = paginateAndFilter(
+    accountTypes,
     accountsPage,
     rowsPerPage,
-    'owner'
+    'id'
+  );
+  const { currentData: currentTransactionPresets, totalPages: transactionsTotalPages } = paginateAndFilter(
+    transactionPresets,
+    transactionsPage,
+    rowsPerPage,
+    'id'
   );
   const { currentData: currentBillers, totalPages: billersTotalPages } = paginateAndFilter(
     billers,
@@ -171,18 +193,20 @@ const PresetsPage = () => {
     switch (activeTable) {
       case 'Accounts':
         return (
-          <AccountsTable
-            accounts={currentAccounts}
+          <AccountPresetTable
+            accountTypes={currentAccountTypes}
             setShowUpdatePopUp={setShowUpdatePopUp}
             setShowDeletePopUp={setShowDeletePopUp}
+            onEditStatus={fetchAccountTypes}
           />
         );
       case 'Transaction':
         return (
           <TransactionAdminTable
-            accounts={currentAccounts}
+            transactionPresets={currentTransactionPresets}
             setShowUpdatePopUp={setShowUpdatePopUp}
             setShowDeletePopUp={setShowDeletePopUp}
+            onEditStatus={fetchTransactionsPresets}
           />
         );
       case 'Billers':
@@ -221,10 +245,9 @@ const PresetsPage = () => {
         setPage = setAccountsPage;
         break;
       case 'Transaction':
-        // Add logic for transactions if needed
-        // finalTotalPages = transactionsTotalPages;
-        // currPage = transactionsPage;
-        // setPage = setTransactionsPage;
+        finalTotalPages = transactionsTotalPages;
+        currPage = transactionsPage;
+        setPage = setTransactionsPage;
         break;
       case 'Billers':
         finalTotalPages = billersTotalPages;
@@ -285,6 +308,16 @@ const PresetsPage = () => {
           </div>
         </div>
       </div>
+      <AddAccountPresetDetailSheet
+        status={addAccountWindow}
+        onClose={() => toggleAddItemDetailSheet()}
+        onAddStatus={addedItemToTable}
+      />
+      <AddTransactionPresetDetailSheet
+        status={addTransactionWindow}
+        onClose={() => toggleAddItemDetailSheet()}
+        onAddStatus={addedItemToTable}
+      />
       <AddBillerDetailSheet
         status={addBillerWindow}
         onClose={() => toggleAddItemDetailSheet()}
