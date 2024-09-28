@@ -3,7 +3,7 @@
 import AccountsPage from '@/components/AdminSide/Accounts/AccountsPage';
 import AdditionalFundsPage from '@/components/AdminSide/AdditionalFundsPage';
 import AdminSideBar from '@/components/AdminSide/AdminSideBar'
-import CreateBillPage from '@/components/AdminSide/CreateBillPage';
+import CreateBillPage from '@/components/AdminSide/Bills/CreateBillPage';
 import PresetsPage from '@/components/AdminSide/PresetsPage';
 import { useAppSelector } from '@/app/store/userSlice';
 import React, { useEffect, useState } from 'react'

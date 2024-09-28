@@ -102,6 +102,16 @@ declare interface Bill {
   total: string;
   tax: string;
 }
+
+declare interface AdminBill {
+  id: string;
+  created_at: Date;
+  biller: string;
+  description: string;
+  amount: number;
+  due_date: Date
+}
+
 declare interface BillDetails {
   bill: Partial<Bill>;
   biller: Partial<Biller>;

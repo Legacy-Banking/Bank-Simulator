@@ -168,5 +168,18 @@ export const billAction = {
         if (error){
             throw error;
         }
-    }      
+    },
+    
+    fetchAdminBills: async (): Promise<AdminBill[]> => {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from('admin_bills') 
+          .select('*');
+    
+        if (error) {
+          throw new Error(`Failed to fetch admin bills: ${error.message}`);
+        }
+    
+        return data;
+      },
 };
