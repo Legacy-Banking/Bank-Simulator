@@ -184,6 +184,10 @@ class ScheduleAction {
         }]).select('id').single(); 
         await this.supabase.from('schedule_payments').update({recurring_payment: recur_payment.id}).eq('id', schedule_payment.id);  
     }
+
+
+    // Method to execute all schedules that are pending and have a pay_at date less than or equal to the current date
+    // This method should be called at the start of each day, at a cron job or similar
     public async executeSchedules(): Promise<void> {
         const {data:schedulePayments,error}=await this.supabase.from('schedule_payments').select('*').lte('pay_at',new Date()).eq('status','pending');
         if(schedulePayments){
@@ -192,6 +196,7 @@ class ScheduleAction {
             }
         }
     }
+
     private async executeSchedule(schedule: any): Promise<void> {
         const schedule_type = schedule.schedule_type;
         switch (schedule_type) {
@@ -228,39 +233,55 @@ class ScheduleAction {
         }
     }
     private async executeTransferRecur(schedule: any): Promise<void> {
-        const { data:recurringPayment, error:recurringPaymentError } = await this.supabase.from('recurring_payments').select('*').eq('id', schedule.recurring_payment).single();
-        const interval = recurringPayment.interval;
-        const pay_at = new Date(schedule.pay_at);
+        await this.executeTransfer(schedule);
         await this.executeRecur(schedule);
     }
+
     private async executeBpayRecur(schedule: any): Promise<void> {
-        const { data:recurringPayment, error:recurringPaymentError } = await this.supabase.from('recurring_payments').select('*').eq('id', schedule.recurring_payment).single();
-        const interval = recurringPayment.interval;
-        const pay_at = new Date(schedule.pay_at);
+        await this.executeBpay(schedule);
         await this.executeRecur(schedule);
     }
 
     private async executeRecur(schedule: any): Promise<void> {
-        const { data:recurringPayment, error:recurringPaymentError } = await this.supabase.from('recurring_payments').select('*').eq('id', schedule.recurring_payment).single();
-        const recur_rule = recurringPayment.recur_rule;
-        const interval = recurringPayment.interval;
-        const end_date = new Date(recurringPayment.end_date);
-        const recur_count_dec = recurringPayment.recur_count_dec;
+        const { data: recurringPayment, error: recurringPaymentError } = await this.supabase.from('recurring_payments').select('*').eq('id', schedule.recurring_payment).single();
+        if (recurringPaymentError || !recurringPayment) {
+            console.error('Error fetching recurring payment:', recurringPaymentError);
+            return;
+        }
+    
+        const { recur_rule, interval, end_date, recur_count_dec } = recurringPayment;
         const pay_at = new Date(schedule.pay_at);
+        const next_pay_at = new Date(pay_at.getTime() + this.parseInterval(interval));
+    
+        let shouldCompleteSchedule = false;
+    
+        // Check recurrence rules before updating
         switch (recur_rule) {
             case 'untilFurtherNotice':
-                //update parent schedule's pay_at, add the interval to the pay_at
-                await this.supabase.from('schedule_payments').update({pay_at: new Date(pay_at.getTime() + this.parseInterval(interval))}).eq('id', schedule.id);
                 break;
-            case 'endDate':
-                //update parent schedule's pay_at, add the interval to the pay_at, check if pay_at is before end_date, if not, set status to completed
+            case 'untilDate':
+                if (next_pay_at > new Date(end_date)) {
+                    shouldCompleteSchedule = true;
+                }
                 break;
-            case 'numberOfPayments':
-                //if recur_count_dec > 0, update parent schedule's pay_at, add the interval to the pay_at, decrement recur_count_dec, if recur_count_dec = 0, set status to completed
-                break;   
+            case 'forCount':
+                if (recur_count_dec > 0) {
+                    await this.supabase.from('recurring_payments').update({ recur_count_dec: recur_count_dec - 1 }).eq('id', schedule.recurring_payment);
+                }
+                if (recur_count_dec - 1 <= 0) {
+                    shouldCompleteSchedule = true;
+                }
+                break;
         }
-
+    
+        // Update next pay_at or complete the schedule if needed
+        if (shouldCompleteSchedule) {
+            await this.supabase.from('schedule_payments').update({ status: 'completed' }).eq('id', schedule.id);
+        } else {
+            await this.supabase.from('schedule_payments').update({ pay_at: next_pay_at }).eq('id', schedule.id);
+        }
     }
+    
 
 }
 
