@@ -14,6 +14,7 @@ import ConstantTable from './ConstantTable';
 import PresetOption from './PresetOption';
 import AddButton from './AddButton';
 import AddBillerDetailSheet from './Inserting Items/AddBillerDetailSheet';
+import AddConstantDetailSheet from './Inserting Items/AddConstantDetailSheet';
 
 const PresetsPage = () => {
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -36,6 +37,7 @@ const PresetsPage = () => {
   // Pop-up states
   const [showUpdatePopUp, setShowUpdatePopUp] = useState(false);
   const [showDeletePopUp, setShowDeletePopUp] = useState(false);
+  const [showAddPopUp, setShowAddPopUp] = useState(false);
 
   // Fetch data
   const supabase = createClient();
@@ -105,25 +107,23 @@ const PresetsPage = () => {
 
   }
 
-  const addItemToTable = async () => {
-    // Example data to insert into a table
-    const newItem = {
-      name: 'New Item',
-      description: 'This is a description of the new item.',
-      price: 100,
-    };
-  
-    // Inserting into the table "items"
-    const { data, error } = await supabase
-      .from('items') // Replace 'items' with your table name
-      .insert([newItem]);
-  
-    // Handle the response
-    if (error) {
-      console.error('Error inserting data:', error.message);
-    } else {
-      console.log('Data inserted successfully:', data);
+  const addedItemToTable = () => {
+    // re fetch the data for dynamic change
+    switch (activeTable) {
+      case 'Accounts':
+        // 
+        break;
+      case 'Transaction':
+        // 
+        break;
+      case 'Billers':
+        fetchBillers();
+        break;
+      case 'Constant':
+        fetchConstants();
+        break;
     }
+    setShowAddPopUp(true);
   };
 
   // Pagination and filtering
@@ -288,14 +288,24 @@ const PresetsPage = () => {
       <AddBillerDetailSheet
         status={addBillerWindow}
         onClose={() => toggleAddItemDetailSheet()}
-        onAddStatus={fetchBillers}
+        onAddStatus={addedItemToTable}
         
         />
+      <AddConstantDetailSheet
+        status={addConstantWindow}
+        onClose={() => toggleAddItemDetailSheet()}
+        onAddStatus={addedItemToTable}
+        
+        />
+
       {showUpdatePopUp && (
         <PopUp message="Successfully Updated.." onClose={() => setShowUpdatePopUp(false)} />
       )}
       {showDeletePopUp && (
         <PopUp message="Successfully Deleted.." onClose={() => setShowDeletePopUp(false)} />
+      )}
+      {showAddPopUp && (
+        <PopUp message="Successfully Added.." onClose={() => setShowAddPopUp(false)} />
       )}
     </div>
   );

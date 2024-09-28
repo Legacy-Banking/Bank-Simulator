@@ -31,6 +31,7 @@ const EditConstantDetailSheet: React.FC<ConstantDetailSheetProps> = ({ constant,
   const [pageKey, setPageKey] = useState(constant?.page_key);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [enumOptions, setEnumOptions] = useState<string[]>([]);
 
   const supabase = createClient();
   // Function to update password by user ID
@@ -62,6 +63,19 @@ const updateConstantById = async (
   return { success: true, message: 'Constant updated successfully' };
 };
 
+const fetchEnumValues = async () => {
+  const { data, error } = await supabase.rpc('get_page_keys');
+
+  if (error) {
+    console.error('Error fetching enum values:', error.message);
+  } else {
+    setEnumOptions(data?.map((item: { page_key: string }) => item.page_key) || []);
+  }
+};
+
+fetchEnumValues();
+
+
 const handleDetailsUpdate = async () => {
   const constantId = constant?.id // Replace with the actual user ID from your app logic
 
@@ -86,7 +100,7 @@ const handleDetailsUpdate = async () => {
         </DialogHeader>
 
         <form className="flex flex-col w-full rounded-md text-[#344054]">
-          <label className="">Constant Code</label>
+          <label className="">Key</label>
           <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " 
                   placeholder="Enter constant code e.g. (1022)"  
                   value={key} 
@@ -94,20 +108,26 @@ const handleDetailsUpdate = async () => {
                   required />
           
 
-          <label className="">Constant Name</label>
-          <input
+          <label className="">Content</label>
+          <textarea
             className="rounded-md px-3 py-2 mt-2 border mb-5 outline outline-1 outline-gray-400 text-base drop-shadow-"
             placeholder="Enter constant name e.g. (Melbourne Hospital)"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             required
           />
-          <label className="">Reference Number</label>
-          <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " 
-                  placeholder="Enter reference number e.g. 1022 1234 2404 1111"
-                  value={pageKey}
-                  onChange={(e) => setPageKey(e.target.value)}
-                  required />
+          <label className="">Page Key</label>
+          <select 
+            className='rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm '
+            title='Page Key'
+            value={pageKey} 
+            onChange={(e) => setPageKey(e.target.value)}>
+              {enumOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
         </form>
 
           {/* Error Message */}

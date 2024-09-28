@@ -18,6 +18,7 @@ import { boolean } from 'zod';
 import EditAccountDetailSheet from '../Accounts/EditAccountDetailSheet';
 import PopUp from '../Accounts/PopUp';
 import EditConstantDetailSheet from './Editing Items/EditConstantDetailSheet';
+import TrashConstantDetailSheet from './Deleting Items/TrashConstantDetailSheet';
 
 // ConstantTable component
 export const ConstantTable = ({ constants = [], setShowUpdatePopUp, setShowDeletePopUp, onEditStatus }: ConstantsTableProps) => {
@@ -25,8 +26,9 @@ export const ConstantTable = ({ constants = [], setShowUpdatePopUp, setShowDelet
   const [deleteConstantWindow, setDeleteConstantWindow] = useState(false);
   const [editConstantWindow, setEditConstantWindow] = useState(false);
 
-  const toggleDeleteConstantWindow = () => {
+  const toggleDeleteConstantWindow = (acc : Constant | null) => {
     setDeleteConstantWindow((prevState) => !prevState);
+    setSelectedConstant(acc);
   };
 
   const toggleEditConstantWindow = (acc : Constant | null) => {
@@ -37,7 +39,7 @@ export const ConstantTable = ({ constants = [], setShowUpdatePopUp, setShowDelet
   };
 
   const deleteConstant = () => {
-    toggleDeleteConstantWindow();
+    toggleDeleteConstantWindow(null);
     setShowDeletePopUp(true);
     onEditStatus();
   }
@@ -91,7 +93,7 @@ export const ConstantTable = ({ constants = [], setShowUpdatePopUp, setShowDelet
                 
                 <TableCell >
                     <Button onClick={() => toggleEditConstantWindow(acc)} className="p-0 ml-4"> <img src="../Edit.png" alt="Edit button" /></Button>
-                    <Button onClick={toggleDeleteConstantWindow} className="p-0 ml-4"> <img src="../Delete.png" alt="Delete button" /></Button>
+                    <Button onClick={() => toggleDeleteConstantWindow(acc)} className="p-0 ml-4"> <img src="../Delete.png" alt="Delete button" /></Button>
                 </TableCell>
               </TableRow>
             );
@@ -99,12 +101,12 @@ export const ConstantTable = ({ constants = [], setShowUpdatePopUp, setShowDelet
         </TableBody>
       </Table>
 
-      {/* <TrashConstantDetailSheet
-        account={selectedConstant}
+      <TrashConstantDetailSheet
+        constant={selectedConstant}
         status={deleteConstantWindow}
-        onClose={toggleDeleteConstantWindow}
+        onClose={() => toggleDeleteConstantWindow(selectedConstant)}
         deleteConstant={deleteConstant}
-      /> */}
+      />
       <EditConstantDetailSheet
         constant={selectedConstant}
         status={editConstantWindow}
