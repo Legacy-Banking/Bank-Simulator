@@ -34,11 +34,14 @@ const AccountsPage = () => {
   const filteredAccounts = accounts.filter((account) =>
     (account.owner_username ?? '').toLowerCase().includes(inputValue.toLowerCase())
   );
-
-  const totalPages = Math.ceil(filteredAccounts.length / rowsPerPage);
+  
+  const uniqueAccounts = filteredAccounts.filter((account, index, self) =>
+    index === self.findIndex((t) => t.owner === account.owner)
+  );
+  const totalPages = Math.ceil(uniqueAccounts.length / rowsPerPage);
   const indexOfLastTransaction = page * rowsPerPage;
   const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
-  const currentAccounts = filteredAccounts.slice(indexOfFirstTransaction, indexOfLastTransaction);
+  const currentAccounts = uniqueAccounts.slice(indexOfFirstTransaction, indexOfLastTransaction);
 
   // Fetching data from Supabase
   const supabase = createClient();
@@ -56,6 +59,8 @@ const AccountsPage = () => {
 
     fetchUsers();
   }, []); // Run once when the component mounts
+
+
 
   // Pop-up states
   const [showUpdatePopUp, setShowUpdatePopUp] = useState(false);
