@@ -10,7 +10,7 @@ import PopUp from '../Accounts/PopUp';
 import { Button } from '@/components/ui/button';
 import { TransactionAdminTable } from './TransactionAdminTable';
 import { BillersTable } from './BillersTable';
-import { CreateBillTable } from './CreateBillTable';
+import ConstantTable from './ConstantTable';
 import PresetOption from './PresetOption';
 import AddButton from './AddButton';
 import AddBillerDetailSheet from './Inserting Items/AddBillerDetailSheet';
@@ -18,6 +18,7 @@ import AddBillerDetailSheet from './Inserting Items/AddBillerDetailSheet';
 const PresetsPage = () => {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [billers, setBillers] = useState<Biller[]>([]);
+  const [constants, setConstants] = useState<Biller[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -62,16 +63,28 @@ const PresetsPage = () => {
     setLoading(false);
   };
 
+  const fetchConstants = async () => {
+    const { data, error } = await supabase.from('content_embeddings').select('*');
+
+    if (error) {
+      setError(error.message);
+    } else {
+      setConstants(data || []);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
     fetchUsers();
     fetchBillers();
+    fetchConstants();
   }, []);
 
 
   const [addAccountWindow, setAddAccountWindow] = useState(false);
   const [addBillerWindow, setAddBillerWindow] = useState(false);
   const [addTransactionWindow, setAddTransactionWindow] = useState(false);
-  const [addBillWindow, setAddBillWindow] = useState(false);
+  const [addConstantWindow, setAddConstantWindow] = useState(false);
 
   const toggleAddItemDetailSheet = () => {
     switch (activeTable) {
@@ -85,7 +98,7 @@ const PresetsPage = () => {
         setAddBillerWindow((prevState) => !prevState);
         break;
       case 'Constant':
-        setAddBillWindow((prevState) => !prevState);
+        setAddConstantWindow((prevState) => !prevState);
         break;
       
     }
@@ -145,6 +158,12 @@ const PresetsPage = () => {
     rowsPerPage,
     'biller_code'
   );
+  const { currentData: currentConstants, totalPages: constantsTotalPages } = paginateAndFilter(
+    constants,
+    constantsPage,
+    rowsPerPage,
+    'id'
+  );
   // Add similar logic for transactions and constants if needed
 
   // Render functions
@@ -178,10 +197,11 @@ const PresetsPage = () => {
         );
       case 'Constant':
         return (
-          <CreateBillTable
-            accounts={currentAccounts}
+          <ConstantTable
+            constants={currentConstants}
             setShowUpdatePopUp={setShowUpdatePopUp}
             setShowDeletePopUp={setShowDeletePopUp}
+            onEditStatus={fetchConstants}
           />
         );
       default:
@@ -213,9 +233,9 @@ const PresetsPage = () => {
         break;
       case 'Constant':
         // Add logic for constants if needed
-        // finalTotalPages = constantsTotalPages;
-        // currPage = constantsPage;
-        // setPage = setConstantsPage;
+        finalTotalPages = constantsTotalPages;
+        currPage = constantsPage;
+        setPage = setConstantsPage;
         break;
       default:
         break;

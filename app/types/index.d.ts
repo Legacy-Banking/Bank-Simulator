@@ -113,6 +113,12 @@ declare interface Biller {
   reference_number: string;
 
 }
+declare interface Constant {
+  id: string;
+  key: string;
+  content: string;
+  page_key: string;
+}
 declare interface SavedBiller {
   id: string;
   saved_billers: string;
@@ -179,6 +185,12 @@ type AccountsTableProps = {
 }
 type BillersTableProps = {
   billers: Biller[];
+  setShowUpdatePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowDeletePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+  onEditStatus: () => void;
+}
+type ConstantsTableProps = {
+  constants: Constant[];
   setShowUpdatePopUp: React.Dispatch<React.SetStateAction<boolean>>;
   setShowDeletePopUp: React.Dispatch<React.SetStateAction<boolean>>;
   onEditStatus: () => void;
