@@ -17,9 +17,10 @@ import TrashAccountDetailSheet from '../Accounts/TrashAccountDetailSheet';
 import { boolean } from 'zod';
 import EditAccountDetailSheet from '../Accounts/EditAccountDetailSheet';
 import PopUp from '../Accounts/PopUp';
+import EditConstantDetailSheet from './Editing Items/EditConstantDetailSheet';
 
 // ConstantTable component
-export const ConstantTable = ({ constants = [], setShowUpdatePopUp, setShowDeletePopUp }: ConstantsTableProps) => {
+export const ConstantTable = ({ constants = [], setShowUpdatePopUp, setShowDeletePopUp, onEditStatus }: ConstantsTableProps) => {
   const [selectedConstant, setSelectedConstant] = useState<Constant | null>(null);
   const [deleteConstantWindow, setDeleteConstantWindow] = useState(false);
   const [editConstantWindow, setEditConstantWindow] = useState(false);
@@ -36,14 +37,14 @@ export const ConstantTable = ({ constants = [], setShowUpdatePopUp, setShowDelet
   };
 
   const deleteConstant = () => {
-    // currently empty but this will delete the selected account
     toggleDeleteConstantWindow();
     setShowDeletePopUp(true);
+    onEditStatus();
   }
   const updateConstant = () => {
     toggleEditConstantWindow(null);
     setShowUpdatePopUp(true);
-    // currently empty but this will update the selected account
+    onEditStatus();
   }
 
 
@@ -103,13 +104,13 @@ export const ConstantTable = ({ constants = [], setShowUpdatePopUp, setShowDelet
         status={deleteConstantWindow}
         onClose={toggleDeleteConstantWindow}
         deleteConstant={deleteConstant}
-      />
+      /> */}
       <EditConstantDetailSheet
-        account={selectedConstant}
+        constant={selectedConstant}
         status={editConstantWindow}
         onClose={() => toggleEditConstantWindow(selectedConstant)}
         updateConstant={updateConstant}
-        /> */}
+        />
 
     </>
   );

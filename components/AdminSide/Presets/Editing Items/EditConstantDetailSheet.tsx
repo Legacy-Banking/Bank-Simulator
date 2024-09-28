@@ -15,57 +15,57 @@ import { create } from 'domain';
 
 
 // Define the props type for the component
-type BillerDetailSheetProps = {
-  biller: Biller | null,
+type ConstantDetailSheetProps = {
+  constant: Constant | null,
   status: boolean;
   onClose: () => void;
-  updateBiller: () => void;
+  updateConstant: () => void;
 };
 
 
-const EditBillerDetailSheet: React.FC<BillerDetailSheetProps> = ({ biller, status, onClose , updateBiller}) => {
+const EditConstantDetailSheet: React.FC<ConstantDetailSheetProps> = ({ constant, status, onClose , updateConstant}) => {
 
   if (!status) return null;
-  const [billerCode, setBillerCode] = useState(biller?.biller_code);
-  const [billerName, setBillerName] = useState(biller?.name);
-  const [referenceNumber, setReferenceNumber] = useState(biller?.reference_number);
+  const [key, setKey] = useState(constant?.key);
+  const [content, setContent] = useState(constant?.content);
+  const [pageKey, setPageKey] = useState(constant?.page_key);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   const supabase = createClient();
   // Function to update password by user ID
-const updateBillerById = async (
-  billerId: string | undefined, 
-  billerCode: string | undefined, 
-  billerName: string | undefined, 
-  referenceNumber: string | undefined
+const updateConstantById = async (
+  constantId: string | undefined, 
+  key: string | undefined, 
+  content: string | undefined, 
+  pageKey: string | undefined
 ) => {
-  if (!billerId) {
-    return { success: false, message: "No biller is selected" };
+  if (!constantId) {
+    return { success: false, message: "No constant is selected" };
   }
 
-  // Update the biller in the 'admin_presets_billers' table
+  // Update the constant in the 'admin_presets_constants' table
   const { error } = await supabase
-    .from('admin_presets_billers')
+    .from('content_embeddings')
     .update({
-      biller_code: billerCode,
-      biller_name: billerName,
-      reference_number: referenceNumber,
+      key: key,
+      content: content,
+      page_key: pageKey,
     })
-    .eq('id', billerId); // Make sure to match by the biller's ID
+    .eq('id', constantId); // Make sure to match by the constant's ID
 
   if (error) {
-    console.error('Error updating biller:', error.message);
+    console.error('Error updating constant:', error.message);
     return { success: false, message: error.message };
   }
-  updateBiller();
-  return { success: true, message: 'Biller updated successfully' };
+  updateConstant();
+  return { success: true, message: 'Constant updated successfully' };
 };
 
 const handleDetailsUpdate = async () => {
-  const billerId = biller?.id // Replace with the actual user ID from your app logic
+  const constantId = constant?.id // Replace with the actual user ID from your app logic
 
-  const result = await updateBillerById(billerId, billerCode, billerName, referenceNumber);
+  const result = await updateConstantById(constantId, key, content, pageKey);
 
   if (result.success) {
     console.log(result.message);
@@ -86,27 +86,27 @@ const handleDetailsUpdate = async () => {
         </DialogHeader>
 
         <form className="flex flex-col w-full rounded-md text-[#344054]">
-          <label className="">Biller Code</label>
+          <label className="">Constant Code</label>
           <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " 
-                  placeholder="Enter biller code e.g. (1022)"  
-                  value={billerCode} 
-                  onChange={(e) => setBillerCode(e.target.value)} 
+                  placeholder="Enter constant code e.g. (1022)"  
+                  value={key} 
+                  onChange={(e) => setKey(e.target.value)} 
                   required />
           
 
-          <label className="">Biller Name</label>
+          <label className="">Constant Name</label>
           <input
             className="rounded-md px-3 py-2 mt-2 border mb-5 outline outline-1 outline-gray-400 text-base drop-shadow-"
-            placeholder="Enter biller name e.g. (Melbourne Hospital)"
-            value={billerName}
-            onChange={(e) => setBillerName(e.target.value)}
+            placeholder="Enter constant name e.g. (Melbourne Hospital)"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
             required
           />
           <label className="">Reference Number</label>
           <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " 
                   placeholder="Enter reference number e.g. 1022 1234 2404 1111"
-                  value={referenceNumber}
-                  onChange={(e) => setReferenceNumber(e.target.value)}
+                  value={pageKey}
+                  onChange={(e) => setPageKey(e.target.value)}
                   required />
         </form>
 
@@ -129,4 +129,4 @@ const handleDetailsUpdate = async () => {
   );
 };
 
-export default EditBillerDetailSheet;
+export default EditConstantDetailSheet;

@@ -70,7 +70,7 @@ export const BillersTable = ({ billers = [], setShowUpdatePopUp, setShowDeletePo
         <TableBody>
           {billers.map((biller: Biller) => {
             const billerCode = biller.biller_code;
-            const billerName = biller.biller_name;
+            const billerName = biller.name;
             const referenceNumber = formatReferenceNumber(biller.reference_number);
 
             return (

@@ -108,7 +108,7 @@ declare interface BillDetails {
 }
 declare interface Biller {
   id: string;
-  biller_name: string;
+  name: string;
   biller_code: string;
   reference_number: string;
 
