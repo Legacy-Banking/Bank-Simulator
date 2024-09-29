@@ -53,4 +53,77 @@ export const userAction = {
     return uniqueOwners;
     },
 
+    listAllUsers: async (): Promise<{ id: string; last_sign_in_at: string | null }[]> => {
+      const supabase = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SERVICE_ROLE_KEY!, {
+          auth: {
+            autoRefreshToken: false,
+            persistSession: false
+          }
+        });
+        
+      // Fetch all users using the Supabase Admin API
+      const { data: { users }, error } = await supabase.auth.admin.listUsers();
+      
+      if (error) {
+          throw new Error(`Failed to list users: ${error.message}`);
+      }
+
+      // Map the users to include the required fields
+      return users.map(user => ({
+          id: user.id,
+          last_sign_in_at: user.last_sign_in_at ?? null, // Metadata field to track last sign-in time
+      }));
+  },
+
+  listMostRecentUsers: async (): Promise<{ id: string; last_sign_in_at: string | null }[]> => {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SERVICE_ROLE_KEY!
+    );
+
+    let allUsers: { id: string; last_sign_in_at: string | null }[] = [];
+    let page = 1;
+    let limit = 50; // Maximum 50 users per page
+    let hasMore = true;
+
+    while (hasMore) {
+      console.log(`Fetching users - Page: ${page}`);
+      const { data: { users }, error } = await supabase.auth.admin.listUsers({ page, perPage: limit });
+
+      if (error) {
+        console.error("Error fetching users:", error);
+        break;
+      }
+
+      if (!users || users.length === 0) {
+        hasMore = false;
+        break;
+      }
+
+      // Map and filter users with last_sign_in_at
+      const mappedUsers = users.map((user) => ({
+        id: user.id,
+        last_sign_in_at: user.last_sign_in_at || null
+      }));
+
+      allUsers.push(...mappedUsers);
+      page += 1;
+
+      // If we received fewer users than the limit, assume we're done
+      if (users.length < limit) {
+        hasMore = false;
+      }
+    }
+
+    // Sort by last_sign_in_at and get the 50 most recent
+    const sortedUsers = allUsers
+      .filter(user => user.last_sign_in_at !== null)
+      .sort((a, b) => new Date(b.last_sign_in_at!).getTime() - new Date(a.last_sign_in_at!).getTime())
+      .slice(0, 50);
+
+    return sortedUsers;
+  },
+
 }

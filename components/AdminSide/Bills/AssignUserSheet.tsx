@@ -40,7 +40,7 @@ interface AssignUserSheetProps {
 const AssignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, biller, amount, description, due_date, linkedBill}) => {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [activeOnly, setActiveOnly] = useState(false);
-  const [users, setUsers] = useState<{ id: string; owner_username: string }[]>([]);
+  const [users, setUsers] = useState<{ id: string; owner_username: string ; last_sign_in_at: string | null}[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
 
     const fetchUsers = async () => {
@@ -54,17 +54,25 @@ const AssignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bill
               : [];
     
             // Fetch all users
-            const fetchedUsers = await userAction.fetchUniqueOwners();
+            const fetchedOwners = await userAction.fetchUniqueOwners();
+
+            // Fetch all users from the admin list (to get last_sign_in_at)
+            const adminUsers = await userAction.listMostRecentUsers();
+            console.log("Admin users with last_sign_in_at:", adminUsers);
     
-            // Map the fetched users to have an `id` field and filter out already assigned users
-            const mappedUsers = fetchedUsers
-              .filter(user => !assignedUsersArray.includes(user.owner_username)) // Filter out already assigned users
-              .map((user) => ({
-                id: user.owner, // Map `owner` (string) to `id`
-                owner_username: user.owner_username,
-              }));
-    
-            setUsers(mappedUsers); // Set the mapped users to the state
+            // Map the fetched owners to include last_sign_in_at from the adminUsers
+            const mappedUsers = fetchedOwners
+            .map((owner) => {
+                const adminUser = adminUsers.find((u) => u.id === owner.owner); // Match by user id
+                return {
+                id: owner.owner, // Map `owner` to `id`
+                owner_username: owner.owner_username,
+                last_sign_in_at: adminUser ? adminUser.last_sign_in_at : null, // Get last_sign_in_at if available
+                };
+            })
+            .filter(user => !assignedUsersArray.includes(user.owner_username)); // Filter out already assigned users
+            setUsers(mappedUsers);
+
       } catch (error) {
         console.error("Failed to fetch users:", error);
       }
@@ -81,6 +89,7 @@ const AssignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bill
         if (!isOpen) {
         setSelectedUsers([]); // Clear selected users when sheet closes
         setInputValue("");
+        setActiveOnly(false);
         }
     }, [isOpen]);
 
@@ -134,8 +143,17 @@ const AssignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bill
       }
   };
 
-    // Filter users based on the input value
-    const filteredUsers = users.filter(user => user.owner_username.toLowerCase().includes(inputValue.toLowerCase()));
+    const isUserActive = (lastSignInAt: string | null) => {
+        if (!lastSignInAt) return false;
+        const lastSignInDate = new Date(lastSignInAt);
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000); // 1 hour ago
+        return lastSignInDate > oneHourAgo; // Check if last sign-in was within the last hour
+    };
+
+    // filter for search and recently active
+    const filteredUsers = users
+        .filter(user => user.owner_username.toLowerCase().includes(inputValue.toLowerCase()))
+        .filter(user => !activeOnly || isUserActive(user.last_sign_in_at));
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -156,7 +174,7 @@ const AssignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bill
             <Switch
               checked={activeOnly}
               onCheckedChange={setActiveOnly}
-              className="ml-2 bg-blue-25"
+              className={`ml-2 ${activeOnly ? 'bg-blue-200' : 'bg-gray-300'}`}
             />
           </div>
         </div>
