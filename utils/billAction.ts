@@ -311,4 +311,43 @@ export const billAction = {
         }
     }
     },
+
+    updateAssignedUsers: async (billId: string, assignedUsers: string) => {
+        const supabase = createClient();
+        
+        const { error } = await supabase
+          .from('admin_bills')
+          .update({ assigned_users: assignedUsers })
+          .eq('id', billId);
+      
+        if (error) {
+          throw new Error(`Failed to update assigned users for bill ${billId}: ${error.message}`);
+        }
+      },
+      
+            // Fetch admin bill by its ID
+    fetchAdminBillById: async (billId: string) => {
+        const supabase = createClient();
+        try {
+        const { data, error } = await supabase
+            .from('admin_bills') // Replace 'admin_bills' with the actual table name in your database
+            .select('id, biller, amount, description, due_date, assigned_users')
+            .eq('id', billId)
+            .single(); // We expect a single row since we are fetching by ID
+
+        if (error) {
+            throw new Error(`Failed to fetch admin bill: ${error.message}`);
+        }
+
+        if (!data) {
+            throw new Error('No admin bill found with the given ID');
+        }
+
+        return data; // The 'data' will contain the fields from the row in the admin_bills table
+
+        } catch (error) {
+        console.error('Error fetching admin bill by ID:', error);
+        throw error;
+        }
+    },
 };

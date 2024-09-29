@@ -111,6 +111,7 @@ declare interface AdminBill {
   description: string;
   amount: number;
   due_date: Date;
+  assigned_users: string;
 }
 
 interface AdminBillWithBiller extends AdminBill {

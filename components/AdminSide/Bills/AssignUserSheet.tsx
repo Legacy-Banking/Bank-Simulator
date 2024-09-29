@@ -24,6 +24,7 @@ import {
   } from "@/components/ui/table";
   import { userAction } from "@/utils/userAction";
   import { billAction } from "@/utils/billAction";
+import SearchBar from "@/components/SearchBar";
 
 interface AssignUserSheetProps {
   isOpen: boolean;
@@ -33,38 +34,53 @@ interface AssignUserSheetProps {
   description: string;      
   due_date: Date;
   linkedBill: string;
+  assignedUsers: string;
 }
 
 const AssignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, biller, amount, description, due_date, linkedBill}) => {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [activeOnly, setActiveOnly] = useState(false);
   const [users, setUsers] = useState<{ id: string; owner_username: string }[]>([]);
+  const [inputValue, setInputValue] = useState<string>("");
 
-  useEffect(() => {
-    // Fetch users from the database
     const fetchUsers = async () => {
-      try {
-        const fetchedUsers = await userAction.fetchUniqueOwners();
-
-        // Map the fetched users to have an `id` field
-        const mappedUsers = fetchedUsers.map((user) => ({
-          id: user.owner, // Map `owner` (string) to `id`
-          owner_username: user.owner_username,
-        }));
-
-        setUsers(mappedUsers); // Set the mapped users to the state
+        try {
+            // Fetch the current assigned users from the linkedBill (admin bill)
+            const { assigned_users: currentAssignedUsers } = await billAction.fetchAdminBillById(linkedBill); // Assume you have a function to fetch the bill by ID
+    
+            // Split assigned users string into an array for easier comparison
+            const assignedUsersArray = currentAssignedUsers
+              ? currentAssignedUsers.split(",").map((user: string) => user.trim())
+              : [];
+    
+            // Fetch all users
+            const fetchedUsers = await userAction.fetchUniqueOwners();
+    
+            // Map the fetched users to have an `id` field and filter out already assigned users
+            const mappedUsers = fetchedUsers
+              .filter(user => !assignedUsersArray.includes(user.owner_username)) // Filter out already assigned users
+              .map((user) => ({
+                id: user.owner, // Map `owner` (string) to `id`
+                owner_username: user.owner_username,
+              }));
+    
+            setUsers(mappedUsers); // Set the mapped users to the state
       } catch (error) {
         console.error("Failed to fetch users:", error);
       }
     };
 
-    fetchUsers();
-  }, []); // Fetch users when component mounts
-
+    useEffect(() => {
+        if (isOpen) {
+        fetchUsers(); // Fetch users when the sheet is opened
+        }
+    }, [isOpen, linkedBill]);
+  
     // Reset selected users when the sheet closes
     useEffect(() => {
         if (!isOpen) {
         setSelectedUsers([]); // Clear selected users when sheet closes
+        setInputValue("");
         }
     }, [isOpen]);
 
@@ -84,12 +100,42 @@ const AssignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bill
         // Call the createBillForUsers function from billAction
         await billAction.createBillForUsers(selectedUsers, biller, amount, description, due_date, linkedBill);
         console.log("Bills successfully assigned to users:", selectedUsers);
+
+        // Fetch the current assigned users from the linkedBill (admin bill)
+        const { assigned_users: currentAssignedUsers } = await billAction.fetchAdminBillById(linkedBill); // Assume you have a function to fetch the bill by ID
+
+        // Map selected user IDs to usernames and filter out any null values
+        const selectedUsernames = selectedUsers.map(userId => {
+            const user = users.find(u => u.id === userId);
+            return user ? user.owner_username : null;
+        }).filter(Boolean); // Remove any null values
+
+        // If currentAssignedUsers exists, split it into an array; otherwise, use an empty array
+        const existingUserArray = currentAssignedUsers && currentAssignedUsers.length > 0
+            ? currentAssignedUsers.split(",").map((user: string) => user.trim())
+            : [];
+
+        // Merge and deduplicate both existing and new assigned users
+        const updatedAssignedUsersArray = [...existingUserArray, ...selectedUsernames].filter((value, index, self) => self.indexOf(value) === index);
+
+        // Join the array back into a string
+        const updatedAssignedUsers = updatedAssignedUsersArray.join(", ");
+
+        // Update the assigned users in the Admin Bill
+        await billAction.updateAssignedUsers(linkedBill, updatedAssignedUsers);
+
+        console.log("Updated assigned users in Admin Bill:", updatedAssignedUsers);
+
         // Optionally, you can close the dialog or reset the selected users
         onClose();
+
       } catch (error) {
         console.error("Failed to assign bills to users:", error);
       }
   };
+
+    // Filter users based on the input value
+    const filteredUsers = users.filter(user => user.owner_username.toLowerCase().includes(inputValue.toLowerCase()));
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -103,7 +149,8 @@ const AssignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bill
 
         {/* Search & Toggle Active Users */}
         <div className="flex items-center justify-between py-4">
-          <Input placeholder="Search Users" className="w-2/5 font-inter" />
+        {/* <Input placeholder="Search Users" className="w-2/5 font-inter" /> */}
+          <SearchBar inputValue={inputValue} setInputValue={setInputValue} /> 
           <div className="flex items-center gap-2 ml-4">
             <span className="text-sm font-inter">Active Users</span>
             <Switch
@@ -124,10 +171,10 @@ const AssignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bill
                 <div className="flex justify-end items-center space-x-4 mr-12">
                     <span>Assign All</span>
                     <Checkbox
-                    checked={selectedUsers.length === users.length}
+                    checked={selectedUsers.length === filteredUsers.length}
                     onCheckedChange={() =>
                         setSelectedUsers(
-                          selectedUsers.length === users.length ? [] : users.map((user) => user.id)
+                          selectedUsers.length === filteredUsers.length ? [] : filteredUsers.map((user) => user.id)
                         )
                     }
                     className="custom-checkbox border-white-100"
@@ -137,7 +184,7 @@ const AssignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bill
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.map((user) => (
+              {filteredUsers.map((user) => (
                 <TableRow key={user.id} 
                           className="border-t border-gray-200 hover:bg-gray-200"
                           onClick={() => handleSelectUser(user.id)}>

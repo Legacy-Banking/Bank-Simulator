@@ -199,6 +199,7 @@ const AdminBillsTable = () => {
             description={selectedBill.description || ""}
             due_date={new Date(selectedBill.due_date)} 
             linkedBill={selectedBill.id}
+            assignedUsers={selectedBill.assigned_users || ""}
             />
         </>
         )}
