@@ -82,7 +82,7 @@ export const billAction = {
         const messageDescription = `A new bill of $${amount} has been assigned to you from ${biller.name}. Please pay by ${newBill.due_date!.toLocaleDateString()}.`;
 
         try {
-            await inboxAction.createMessage(biller.name, user_id, messageDescription, 'bill', invoiceNumber);
+            await inboxAction.createMessage(biller.name, user_id, messageDescription, 'bill', invoiceNumber, "");
             console.log('Message sent to user about new bill');
         } catch (messageError) {
             console.error('Failed to send message to user:', messageError);
@@ -239,20 +239,46 @@ export const billAction = {
         console.log("Admin bill created:", data);
     },
 
-    deleteAdminBill: async (billId: string): Promise<void> => {
+    deleteAdminBillWithReferences: async (billId: string): Promise<void> => {
         const supabase = createClient();
-    
-        const { error } = await supabase
-          .from('admin_bills')
-          .delete()
-          .eq('id', billId);
-    
-        if (error) {
-          throw new Error(`Failed to delete bill: ${error.message}`);
+
+        try {
+            // Start a transaction to ensure all deletions happen atomically
+            const { error: deleteBillError } = await supabase
+                .from('bills')
+                .delete()
+                .match({ linked_bill: billId });
+
+            if (deleteBillError) {
+                throw new Error(`Failed to delete bills with linked bill: ${deleteBillError.message}`);
+            }
+
+            const { error: deleteMessagesError } = await supabase
+                .from('messages')
+                .delete()
+                .match({ linked_bill: billId });
+
+            if (deleteMessagesError) {
+                throw new Error(`Failed to delete messages with linked bill: ${deleteMessagesError.message}`);
+            }
+
+            // Finally, delete the admin bill itself
+            const { error: deleteAdminBillError } = await supabase
+                .from('admin_bills') // Assuming your admin bill table is called 'admin_bills'
+                .delete()
+                .eq('id', billId);
+
+            if (deleteAdminBillError) {
+                throw new Error(`Failed to delete admin bill: ${deleteAdminBillError.message}`);
+            }
+
+            console.log(`Successfully deleted admin bill and its related entries for bill ID: ${billId}`);
+
+        } catch (error) {
+            console.error('Failed to delete admin bill and its references:', error);
+            throw error; // Propagate the error to be caught in the calling function
         }
-    
-        console.log(`Bill with ID ${billId} deleted successfully`);
-      },
+    },
 
     createBillForUsers: async (user_ids: string[], biller: Biller, amount: number, description: string,  dueDate: Date, linkedBill: string): Promise<void> => {
     const supabase = createClient();
@@ -298,7 +324,7 @@ export const billAction = {
         const messageDescription = `A new bill of $${amount} has been assigned to you from ${biller.name}. Please pay by ${newBill.due_date!.toLocaleDateString()}.`;
 
         try {
-            await inboxAction.createMessage(biller.name, user_id, messageDescription, 'bill', invoiceNumber);
+            await inboxAction.createMessage(biller.name, user_id, messageDescription, 'bill', invoiceNumber, linkedBill);
             console.log(`Message sent to user ${user_id} about new bill.`);
         } catch (messageError) {
             console.error(`Failed to send message to user ${user_id}:`, messageError);

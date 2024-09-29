@@ -34,7 +34,9 @@ const AdminBillsTable = () => {
     const handleDelete = async () => {
         if (deleteBillId) {
             try {
-              await billAction.deleteAdminBill(deleteBillId); // Call the delete function
+            //   await billAction.deleteAdminBill(deleteBillId); // Call the delete function
+              await billAction.deleteAdminBillWithReferences(deleteBillId); 
+
               setBills((prevBills) => prevBills.filter((bill) => bill.id !== deleteBillId));
               setShowDeleteDialog(false); // Close the dialog after deleting
             } catch (error) {

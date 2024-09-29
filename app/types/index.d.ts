@@ -149,6 +149,7 @@ declare interface Message {
   read: boolean;
   type: string;
   bill_id: string;
+  linked_bill: string;
 }
 
 declare interface Card {
