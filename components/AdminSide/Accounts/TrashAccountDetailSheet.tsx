@@ -26,21 +26,26 @@ const TrashAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, s
 
   const supabase = createClient();
 
-  async function deleteUser(userId: string | undefined) {
-    if (userId == undefined) {
-      return
+  async function deleteAccountsByOwnerUsername(ownerUsername: string | undefined) {
+    if (!ownerUsername) {
+      return;
     }
-    const { data, error } = await supabase.auth.admin.deleteUser(userId);
-
+    const { data, error } = await supabase
+      .from('accounts') // Replace with your table name
+      .delete()
+      .eq('owner_username', ownerUsername); // Match by owner username
+  
     if (error) {
       setError(error.message);
-      console.error('Error deleting user:', error.message);
+      console.error('Error deleting accounts:', error.message);
     } else {
       setError('');
-      console.log('User deleted:', data);
-      deleteAccount();
+      console.log('Accounts deleted:', data);
+      deleteAccount(); // Call parent function to refresh data
     }
   }
+  
+  
   if (!status) return null;
 
   return (
@@ -65,7 +70,7 @@ const TrashAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, s
         {/* Footer with Close button */}
         <DialogFooter className="mt-8 flex ">
             <Button onClick={onClose} className="grow uppercase font-inter border-2 hover:bg-slate-200 tracking-wider">Cancel</Button>
-          <Button onClick={(e) => deleteUser(account?.owner)} className="grow uppercase font-inter tracking-wider bg-blue-25 hover:bg-blue-200 text-white-100">Delete</Button>
+          <Button onClick={(e) => deleteAccountsByOwnerUsername(account?.owner_username)} className="grow uppercase font-inter tracking-wider bg-blue-25 hover:bg-blue-200 text-white-100">Delete</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
