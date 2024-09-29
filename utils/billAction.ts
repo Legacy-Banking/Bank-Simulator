@@ -170,18 +170,45 @@ export const billAction = {
         }
     },
     
-    fetchAdminBills: async (): Promise<AdminBill[]> => {
+    // fetchAdminBills: async (): Promise<AdminBill[]> => {
+    //     const supabase = createClient();
+    //     const { data, error } = await supabase
+    //       .from('admin_bills') 
+    //       .select('*');
+    
+    //     if (error) {
+    //       throw new Error(`Failed to fetch admin bills: ${error.message}`);
+    //     }
+    
+    //     return data;
+    //   },
+
+    fetchAdminBills: async (): Promise<AdminBillWithBiller[]> => {
         const supabase = createClient();
+    
         const { data, error } = await supabase
-          .from('admin_bills') 
-          .select('*');
+          .from('admin_bills')
+          .select(`
+            id, 
+            amount, 
+            description, 
+            due_date, 
+            biller: biller ( id, name, biller_code, biller_details )
+          `);
     
         if (error) {
-          throw new Error(`Failed to fetch admin bills: ${error.message}`);
+          throw new Error(`Failed to fetch bills: ${error.message}`);
         }
     
-        return data;
+        // Ensure each bill's 'biller' field is a single object, not an array
+        const formattedData = data.map((bill: any) => ({
+          ...bill,
+          biller: Array.isArray(bill.biller) ? bill.biller[0] : bill.biller // Extract the first element if biller is an array
+        }));
+    
+        return formattedData as AdminBillWithBiller[]; // Cast to AdminBillWithBiller[]
       },
+      
 
     createAdminBill: async (
         biller_id: string, 
@@ -226,4 +253,62 @@ export const billAction = {
     
         console.log(`Bill with ID ${billId} deleted successfully`);
       },
+
+    createBillForUsers: async (user_ids: string[], biller: Biller, amount: number, description: string,  dueDate: Date, linkedBill: string): Promise<void> => {
+    const supabase = createClient();
+    console.log("IN Creating Bill Form")
+    for (const user_id of user_ids) {
+        try {
+        // Fetch the reference number from user_billers if it exists
+        let referenceNumber = await billerAction.fetchReferenceNumberByBillerName(user_id, biller.name);
+
+        // If no reference number found, generate a new one
+        if (!referenceNumber) {
+            referenceNumber = referenceNumberGenerator();
+            // Add this reference number to the user's biller_reference list
+            await billerAction.addReferenceNumber(user_id, biller.name, referenceNumber);
+        }
+
+        // Generate a unique invoice number for this bill
+        const invoiceNumber = await generateUniqueInvoiceNumber();
+
+        // Create the new bill object
+        const newBill: Partial<Bill> = {
+            billed_user: user_id,
+            from: biller.name,
+            description: description,
+            amount: amount,
+            paid_on: new Date(), 
+            status: 'unpaid',
+            created_at: new Date(),
+            due_date: dueDate,
+            invoice_number: invoiceNumber,
+            reference_number: referenceNumber,
+            linked_bill: linkedBill,
+        };
+
+        // Insert the bill into the 'bills' table
+        const { data, error } = await supabase.from('bills').insert(newBill);
+
+        if (error) {
+            throw new Error(`Failed to create bill for user ${user_id}: ${error.message}`);
+        }
+
+        // Send a message to the user inbox about the new bill
+        const messageDescription = `A new bill of $${amount} has been assigned to you from ${biller.name}. Please pay by ${newBill.due_date!.toLocaleDateString()}.`;
+
+        try {
+            await inboxAction.createMessage(biller.name, user_id, messageDescription, 'bill', invoiceNumber);
+            console.log(`Message sent to user ${user_id} about new bill.`);
+        } catch (messageError) {
+            console.error(`Failed to send message to user ${user_id}:`, messageError);
+            // Handle the message error gracefully if necessary
+        }
+
+        console.log(`Bill created for user ${user_id}:`, data);
+        } catch (err) {
+        console.error(`Failed to create bill for user ${user_id}:`, err);
+        }
+    }
+    },
 };

@@ -96,6 +96,7 @@ declare interface Bill {
   status: string;
   invoice_number: string;
   reference_number: string;
+  linked_bill: string;
 
   invoice_date: string;
   billed_to: string;
@@ -109,7 +110,11 @@ declare interface AdminBill {
   biller: string;
   description: string;
   amount: number;
-  due_date: Date
+  due_date: Date;
+}
+
+interface AdminBillWithBiller extends AdminBill {
+  biller: Biller;
 }
 
 declare interface BillDetails {

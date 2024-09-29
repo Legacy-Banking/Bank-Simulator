@@ -25,6 +25,32 @@ export const userAction = {
         const supabase = supabaseClient();
         const { data, error } = await supabase.from('admin_users').select('role').eq('id', user_id).single();
         return data?.role || 'default';
-    }
+    },
+
+    fetchUniqueOwners: async (): Promise<{ owner: string; owner_username: string }[]> => {
+      const supabase = supabaseClient();
+  
+      // Query the 'amount' table and select distinct 'owner' and 'owner_username'
+      const { data, error } = await supabase
+        .from('account') // Replace with your actual table name if it's different
+        .select('owner, owner_username');
+  
+      if (error) {
+        console.error('Error fetching unique owners:', error);
+        throw new Error(error.message);
+      }
+  
+    // Create a Set to filter unique users
+    const uniqueOwnersMap: { [key: string]: { owner: string; owner_username: string } } = {};
+
+    data?.forEach((item) => {
+      uniqueOwnersMap[item.owner] = item;
+    });
+
+    // Convert the map back to an array
+    const uniqueOwners = Object.values(uniqueOwnersMap);
+
+    return uniqueOwners;
+    },
 
 }

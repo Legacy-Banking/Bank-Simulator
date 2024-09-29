@@ -3,15 +3,18 @@ import { billAction } from '@/utils/billAction'; // Assuming this is the path to
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@/components/ui/table'; 
 import { Button } from '@/components/ui/button';
 import { formatAmount } from "@/lib/utils";
-import { ChevronUp, ChevronDown, ChevronsUpDown, Trash2Icon,  Plus, Minus } from 'lucide-react';
+import { ChevronUp, ChevronDown, ChevronsUpDown, Trash2Icon, UserPlus, UserMinus } from 'lucide-react';
 import TrashBillDetailSheet from './TrashBillDetialSheet';
+import AssignUserSheet from './AssignUserSheet';
 
 const AdminBillsTable = () => {
-    const [bills, setBills] = useState<AdminBill[]>([]);
+    const [bills, setBills] = useState<AdminBillWithBiller []>([]);
     const [loading, setLoading] = useState(true);
     const [sortConfig, setSortConfig] = useState<{ key: keyof AdminBill; direction: 'ascending' | 'descending' } | null>(null);
     const [deleteBillId, setDeleteBillId] = useState<string | null>(null);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [isAssignSheetOpen, setIsAssignSheetOpen] = useState(false);
+    const [selectedBill, setSelectedBill] = useState<AdminBillWithBiller  | null>(null);
   
     useEffect(() => {
       const fetchData = async () => {
@@ -84,6 +87,11 @@ const AdminBillsTable = () => {
       { label: 'Due Date', key: 'due_date' as keyof AdminBill },
       { label: 'Action', key: null }, // actions won't be sorted
     ];
+
+    const handleAssignUserClick = (bill: AdminBillWithBiller) => {
+        setSelectedBill(bill); // Set the bill details for assignment
+        setIsAssignSheetOpen(true); // Open the AssignUserSheet
+      };
   
     return (
       <>
@@ -118,8 +126,8 @@ const AdminBillsTable = () => {
         </TableHeader>
 
         <TableBody>
-          {sortedBills.map((bill: AdminBill) => {
-            const billerName = bill.biller;
+          {sortedBills.map((bill: AdminBillWithBiller) => {
+            const billerName = bill.biller.name;
             const amount = bill.amount;
             const dueDate = new Date(bill.due_date);
 
@@ -145,11 +153,17 @@ const AdminBillsTable = () => {
                 </TableCell>
 
                 <TableCell>
-                <div className="flex flex-col lg:flex-row justify-start gap-4 px-4">
-                  <Button className="bg-white-100 border border-gray-300"><Plus className="inline h-4 w-4 mr-1" /> Assign User</Button>
-                  <Button className="bg-white-100 border border-gray-300"><Minus className="inline h-4 w-4 mr-1" /> Unassign User</Button>
+                <div className="flex flex-col lg:flex-row justify-start gap-6 px-4">
+                  <Button className="bg-white-100 border border-gray-300 p-2"
+                          onClick={() => handleAssignUserClick(bill)}
+                          >
+                            <UserPlus className="inline h-6 w-6" fill="#99e087"/>
+                           </Button>
+                  <Button className="bg-white-100 border border-gray-300 p-2">
+                        <UserMinus className="inline h-6 w-6" fill="#F87171"/>
+                        </Button>
                   <Button
-                      className="bg-white-100 border border-gray-300"
+                      className="bg-white-100 border border-gray-300 p-2"
                       onClick={() => {
                         setDeleteBillId(bill.id); // Set the bill ID to delete
                         setShowDeleteDialog(true); // Show the confirmation dialog
@@ -167,10 +181,32 @@ const AdminBillsTable = () => {
         </Table>
 
         {/* Add Admin Bills Sheet */}
+
         {/* Add Assign Bill Sheet */}
+        {selectedBill && (
+        <>
+            {console.log("AssignUserSheet Props: ", {
+            biller: selectedBill.biller,
+            amount: selectedBill.amount,
+            description: selectedBill.description || "",
+            duedate: selectedBill.due_date
+            })}
+            <AssignUserSheet
+            isOpen={isAssignSheetOpen}
+            onClose={() => setIsAssignSheetOpen(false)}
+            biller={selectedBill.biller} // Pass full biller object with name and biller_code
+            amount={selectedBill.amount}
+            description={selectedBill.description || ""}
+            due_date={new Date(selectedBill.due_date)} 
+            linkedBill={selectedBill.id}
+            />
+        </>
+        )}
+
+
         {/* Add Unassign Bill Sheet */}
 
-                {/* Delete Confirmation Dialog */}
+        {/* Delete Confirmation Dialog */}
         <TrashBillDetailSheet 
           status={showDeleteDialog} 
           onClose={() => setShowDeleteDialog(false)} 
