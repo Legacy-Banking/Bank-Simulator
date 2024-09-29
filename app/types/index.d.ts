@@ -109,7 +109,10 @@ declare interface AdminBill {
   biller: string;
   description: string;
   amount: number;
-  due_date: Date
+  due_date: Date;
+  invoice_number: string;
+  status: string;
+  assigned_users?: { name: string; status: 'overdue' | 'pending' | 'paid' }[];  // Add this if it should exist
 }
 
 declare interface BillDetails {
