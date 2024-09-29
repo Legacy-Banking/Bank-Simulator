@@ -32,18 +32,48 @@ const AddConstantDetailSheet: React.FC<ConstantDetailSheetProps> = ({ status, on
   const [enumOptions, setEnumOptions] = useState<string[]>([]);
 
 
-  const supabase = createClient();
   const fetchEnumValues = async () => {
-    const { data, error } = await supabase.rpc('get_page_keys');
-
-    if (error) {
-      console.error('Error fetching enum values:', error.message);
-    } else {
-      setEnumOptions(data?.map((item: { page_key: string }) => item.page_key) || []);
-    }
+    const data  = [
+      {
+        "page_key_values": "admin"
+      },
+      {
+        "page_key_values": "view_bills"
+      },
+      {
+        "page_key_values": "default_dashboard"
+      },
+      {
+        "page_key_values": "admin_dashboard"
+      },
+      {
+        "page_key_values": "inbox"
+      },
+      {
+        "page_key_values": "bpay"
+      },
+      {
+        "page_key_values": "transfer_funds"
+      },
+      {
+        "page_key_values": "login"
+      },
+      {
+        "page_key_values": "signup"
+      },
+      {
+        "page_key_values": "pay_anyone"
+      },
+      {
+        "page_key_values": "home"
+      }
+    ];
+    
+    setEnumOptions(data?.map((item: { page_key_values: string }) => item.page_key_values) || []);
   };
   
   fetchEnumValues();
+  
 
   const addConstant = async (key : string, content : string, pageKey : string) => {
     // go to supabase and insert into the table
