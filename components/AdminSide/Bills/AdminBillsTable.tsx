@@ -6,6 +6,7 @@ import { formatAmount } from "@/lib/utils";
 import { ChevronUp, ChevronDown, ChevronsUpDown, Trash2Icon, UserPlus, UserMinus } from 'lucide-react';
 import TrashBillDetailSheet from './TrashBillDetialSheet';
 import AssignUserSheet from './AssignUserSheet';
+import UnassignUserSheet from './UnassignUserSheet';
 
 const AdminBillsTable = () => {
     const [bills, setBills] = useState<AdminBillWithBiller []>([]);
@@ -14,6 +15,7 @@ const AdminBillsTable = () => {
     const [deleteBillId, setDeleteBillId] = useState<string | null>(null);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [isAssignSheetOpen, setIsAssignSheetOpen] = useState(false);
+    const [isUnassignSheetOpen, setIsUnassignSheetOpen] = useState(false); 
     const [selectedBill, setSelectedBill] = useState<AdminBillWithBiller  | null>(null);
   
     useEffect(() => {
@@ -94,6 +96,11 @@ const AdminBillsTable = () => {
         setSelectedBill(bill); // Set the bill details for assignment
         setIsAssignSheetOpen(true); // Open the AssignUserSheet
       };
+
+    const handleUnassignUserClick = (bill: AdminBillWithBiller) => {
+        setSelectedBill(bill); // Set the bill details for unassignment
+        setIsUnassignSheetOpen(true); // Open the UnassignUserSheet
+    };
   
     return (
       <>
@@ -161,9 +168,11 @@ const AdminBillsTable = () => {
                           >
                             <UserPlus className="inline h-6 w-6" fill="#99e087"/>
                            </Button>
-                  <Button className="bg-white-100 border border-gray-300 p-2">
-                        <UserMinus className="inline h-6 w-6" fill="#F87171"/>
-                        </Button>
+                  <Button className="bg-white-100 border border-gray-300 p-2"
+                          onClick={() => handleUnassignUserClick(bill)}    
+                          >
+                            <UserMinus className="inline h-6 w-6" fill="#F87171"/>
+                            </Button>
                   <Button
                       className="bg-white-100 border border-gray-300 p-2"
                       onClick={() => {
@@ -208,6 +217,21 @@ const AdminBillsTable = () => {
 
 
         {/* Add Unassign Bill Sheet */}
+        {selectedBill && (
+        <>
+            <UnassignUserSheet
+            isOpen={isUnassignSheetOpen}
+            onClose={() => setIsUnassignSheetOpen(false)}
+            biller={selectedBill.biller}
+            amount={selectedBill.amount}
+            description={selectedBill.description || ""}
+            due_date={new Date(selectedBill.due_date)} 
+            linkedBill={selectedBill.id}
+            assignedUsers={selectedBill.assigned_users || ""}
+            />
+        </>
+        )}
+
 
         {/* Delete Confirmation Dialog */}
         <TrashBillDetailSheet 
@@ -217,7 +241,7 @@ const AdminBillsTable = () => {
         />
 
       </>
-    );
+    );  
   };
 
 export default AdminBillsTable;
