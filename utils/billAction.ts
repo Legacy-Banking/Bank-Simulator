@@ -442,23 +442,23 @@ export const billAction = {
             // Get the assigned users string from the selected bill
             const assignedUsersString = selectedBill.assigned_users || '';
             console.log('Assigned users string:', assignedUsersString);
+    
+            // Split the string by ',' to get individual pairs of username|userid
+            const assignedUserPairs = assignedUsersString ? assignedUsersString.split(',') : [];
+            console.log('Assigned User Pairs:', assignedUserPairs);
 
-            // Split the string by '|' and log the IDs
-            const assignedUserIds = assignedUsersString ? assignedUsersString.split('|') : [];
-            console.log('Assigned User IDs:', assignedUserIds);
-
-            if (assignedUserIds.length === 0) {
+            if (assignedUserPairs.length === 0) {
                 console.log('No assigned users found.');
                 return [];
             }
 
             // Fetch assigned user details for each user ID
             const assignedUsersDetails = await Promise.all(
-                assignedUserIds.map(async (userId) => {
-                    const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+                assignedUserPairs.map(async (pair) => {
+                    const [username, userId] = pair.split('|');
 
                     // If the userId is a UUID (based on regex), fetch from the 'bills' table
-                    if (uuidRegex.test(userId)) {
+                    if (userId) {
                         console.log('Fetching user by UUID:', userId);
 
                         const { data: bill, error } = await supabase
@@ -475,7 +475,7 @@ export const billAction = {
 
                         // Return the billed user's name and status
                         return {
-                            name: bill.billed_user || 'Unknown',
+                            name: username || 'Unknown',
                             status: bill.status || 'unpaid', // Default to unpaid if no status
                         };
                     } else {
