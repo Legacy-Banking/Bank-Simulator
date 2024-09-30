@@ -82,7 +82,7 @@ const AccountsPage = () => {
             <div className='flex flex-1'>
               <h1 className="text-xl text-black font-semibold">Accounts</h1>
             </div>
-            <SearchBar inputValue={inputValue} setInputValue={setInputValue} />
+            <SearchBar inputValue={inputValue} setInputValue={setInputValue} setPage={setPage}/>
           </div>
           <section className="flex w-full flex-col mt-6 bg-white-100 rounded-b-3xl">
             <AccountsTable

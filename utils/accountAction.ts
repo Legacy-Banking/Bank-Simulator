@@ -26,6 +26,30 @@ export const accountAction = {
         }
         return data || [];
     },
+    fetchAccountTotalBalance: async (user_id: string): Promise<number> => {
+        const supabase = createClient();
+
+        // Sum the balance of all accounts for a given user
+        const { data, error } = await supabase
+            .from('account')
+            .select('balance') // Fetch only the balance column
+            .eq('owner', user_id);
+
+        if (error) {
+            console.error('Error fetching total balance:', error);
+            throw error;
+        }
+
+        // If no accounts found, return 0 as the total balance
+        if (!data || data.length === 0) {
+            return 0;
+        }
+
+        // Calculate the total balance
+        const totalBalance = data.reduce((sum, account) => sum + account.balance, 0);
+
+        return totalBalance;
+    },
     fetchAccountById: async (account_id: string): Promise<Account> => {
         const supabase = createClient();
         const { data, error } = await supabase

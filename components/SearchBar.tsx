@@ -4,8 +4,9 @@ import { string } from 'zod';
 interface SearchBarProps {
     inputValue: string;
     setInputValue: React.Dispatch<React.SetStateAction<string>>;
+    setPage: React.Dispatch<React.SetStateAction<number>>;
   }
-function SearchBar({ inputValue, setInputValue }: SearchBarProps) {
+function SearchBar({ inputValue, setInputValue, setPage }: SearchBarProps) {
     const inputRef = useRef<HTMLInputElement>(null);
 
     const handleMagnifierClick = () => {
@@ -16,11 +17,15 @@ function SearchBar({ inputValue, setInputValue }: SearchBarProps) {
 
     const handleClearInput = () => {
         setInputValue('');
+        setPage(1);
         if (inputRef.current) {
             inputRef.current.focus();
         }
     };
-
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInputValue(e.target.value); // Update input value
+        setPage(1);                    // Reset page to 1 whenever input changes
+    };
     return (
         <div className='w-64 h-10 border-[#D7D7D7] border-2 rounded-lg py-2 px-4 flex text-[#667085] font-semibold items-center'>
             {!inputValue && (
@@ -35,7 +40,7 @@ function SearchBar({ inputValue, setInputValue }: SearchBarProps) {
                 ref={inputRef}
                 placeholder="Search User"
                 value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
+                onChange={handleInputChange}
                 className="w-full outline-none focus:ring-0 bg-gray-100"
             />
             {inputValue && (

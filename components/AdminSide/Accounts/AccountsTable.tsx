@@ -28,6 +28,8 @@ export const AccountsTable = ({ accounts = [], setShowUpdatePopUp, setShowDelete
   const [editAccountWindow, setEditAccountWindow] = useState(false);
   const [openUserAccountsWindow, setOpenUserAccountsWindow] = useState(false);
   const [selectedUserAccounts, setSelectedUserAccounts] = useState<Account []>([]);
+  const [accountBalances, setAccountBalances] = useState<{ [key: string]: number }>({}); // State to store balances by user ID
+
   const toggleDeleteAccountWindow = () => {
     setDeleteAccountWindow((prevState) => !prevState);
   };
@@ -55,6 +57,27 @@ export const AccountsTable = ({ accounts = [], setShowUpdatePopUp, setShowDelete
       setSelectedUserAccounts(await accountAction.fetchAccountsbyUserId(userId));
     }
   }
+   // Fetch and set the total balance for a user
+   const fetchTotalBalance = async (userId: string) => {
+    try {
+      const balance = await accountAction.fetchAccountTotalBalance(userId);
+      setAccountBalances((prevBalances) => ({
+        ...prevBalances,
+        [userId]: balance,
+      }));
+    } catch (error) {
+      console.error('Error fetching total balance:', error);
+    }
+  };
+
+  useEffect(() => {
+    // Fetch total balances for all accounts when the component mounts
+    accounts.forEach((acc: Account) => {
+      if (!accountBalances[acc.owner]) {
+        fetchTotalBalance(acc.owner);
+      }
+    });
+  }, [accounts]); // Re-run effect when accounts change
 
   return (
     <>
@@ -71,7 +94,6 @@ export const AccountsTable = ({ accounts = [], setShowUpdatePopUp, setShowDelete
         <TableBody>
           {accounts.map((acc: Account) => {
             const accountName = acc.owner_username;
-            const balance = acc.balance;
             const lastLogin = new Date();
 
             return (
@@ -91,7 +113,7 @@ export const AccountsTable = ({ accounts = [], setShowUpdatePopUp, setShowDelete
 
                 <TableCell className="font-inter font-bold">
                   <span className='cursor-pointer'>
-                    {formatAmount(balance)}
+                    {formatAmount(accountBalances[acc.owner])}
                   </span>
                 </TableCell>
 
