@@ -231,7 +231,6 @@ const AdminBillsTable = () => {
       {selectedBill && (
         <AdminBillDetailSheet
           bill={selectedBill}
-          assignedUsers={selectedBill?.assigned_users || []}
           onClose={closeBillDetails}
         />
       )}

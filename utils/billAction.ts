@@ -4,21 +4,6 @@ import { number } from "zod";
 import { referenceNumberGenerator, generateUniqueInvoiceNumber, calculateDueDate } from "./accbsbGenerator"
 import { inboxAction } from "./inboxAction";
 
-const fetchBillerCode = async (billerName: string) => {
-    const supabase = createClient();
-    const { data, error } = await supabase
-        .from('billers')
-        .select('biller_code')
-        .eq('name', billerName)
-        .single(); // single() ensures you're only fetching one record
-
-    if (error) {
-        throw new Error(`Error fetching biller_code: ${error.message}`);
-    }
-
-    return data.biller_code;
-}
-
 export const billAction = {
     fetchBillsbyUserId: async (user_id: string): Promise<Bill[]> => {
         const supabase = createClient();
@@ -173,6 +158,7 @@ export const billAction = {
             throw error;
         }
     },
+
     updateBillAmount: async (bill: Partial<Bill>, amount: number): Promise<void> => {
         const invoice_number = bill.invoice_number;
         const supabase = createClient();
@@ -208,6 +194,7 @@ export const billAction = {
             amount, 
             description, 
             due_date, 
+            assigned_users,
             biller: biller ( id, name, biller_code, biller_details )
           `);
 
@@ -395,6 +382,31 @@ export const billAction = {
         }
     },
 
+    fetchAssignedUsersById: async (billId: string) => {
+        const supabase = createClient();
+        try {
+            const { data, error } = await supabase
+                .from('admin_bills') // Replace 'admin_bills' with the actual table name in your database
+                .select('assigned_users')
+                .eq('id', billId)
+                .single(); // We expect a single row since we are fetching by ID
+
+            if (error) {
+                throw new Error(`Failed to fetch assigned users: ${error.message}`);
+            }
+
+            if (!data) {
+                throw new Error('No assigned users found with the given ID');
+            }
+
+            return data; // The 'data' will contain the fields from the row in the admin_bills table
+
+        } catch (error) {
+            console.error('Error fetching assigned users by ID:', error);
+            throw error;
+        }
+    },
+
     // Fetch admin bill by its ID
     fetchAdminBillById: async (billId: string) => {
         const supabase = createClient();
@@ -420,4 +432,75 @@ export const billAction = {
             throw error;
         }
     },
+
+    fetchAssignedUsersStatus: async (selectedBill: AdminBillWithBiller): Promise<{ name: string; status: string }[]> => {
+        const supabase = createClient();
+
+        try {
+            console.log('Selected Bill:', selectedBill);
+
+            // Get the assigned users string from the selected bill
+            const assignedUsersString = selectedBill.assigned_users || '';
+            console.log('Assigned users string:', assignedUsersString);
+
+            // Split the string by '|' and log the IDs
+            const assignedUserIds = assignedUsersString ? assignedUsersString.split('|') : [];
+            console.log('Assigned User IDs:', assignedUserIds);
+
+            if (assignedUserIds.length === 0) {
+                console.log('No assigned users found.');
+                return [];
+            }
+
+            // Fetch assigned user details for each user ID
+            const assignedUsersDetails = await Promise.all(
+                assignedUserIds.map(async (userId) => {
+                    const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+
+                    // If the userId is a UUID (based on regex), fetch from the 'bills' table
+                    if (uuidRegex.test(userId)) {
+                        console.log('Fetching user by UUID:', userId);
+
+                        const { data: bill, error } = await supabase
+                            .from('bills') // Ensure this table exists
+                            .select('billed_user, status')
+                            .eq('billed_user', userId)
+                            .eq('linked_bill', selectedBill.id)  // Ensure it’s linked to the correct bill
+                            .single();
+
+                        if (error || !bill) {
+                            console.error(`Error fetching user ${userId}:`, error?.message);
+                            return { name: 'Unknown', status: 'unpaid' }; // Default to unpaid if error
+                        }
+
+                        // Return the billed user's name and status
+                        return {
+                            name: bill.billed_user || 'Unknown',
+                            status: bill.status || 'unpaid', // Default to unpaid if no status
+                        };
+                    } else {
+                        // Otherwise, treat the userId as a username
+                        console.log('Treating userId as a username:', userId);
+                        return {
+                            name: userId,  // Username directly from the string
+                            status: 'unpaid',  // Default status for usernames
+                        };
+                    }
+                })
+            );
+
+            // Filter out null values and ensure TypeScript understands the correct type
+            const validAssignedUsers = assignedUsersDetails.filter(
+                (user): user is { name: string; status: string } => user !== null
+            );
+
+            console.log('Final assigned users details:', validAssignedUsers);
+            return validAssignedUsers;
+
+        } catch (error) {
+            console.error('Error fetching assigned users:', error);
+            throw error;
+        }
+    }
+
 };

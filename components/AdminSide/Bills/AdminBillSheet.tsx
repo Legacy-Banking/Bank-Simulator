@@ -1,5 +1,4 @@
-import React from 'react';
-import {
+import React, { useEffect, useState } from 'react'; import {
     Dialog,
     DialogContent,
     DialogHeader,
@@ -10,23 +9,37 @@ import {
 import SheetDetails from '@/components/SheetDetails'; // Import the existing SheetDetails component
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { useAppSelector } from "@/app/store/hooks"; // Import for user data
-
+import StatusLabel from '@/components/StatusLabel';
+import { billAction } from '@/utils/billAction'; // Assuming this is the path to billAction
 
 // Define the props for the component
 type AdminBillDetailProps = {
-    bill: AdminBill | null;
-    assignedUsers: { name: string; status: 'overdue' | 'pending' | 'paid' }[];
+    bill: AdminBillWithBiller | null;
     onClose: () => void;
 };
 
-const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, assignedUsers = [], onClose }) => {
+const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, onClose }) => {
     if (!bill) return null;
+    const [loading, setLoading] = useState(true);
+    const [assignedUsersDetails, setAssignedUsersDetails] = useState<{ name: string, status: string }[]>([]);
 
-    console.log('Biller Code:', bill.biller_code);
+    useEffect(() => {
+        const fetchData = async () => {
+            if (bill) {
+                try {
+                    const data = await billAction.fetchAssignedUsersStatus(bill);
+                    console.log("Fetched Assigned User Details:", data); // Log fetched data here
+                    setAssignedUsersDetails(data); // Correctly set the state
+                } catch (error) {
+                    console.error('Failed to fetch assigned users:', error);
+                } finally {
+                    setLoading(false);
+                }
+            }
+        };
+        fetchData();
+    }, [bill]); // Make sure "bill" is the only dependency
 
-    const safeAssignedUsers = Array.isArray(assignedUsers) ? assignedUsers : [];
-
-    const user = useAppSelector((state) => state.user);
 
     return (
         <Dialog open={!!bill} onOpenChange={onClose}>
@@ -41,7 +54,7 @@ const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, assignedUs
                 {/* Bill details on the left */}
                 <div className="flex flex-col lg:flex-row gap-4 mt-4">
                     <div className="lg:w-[60%]">
-                        <SheetDetails bill={bill} biller={{ name: bill.biller, biller_code: bill.biller_code }}
+                        <SheetDetails bill={bill} biller={bill.biller}
                         />
                     </div>
 
@@ -56,8 +69,8 @@ const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, assignedUs
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {safeAssignedUsers.length > 0 ? (
-                                    safeAssignedUsers.map((user, index) => (
+                                {!loading && assignedUsersDetails.length > 0 ? (
+                                    assignedUsersDetails.map((user, index) => (
                                         <TableRow key={index} className="bg-white rounded-lg shadow-sm mb-2">
                                             <TableCell className="p-2">
                                                 <div className="flex items-center">
@@ -66,18 +79,14 @@ const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, assignedUs
                                                 </div>
                                             </TableCell>
                                             <TableCell className="p-2">
-                                                <span
-                                                    className={`px-2 py-1 text-sm font-medium rounded-lg ${getStatusClass(user.status)}`}
-                                                >
-                                                    {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
-                                                </span>
+                                                <StatusLabel status={user.status !== 'Unknown' && user.status ? user.status : 'unpaid'} />
                                             </TableCell>
                                         </TableRow>
                                     ))
                                 ) : (
                                     <TableRow>
                                         <TableCell colSpan={2} className="text-center p-4">
-                                            No users assigned.
+                                            {loading ? 'Loading assigned users...' : 'No users assigned.'}
                                         </TableCell>
                                     </TableRow>
                                 )}
@@ -93,18 +102,5 @@ const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, assignedUs
     );
 };
 
-// Helper function to add status-based styles
-const getStatusClass = (status: 'overdue' | 'pending' | 'paid') => {
-    switch (status) {
-        case 'overdue':
-            return 'bg-red-100 text-red-800';
-        case 'pending':
-            return 'bg-yellow-100 text-yellow-800';
-        case 'paid':
-            return 'bg-green-100 text-green-800';
-        default:
-            return '';
-    }
-};
 
 export default AdminBillDetailSheet;
