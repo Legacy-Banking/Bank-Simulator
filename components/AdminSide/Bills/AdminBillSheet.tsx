@@ -59,26 +59,25 @@ const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, onClose })
                     </div>
 
                     {/* Assigned users and status on the right */}
-                    <div className="lg:w-[50%] bg-white border border-gray-200 rounded-lg p-3">
+                    <div className="lg:w-[50%] bg-white border border-gray-200 rounded-lg p-3 max-h-[540px] overflow-y-auto">
 
                         <Table>
                             <TableHeader className="bg-blue-200">
                                 <TableRow>
-                                    <TableHead className="p-2 text-white-200 text-center rounded-tl-2xl">Assigned Users</TableHead>
-                                    <TableHead className="p-2 text-white-200 text-center rounded-tr-2xl">Status</TableHead>
+                                    <TableHead className="p-2 text-base text-white-200 text-center rounded-tl-2xl">Assigned Users</TableHead>
+                                    <TableHead className="p-2 text-base text-white-200 text-center rounded-tr-2xl">Status</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {!loading && assignedUsersDetails.length > 0 ? (
                                     assignedUsersDetails.map((user, index) => (
                                         <TableRow key={index} className="bg-white rounded-lg shadow-sm mb-2">
-                                            <TableCell className="p-2">
-                                                <div className="flex items-center">
-                                                    <span className="inline-block w-8 h-8 rounded-full bg-gray-200 mr-2"></span>
+                                            <TableCell className="p-3">
+                                                <div className="flex text-sm items-center">
                                                     {user.name}
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="p-2">
+                                            <TableCell className="p-2 text-center">
                                                 <StatusLabel status={user.status !== 'Unknown' && user.status ? user.status : 'unpaid'} />
                                             </TableCell>
                                         </TableRow>

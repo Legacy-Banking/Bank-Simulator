@@ -8,8 +8,6 @@ import TrashBillDetailSheet from './TrashBillDetialSheet';
 import AssignUserSheet from './AssignUserSheet';
 import UnassignUserSheet from './UnassignUserSheet';
 import AdminBillDetailSheet from './AdminBillSheet';
-import { useRouter } from 'next/navigation';
-
 
 const AdminBillsTable = () => {
   const [bills, setBills] = useState<AdminBillWithBiller[]>([]);
@@ -20,7 +18,6 @@ const AdminBillsTable = () => {
   const [isAssignSheetOpen, setIsAssignSheetOpen] = useState(false);
   const [isUnassignSheetOpen, setIsUnassignSheetOpen] = useState(false);
   const [selectedBill, setSelectedBill] = useState<AdminBillWithBiller | null>(null);
-  const router = useRouter();
 
   // Function to open the admin bill details popup
   const openBillDetails = (bill: AdminBillWithBiller) => {
