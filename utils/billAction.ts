@@ -280,6 +280,35 @@ export const billAction = {
         }
     },
 
+    unassignAdminBill: async (selectedUsers: string[], linkedBill: string) => {
+        const supabase = createClient();
+
+        try {
+          // Remove user references in the "bills" table
+          await supabase
+            .from("bills")
+            .delete()
+            .in("billed_user", selectedUsers) // assuming user_id is the field for users in "bills" table
+            .eq("linked_bill", linkedBill);
+    
+          // Remove user references in the "messages" table
+          await supabase
+            .from("messages")
+            .delete()
+            .in("to_user", selectedUsers) // assuming user_id is the field for users in "messages" table
+            .eq("linked_bill", linkedBill);
+    
+          console.log("References successfully removed from bills and messages");
+        } catch (error) {
+            if (error instanceof Error) {
+              console.error("Failed to unassign users:", error.message);
+            } else {
+              console.error("Unknown error occurred:", error);
+            }
+            throw error;
+        }
+    },
+
     createBillForUsers: async (user_ids: string[], biller: Biller, amount: number, description: string,  dueDate: Date, linkedBill: string): Promise<void> => {
     const supabase = createClient();
     console.log("IN Creating Bill Form")

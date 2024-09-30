@@ -101,36 +101,34 @@ const UnassignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bi
     );
   };
 
-  const handleAssignUsers = async () => {
+  const handleUnassignUsers = async () => {
     //console.log("Assigned Users:", selectedUsers);
     if (selectedUsers.length === 0) {
-        console.error("No users selected to assign the bill to");
+        console.error("No users selected to unassign the bill to");
         return;
     }
-      try {
-        // Call the createBillForUsers function from billAction
-        await billAction.createBillForUsers(selectedUsers, biller, amount, description, due_date, linkedBill);
-        console.log("Bills successfully assigned to users:", selectedUsers);
 
-        // Fetch the current assigned users from the linkedBill (admin bill)
-        const { assigned_users: currentAssignedUsers } = await billAction.fetchAdminBillById(linkedBill); // Assume you have a function to fetch the bill by ID
-
-        // Map selected user IDs to usernames and filter out any null values
-        const selectedUsernames = selectedUsers.map(userId => {
-            const user = users.find(u => u.id === userId);
-            return user ? user.owner_username : null;
-        }).filter(Boolean); // Remove any null values
-
-        // If currentAssignedUsers exists, split it into an array; otherwise, use an empty array
-        const existingUserArray = currentAssignedUsers && currentAssignedUsers.length > 0
-            ? currentAssignedUsers.split(",").map((user: string) => user.trim())
-            : [];
-
-        // Merge and deduplicate both existing and new assigned users
-        const updatedAssignedUsersArray = [...existingUserArray, ...selectedUsernames].filter((value, index, self) => self.indexOf(value) === index);
-
-        // Join the array back into a string
-        const updatedAssignedUsers = updatedAssignedUsersArray.join(", ");
+    try {
+      // Call unassignAdminBill to remove references from "bills" and "messages" tables
+      await billAction.unassignAdminBill(selectedUsers, linkedBill); // Assumes this will handle removal from "bills" and "messages"
+      console.log("Users successfully unassigned:", selectedUsers);
+  
+      // Fetch the current assigned users from the admin bill (linkedBill)
+      const { assigned_users: currentAssignedUsers } = await billAction.fetchAdminBillById(linkedBill);
+  
+      // Split currentAssignedUsers into an array of "username|id" values
+      const existingUserArray = currentAssignedUsers
+        ? currentAssignedUsers.split(",").map((user: string) => user.trim())
+        : [];
+  
+      // Filter out the selected users (unassigned users) from the existingUserArray
+      const updatedAssignedUsersArray = existingUserArray.filter((assignedUser: string) => {
+        const [, id] = assignedUser.split("|"); // Get the user ID from the format "username|id"
+        return !selectedUsers.includes(id); // Remove users that are being unassigned
+      });
+  
+      // Join the remaining users back into a string for the assigned_users column
+      const updatedAssignedUsers = updatedAssignedUsersArray.join(", ");
 
         // Update the assigned users in the Admin Bill
         await billAction.updateAssignedUsers(linkedBill, updatedAssignedUsers);
@@ -227,7 +225,7 @@ const UnassignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bi
 
         {/* Assign Button */}
         <DialogFooter>
-          <Button onClick={handleAssignUsers} className="w-full bg-blue-gradient hover:bg-blue-200 text-white-100">
+          <Button onClick={handleUnassignUsers} className="w-full bg-blue-gradient hover:bg-blue-200 text-white-100">
             Unassign Users
           </Button>
         </DialogFooter>
