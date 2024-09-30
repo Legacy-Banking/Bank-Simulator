@@ -13,43 +13,44 @@ import {
 // import TransactionDetailSheet from './TransactionDetailSheet'; // Import the sheet component
 import { cn, formatAmount, formatDateTime } from "@/lib/utils";
 import { Button } from '@/components/ui/button';
-import TrashAccountDetailSheet from './TrashAccountDetailSheet';
 import { boolean } from 'zod';
-import EditAccountDetailSheet from './EditAccountDetailSheet';
 import PopUp from './PopUp';
 import { createClient } from '@/utils/supabase/client';
 import { accountAction } from '@/utils/accountAction';
 import OpenUserAccountsDetailSheet from './OpenUserAccountsDetailSheet';
+import TrashUserDetailSheet from './TrashUserDetailSheet';
+import EditUserDetailSheet from './EditUserDetailSheet';
 
-// AccountsTable component
-export const AccountsTable = ({ accounts = [], setShowUpdatePopUp, setShowDeletePopUp }: AccountsTableProps) => {
-  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
-  const [deleteAccountWindow, setDeleteAccountWindow] = useState(false);
-  const [editAccountWindow, setEditAccountWindow] = useState(false);
+// UsersTable component
+export const UsersTable = ({ accounts = [], setShowUpdatePopUp, setShowDeletePopUp, onEditStatus }: UsersTableProps) => {
+  const [selectedUser, setSelectedUser] = useState<Account | null>(null);
+  const [deleteUserWindow, setDeleteUserWindow] = useState(false);
+  const [editUserWindow, setEditUserWindow] = useState(false);
   const [openUserAccountsWindow, setOpenUserAccountsWindow] = useState(false);
   const [selectedUserAccounts, setSelectedUserAccounts] = useState<Account []>([]);
-  const [accountBalances, setAccountBalances] = useState<{ [key: string]: number }>({}); // State to store balances by user ID
+  const [userBalances, setUserBalances] = useState<{ [key: string]: number }>({}); // State to store balances by user ID
 
-  const toggleDeleteAccountWindow = () => {
-    setDeleteAccountWindow((prevState) => !prevState);
+  const toggleDeleteUserWindow = (acc : Account | null) => {
+    setDeleteUserWindow((prevState) => !prevState);
+    setSelectedUser(acc);
   };
 
-  const toggleEditAccountWindow = (acc : Account | null) => {
+  const toggleEditUserWindow = (acc : Account | null) => {
       
-    setEditAccountWindow((prevState) => !prevState);
-    setSelectedAccount(acc);
+    setEditUserWindow((prevState) => !prevState);
+    setSelectedUser(acc);
     
   };
 
-  const deleteAccount = () => {
-    // currently empty but this will delete the selected account
-    toggleDeleteAccountWindow();
+  const deleteUser = () => {
+    toggleDeleteUserWindow(null);
     setShowDeletePopUp(true);
+    onEditStatus();
   }
-  const updateAccount = () => {
-    toggleEditAccountWindow(null);
+  const updateUser = () => {
+    toggleEditUserWindow(null);
     setShowUpdatePopUp(true);
-    // currently empty but this will update the selected account
+    onEditStatus();
   }
   const toggleOpenUserAccountsWindow = async (userId : string | null) => {
     setOpenUserAccountsWindow((prevState) => !prevState)
@@ -60,8 +61,8 @@ export const AccountsTable = ({ accounts = [], setShowUpdatePopUp, setShowDelete
    // Fetch and set the total balance for a user
    const fetchTotalBalance = async (userId: string) => {
     try {
-      const balance = await accountAction.fetchAccountTotalBalance(userId);
-      setAccountBalances((prevBalances) => ({
+      const balance = await accountAction.fetchAccountsTotalBalance(userId);
+      setUserBalances((prevBalances) => ({
         ...prevBalances,
         [userId]: balance,
       }));
@@ -73,7 +74,7 @@ export const AccountsTable = ({ accounts = [], setShowUpdatePopUp, setShowDelete
   useEffect(() => {
     // Fetch total balances for all accounts when the component mounts
     accounts.forEach((acc: Account) => {
-      if (!accountBalances[acc.owner]) {
+      if (!userBalances[acc.owner]) {
         fetchTotalBalance(acc.owner);
       }
     });
@@ -99,9 +100,11 @@ export const AccountsTable = ({ accounts = [], setShowUpdatePopUp, setShowDelete
             return (
               <TableRow
                 key={acc.id}
-                onClick={() => toggleOpenUserAccountsWindow(acc.owner)}
               >
-                <TableCell className="max-w-[200px] pl-8 pr-10">
+                <TableCell className="max-w-[200px] pl-8 pr-10" 
+                onClick={() => toggleOpenUserAccountsWindow(acc.owner)}
+                
+                >
                   <div className="flex items-center gap-3">
                     <h1 className="font-inter text-16 truncate font-semibold text-[#344054] cursor-pointer">
                       {/* Show from_account for positive amounts, and to_account or to_biller based on whether to_account is null */}
@@ -111,21 +114,22 @@ export const AccountsTable = ({ accounts = [], setShowUpdatePopUp, setShowDelete
                 </TableCell>
 
 
-                <TableCell className="font-inter font-bold">
+                <TableCell className="font-inter font-bold"
+                onClick={() => toggleOpenUserAccountsWindow(acc.owner)}
+                
+                >
                   <span className='cursor-pointer'>
-                    {formatAmount(accountBalances[acc.owner])}
+                    {formatAmount(userBalances[acc.owner])}
                   </span>
                 </TableCell>
 
                 <TableCell className="font-inter min-w-32 pl-2 pr-10 text-[#475467] ">
-                  <span className='cursor-pointer'>
                     {lastLogin.toDateString()}
-                  </span>
                 </TableCell>
                 
                 <TableCell >
-                    <Button onClick={() => toggleEditAccountWindow(acc)} className="p-0 ml-4"> <img src="../Edit.png" alt="Edit button" /></Button>
-                    <Button onClick={toggleDeleteAccountWindow} className="p-0 ml-4"> <img src="../Delete.png" alt="Delete button" /></Button>
+                    <Button onClick={() => toggleEditUserWindow(acc)} className="p-0 ml-4"> <img src="../Edit.png" alt="Edit button" /></Button>
+                    <Button onClick={() => toggleDeleteUserWindow(acc)} className="p-0 ml-4"> <img src="../Delete.png" alt="Delete button" /></Button>
                 </TableCell>
               </TableRow>
             );
@@ -133,17 +137,17 @@ export const AccountsTable = ({ accounts = [], setShowUpdatePopUp, setShowDelete
         </TableBody>
       </Table>
 
-      <TrashAccountDetailSheet
-        account={selectedAccount}
-        status={deleteAccountWindow}
-        onClose={toggleDeleteAccountWindow}
-        deleteAccount={deleteAccount}
+      <TrashUserDetailSheet
+        account={selectedUser}
+        status={deleteUserWindow}
+        onClose={() => toggleDeleteUserWindow(selectedUser)}
+        deleteUser={deleteUser}
       />
-      <EditAccountDetailSheet
-        account={selectedAccount}
-        status={editAccountWindow}
-        onClose={() => toggleEditAccountWindow(selectedAccount)}
-        updateAccount={updateAccount}
+      <EditUserDetailSheet
+        account={selectedUser}
+        status={editUserWindow}
+        onClose={() => toggleEditUserWindow(selectedUser)}
+        updateUser={updateUser}
         />
       <OpenUserAccountsDetailSheet
       accounts={selectedUserAccounts}

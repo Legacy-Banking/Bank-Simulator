@@ -26,7 +26,7 @@ export const accountAction = {
         }
         return data || [];
     },
-    fetchAccountTotalBalance: async (user_id: string): Promise<number> => {
+    fetchAccountsTotalBalance: async (user_id: string): Promise<number> => {
         const supabase = createClient();
 
         // Sum the balance of all accounts for a given user

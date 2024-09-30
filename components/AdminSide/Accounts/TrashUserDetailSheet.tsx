@@ -12,16 +12,18 @@ import { cn, formatAmount, formatDateTime } from "@/lib/utils"
 import { createClient } from '@/utils/supabase/client';
 
 // Define the props type for the component
-type AccountDetailSheetProps = {
+type UserDetailSheetProps = {
   account: Account | null,
   status: boolean;
   onClose: () => void;
-  deleteAccount: () => void;
+  deleteUser: () => void;
 };
 
 
 
-const TrashAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, status, onClose, deleteAccount }) => {
+const TrashUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status, onClose, deleteUser }) => {
+  if (!status) return null;
+
   const [error, setError] = useState('');
 
   const supabase = createClient();
@@ -30,23 +32,48 @@ const TrashAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, s
     if (!ownerUsername) {
       return;
     }
-    const { data, error } = await supabase
-      .from('account') // Replace with your table name
-      .delete()
-      .eq('owner_username', ownerUsername); // Match by owner username
   
-    if (error) {
-      setError(error.message);
-      console.error('Error deleting accounts:', error.message);
-    } else {
-      setError('');
-      console.log('Accounts deleted:', data);
-      deleteAccount(); // Call parent function to refresh data
+    try {
+      // Delete cards based on owner_username first (since they have a foreign key constraint)
+      const { data: cardData, error: cardError } = await supabase
+        .from('cards') // Replace with your cards table name
+        .delete()
+        .eq('owner_username', ownerUsername); // Match by owner_username
+  
+      if (cardError) {
+        throw new Error(`Error deleting cards: ${cardError.message}`);
+      } else {
+        console.log('Cards deleted:', cardData);
+      }
+  
+      // Now delete accounts based on owner_username
+      const { data: accountData, error: accountError } = await supabase
+        .from('account') // Replace with your accounts table name
+        .delete()
+        .eq('owner_username', ownerUsername); // Match by owner_username
+  
+      if (accountError) {
+        throw new Error(`Error deleting accounts: ${accountError.message}`);
+      } else {
+        console.log('Users deleted:', accountData);
+      }
+  
+      // Call parent function or refresh data after deletion
+      deleteUser(); // Assuming you have a function to refresh the data
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error.message);
+        console.error('Error occurred: ', error.message);
+      } else {
+        console.error('Unexpected error occurred', error);
+      }
     }
   }
   
   
-  if (!status) return null;
+  
+  
+  
 
   return (
     <Dialog open={!!status} onOpenChange={onClose}>
@@ -54,7 +81,8 @@ const TrashAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, s
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold font-inter mb-10">Confirm Delete</DialogTitle>
           <DialogDescription className="text-base font-inter text-[#191919] border-blue-25 border-y-2 py-4">
-          Are you sure you want to delete user permanently. <br />
+          Are you sure you want to delete user <span className="text-blue-500">{account?.owner_username}</span> permanently? <br />
+          <br />
           You can’t undo this action.
           </DialogDescription>
         </DialogHeader>
@@ -77,4 +105,4 @@ const TrashAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, s
   );
 };
 
-export default TrashAccountDetailSheet;
+export default TrashUserDetailSheet;

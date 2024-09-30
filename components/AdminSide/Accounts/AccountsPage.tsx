@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import SearchBar from '@/components/SearchBar';
 import { createClient } from '@/utils/supabase/client';
-import { AccountsTable } from './AccountsTable';
+import { UsersTable } from './UsersTable';
 import { Pagination } from '@/components/Pagination';
 import PopUp from './PopUp';
 
@@ -45,17 +45,17 @@ const AccountsPage = () => {
 
   // Fetching data from Supabase
   const supabase = createClient();
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const { data, error } = await supabase.from('account').select('*');
+  const fetchUsers = async () => {
+    const { data, error } = await supabase.from('account').select('*');
 
-      if (error) {
-        setError(error.message);
-      } else {
-        setAccounts(data || []);
-      }
-      setLoading(false);
-    };
+    if (error) {
+      setError(error.message);
+    } else {
+      setAccounts(data || []);
+    }
+    setLoading(false);
+  };
+  useEffect(() => {
 
     fetchUsers();
   }, []); // Run once when the component mounts
@@ -85,10 +85,11 @@ const AccountsPage = () => {
             <SearchBar inputValue={inputValue} setInputValue={setInputValue} setPage={setPage}/>
           </div>
           <section className="flex w-full flex-col mt-6 bg-white-100 rounded-b-3xl">
-            <AccountsTable
+            <UsersTable
               accounts={currentAccounts}
               setShowUpdatePopUp={setShowUpdatePopUp}
               setShowDeletePopUp={setShowDeletePopUp}
+              onEditStatus={fetchUsers}
             />
 
             {totalPages > 1 && (
