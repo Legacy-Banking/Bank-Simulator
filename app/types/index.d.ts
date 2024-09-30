@@ -96,6 +96,7 @@ declare interface Bill {
   status: string;
   invoice_number: string;
   reference_number: string;
+  linked_bill: string;
 
   invoice_date: string;
   billed_to: string;
@@ -110,10 +111,12 @@ declare interface AdminBill {
   description: string;
   amount: number;
   due_date: Date;
-  invoice_number: string;
-  reference_number: string;
-  biller_code: string;
-  assigned_users?: { name: string; status: 'overdue' | 'pending' | 'paid' }[];  // Add this if it should exist
+  assigned_users: string;
+
+}
+
+interface AdminBillWithBiller extends AdminBill {
+  biller: Biller;
 }
 
 declare interface BillDetails {
@@ -147,6 +150,7 @@ declare interface Message {
   read: boolean;
   type: string;
   bill_id: string;
+  linked_bill: string;
 }
 
 declare interface Card {

@@ -34,7 +34,7 @@ const TrashAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ status, on
 
         {/* Footer with Close button */}
         <DialogFooter className="mt-8 flex ">
-            <Button onClick={onClose} className="grow uppercase font-inter border-2 hover:bg-slate-200 tracking-wider">Cancel</Button>
+            <Button onClick={onClose} className="grow uppercase font-inter border-2 border-gray-300 hover:bg-slate-200 tracking-wider">Cancel</Button>
           <Button onClick={deleteAccount} className="grow uppercase font-inter tracking-wider bg-blue-25 hover:bg-blue-200 text-white-100">Delete</Button>
         </DialogFooter>
       </DialogContent>

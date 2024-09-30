@@ -97,7 +97,7 @@ export const billAction = {
         const messageDescription = `A new bill of $${amount} has been assigned to you from ${biller.name}. Please pay by ${newBill.due_date!.toLocaleDateString()}.`;
 
         try {
-            await inboxAction.createMessage(biller.name, user_id, messageDescription, 'bill', invoiceNumber);
+            await inboxAction.createMessage(biller.name, user_id, messageDescription, 'bill', invoiceNumber, "");
             console.log('Message sent to user about new bill');
         } catch (messageError) {
             console.error('Failed to send message to user:', messageError);
@@ -185,52 +185,239 @@ export const billAction = {
         }
     },
 
-    // New createAdminBill function
-    createAdminBill: async (biller: Biller, description: string, amount: number, assignedUsers: { name: string; status: 'overdue' | 'pending' | 'paid' }[]) => {
+    // fetchAdminBills: async (): Promise<AdminBill[]> => {
+    //     const supabase = createClient();
+    //     const { data, error } = await supabase
+    //       .from('admin_bills') 
+    //       .select('*');
+
+    //     if (error) {
+    //       throw new Error(`Failed to fetch admin bills: ${error.message}`);
+    //     }
+
+    //     return data;
+    //   },
+
+    fetchAdminBills: async (): Promise<AdminBillWithBiller[]> => {
         const supabase = createClient();
 
-        // Fetch biller_code from the billers table
-        const billerCode = await fetchBillerCode(biller.name);
+        const { data, error } = await supabase
+            .from('admin_bills')
+            .select(`
+            id, 
+            amount, 
+            description, 
+            due_date, 
+            biller: biller ( id, name, biller_code, biller_details )
+          `);
 
-        const newAdminBill: Partial<AdminBill> = {
-            biller: biller.name,
-            description: description,
-            amount: amount,
-            due_date: calculateDueDate(),
-            biller_code: billerCode, // Use the fetched biller_code here
-            assigned_users: assignedUsers,
-            created_at: new Date(),
+        if (error) {
+            throw new Error(`Failed to fetch bills: ${error.message}`);
+        }
+
+        // Ensure each bill's 'biller' field is a single object, not an array
+        const formattedData = data.map((bill: any) => ({
+            ...bill,
+            biller: Array.isArray(bill.biller) ? bill.biller[0] : bill.biller // Extract the first element if biller is an array
+        }));
+
+        return formattedData as AdminBillWithBiller[]; // Cast to AdminBillWithBiller[]
+    },
+
+
+    createAdminBill: async (
+        biller_id: string,
+        amount: number,
+        due_date: Date,
+        description: string
+    ): Promise<void> => {
+        const supabase = createClient();
+
+        const { name: biller_name } = await billerAction.fetchBillerById(biller_id);
+
+        const newBill = {
+            biller: biller_name,      // Reference to the biller
+            amount: amount,            // Amount of the bill
+            due_date: due_date,        // Due date of the bill
+            description: description,  // Optional bill description
+            created_at: new Date(),    // Timestamp of when the bill was created
         };
 
-        // Insert the new admin bill into the database
-        const { data, error } = await supabase.from('admin_bills').insert(newAdminBill);
+        const { data, error } = await supabase
+            .from('admin_bills')       // Insert into 'admin_bills' table
+            .insert([newBill]);        // Insert a new bill row
 
         if (error) {
             throw new Error(`Failed to create admin bill: ${error.message}`);
         }
 
-        console.log('New admin bill created:', data);
+        console.log("Admin bill created:", data);
     },
 
-    fetchAdminBills: async (): Promise<AdminBill[]> => {
+    deleteAdminBillWithReferences: async (billId: string): Promise<void> => {
         const supabase = createClient();
 
-        const { data: bills, error } = await supabase
-            .from('admin_bills')
-            .select('*');
+        try {
+            // Start a transaction to ensure all deletions happen atomically
+            const { error: deleteBillError } = await supabase
+                .from('bills')
+                .delete()
+                .match({ linked_bill: billId });
 
-        if (error) {
-            throw new Error(`Failed to fetch admin bills: ${error.message}`);
+            if (deleteBillError) {
+                throw new Error(`Failed to delete bills with linked bill: ${deleteBillError.message}`);
+            }
+
+            const { error: deleteMessagesError } = await supabase
+                .from('messages')
+                .delete()
+                .match({ linked_bill: billId });
+
+            if (deleteMessagesError) {
+                throw new Error(`Failed to delete messages with linked bill: ${deleteMessagesError.message}`);
+            }
+
+            // Finally, delete the admin bill itself
+            const { error: deleteAdminBillError } = await supabase
+                .from('admin_bills') // Assuming your admin bill table is called 'admin_bills'
+                .delete()
+                .eq('id', billId);
+
+            if (deleteAdminBillError) {
+                throw new Error(`Failed to delete admin bill: ${deleteAdminBillError.message}`);
+            }
+
+            console.log(`Successfully deleted admin bill and its related entries for bill ID: ${billId}`);
+
+        } catch (error) {
+            console.error('Failed to delete admin bill and its references:', error);
+            throw error; // Propagate the error to be caught in the calling function
         }
-
-        // Fetch biller_code for each bill
-        const adminBillsWithBillerCode = await Promise.all(bills.map(async (bill) => {
-            const billerCode = await fetchBillerCode(bill.biller);
-            return { ...bill, biller_code: billerCode };
-        }));
-
-        console.log('Fetched admin bills with biller code:', adminBillsWithBillerCode);
-        return adminBillsWithBillerCode;
     },
 
+    unassignAdminBill: async (selectedUsers: string[], linkedBill: string) => {
+        const supabase = createClient();
+
+        try {
+            // Remove user references in the "bills" table
+            await supabase
+                .from("bills")
+                .delete()
+                .in("billed_user", selectedUsers) // assuming user_id is the field for users in "bills" table
+                .eq("linked_bill", linkedBill);
+
+            // Remove user references in the "messages" table
+            await supabase
+                .from("messages")
+                .delete()
+                .in("to_user", selectedUsers) // assuming user_id is the field for users in "messages" table
+                .eq("linked_bill", linkedBill);
+
+            console.log("References successfully removed from bills and messages");
+        } catch (error) {
+            if (error instanceof Error) {
+                console.error("Failed to unassign users:", error.message);
+            } else {
+                console.error("Unknown error occurred:", error);
+            }
+            throw error;
+        }
+    },
+
+    createBillForUsers: async (user_ids: string[], biller: Biller, amount: number, description: string, dueDate: Date, linkedBill: string): Promise<void> => {
+        const supabase = createClient();
+        console.log("IN Creating Bill Form")
+        for (const user_id of user_ids) {
+            try {
+                // Fetch the reference number from user_billers if it exists
+                let referenceNumber = await billerAction.fetchReferenceNumberByBillerName(user_id, biller.name);
+
+                // If no reference number found, generate a new one
+                if (!referenceNumber) {
+                    referenceNumber = referenceNumberGenerator();
+                    // Add this reference number to the user's biller_reference list
+                    await billerAction.addReferenceNumber(user_id, biller.name, referenceNumber);
+                }
+
+                // Generate a unique invoice number for this bill
+                const invoiceNumber = await generateUniqueInvoiceNumber();
+
+                // Create the new bill object
+                const newBill: Partial<Bill> = {
+                    billed_user: user_id,
+                    from: biller.name,
+                    description: description,
+                    amount: amount,
+                    paid_on: new Date(),
+                    status: 'unpaid',
+                    created_at: new Date(),
+                    due_date: dueDate,
+                    invoice_number: invoiceNumber,
+                    reference_number: referenceNumber,
+                    linked_bill: linkedBill,
+                };
+
+                // Insert the bill into the 'bills' table
+                const { data, error } = await supabase.from('bills').insert(newBill);
+
+                if (error) {
+                    throw new Error(`Failed to create bill for user ${user_id}: ${error.message}`);
+                }
+
+                // Send a message to the user inbox about the new bill
+                const messageDescription = `A new bill of $${amount} has been assigned to you from ${biller.name}. Please pay by ${newBill.due_date!.toLocaleDateString()}.`;
+
+                try {
+                    await inboxAction.createMessage(biller.name, user_id, messageDescription, 'bill', invoiceNumber, linkedBill);
+                    console.log(`Message sent to user ${user_id} about new bill.`);
+                } catch (messageError) {
+                    console.error(`Failed to send message to user ${user_id}:`, messageError);
+                    // Handle the message error gracefully if necessary
+                }
+
+                console.log(`Bill created for user ${user_id}:`, data);
+            } catch (err) {
+                console.error(`Failed to create bill for user ${user_id}:`, err);
+            }
+        }
+    },
+
+    updateAssignedUsers: async (billId: string, assignedUsers: string) => {
+        const supabase = createClient();
+
+        const { error } = await supabase
+            .from('admin_bills')
+            .update({ assigned_users: assignedUsers })
+            .eq('id', billId);
+
+        if (error) {
+            throw new Error(`Failed to update assigned users for bill ${billId}: ${error.message}`);
+        }
+    },
+
+    // Fetch admin bill by its ID
+    fetchAdminBillById: async (billId: string) => {
+        const supabase = createClient();
+        try {
+            const { data, error } = await supabase
+                .from('admin_bills') // Replace 'admin_bills' with the actual table name in your database
+                .select('id, biller, amount, description, due_date, assigned_users')
+                .eq('id', billId)
+                .single(); // We expect a single row since we are fetching by ID
+
+            if (error) {
+                throw new Error(`Failed to fetch admin bill: ${error.message}`);
+            }
+
+            if (!data) {
+                throw new Error('No admin bill found with the given ID');
+            }
+
+            return data; // The 'data' will contain the fields from the row in the admin_bills table
+
+        } catch (error) {
+            console.error('Error fetching admin bill by ID:', error);
+            throw error;
+        }
+    },
 };
