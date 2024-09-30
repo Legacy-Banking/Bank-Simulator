@@ -14,14 +14,14 @@ import { createClient } from '@/utils/supabase/client';
 import { create } from 'domain';
 
 // Define the props type for the component
-type AccountDetailSheetProps = {
+type UserDetailSheetProps = {
   account: Account | null,
   status: boolean;
   onClose: () => void;
-  updateAccount: () => void;
+  updateUser: () => void;
 };
 
-const EditAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, status, onClose , updateAccount}) => {
+const EditUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status, onClose , updateUser}) => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
@@ -115,4 +115,4 @@ const handlePasswordUpdate = async () => {
   );
 };
 
-export default EditAccountDetailSheet;
+export default EditUserDetailSheet;
