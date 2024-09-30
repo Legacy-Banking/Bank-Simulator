@@ -31,7 +31,7 @@ const TrashAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, s
       return;
     }
     const { data, error } = await supabase
-      .from('accounts') // Replace with your table name
+      .from('account') // Replace with your table name
       .delete()
       .eq('owner_username', ownerUsername); // Match by owner username
   

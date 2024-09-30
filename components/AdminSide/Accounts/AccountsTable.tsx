@@ -17,13 +17,17 @@ import TrashAccountDetailSheet from './TrashAccountDetailSheet';
 import { boolean } from 'zod';
 import EditAccountDetailSheet from './EditAccountDetailSheet';
 import PopUp from './PopUp';
+import { createClient } from '@/utils/supabase/client';
+import { accountAction } from '@/utils/accountAction';
+import OpenUserAccountsDetailSheet from './OpenUserAccountsDetailSheet';
 
 // AccountsTable component
 export const AccountsTable = ({ accounts = [], setShowUpdatePopUp, setShowDeletePopUp }: AccountsTableProps) => {
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const [deleteAccountWindow, setDeleteAccountWindow] = useState(false);
   const [editAccountWindow, setEditAccountWindow] = useState(false);
-
+  const [openUserAccountsWindow, setOpenUserAccountsWindow] = useState(false);
+  const [selectedUserAccounts, setSelectedUserAccounts] = useState<Account []>([]);
   const toggleDeleteAccountWindow = () => {
     setDeleteAccountWindow((prevState) => !prevState);
   };
@@ -45,8 +49,12 @@ export const AccountsTable = ({ accounts = [], setShowUpdatePopUp, setShowDelete
     setShowUpdatePopUp(true);
     // currently empty but this will update the selected account
   }
-
-
+  const toggleOpenUserAccountsWindow = async (userId : string | null) => {
+    setOpenUserAccountsWindow((prevState) => !prevState)
+    if (userId) {
+      setSelectedUserAccounts(await accountAction.fetchAccountsbyUserId(userId));
+    }
+  }
 
   return (
     <>
@@ -54,7 +62,7 @@ export const AccountsTable = ({ accounts = [], setShowUpdatePopUp, setShowDelete
         <TableHeader >
           <TableRow className="bg-blue-200 text-white-200">
             <TableHead className="font-inter px-8 rounded-tl-2xl font-normal tracking-wider">Account Name</TableHead>
-            <TableHead className="font-inter px-4 font-normal tracking-wider">Balance</TableHead>
+            <TableHead className="font-inter px-4 font-normal tracking-wider">Total Balance</TableHead>
             <TableHead className="font-inter px-2 font-normal tracking-wider">Last Login</TableHead>
             <TableHead className="font-inter px-8 rounded-tr-2xl font-normal tracking-wider">Action</TableHead>
           </TableRow>
@@ -69,10 +77,11 @@ export const AccountsTable = ({ accounts = [], setShowUpdatePopUp, setShowDelete
             return (
               <TableRow
                 key={acc.id}
+                onClick={() => toggleOpenUserAccountsWindow(acc.owner)}
               >
                 <TableCell className="max-w-[200px] pl-8 pr-10">
                   <div className="flex items-center gap-3">
-                    <h1 className="font-inter text-16 truncate font-semibold text-[#344054]">
+                    <h1 className="font-inter text-16 truncate font-semibold text-[#344054] cursor-pointer">
                       {/* Show from_account for positive amounts, and to_account or to_biller based on whether to_account is null */}
                       {accountName}
                     </h1>
@@ -81,11 +90,15 @@ export const AccountsTable = ({ accounts = [], setShowUpdatePopUp, setShowDelete
 
 
                 <TableCell className="font-inter font-bold">
-                  {formatAmount(balance)}
+                  <span className='cursor-pointer'>
+                    {formatAmount(balance)}
+                  </span>
                 </TableCell>
 
-                <TableCell className="font-inter min-w-32 pl-2 pr-10 text-[#475467]">
-                  {lastLogin.toDateString()}
+                <TableCell className="font-inter min-w-32 pl-2 pr-10 text-[#475467] ">
+                  <span className='cursor-pointer'>
+                    {lastLogin.toDateString()}
+                  </span>
                 </TableCell>
                 
                 <TableCell >
@@ -110,7 +123,11 @@ export const AccountsTable = ({ accounts = [], setShowUpdatePopUp, setShowDelete
         onClose={() => toggleEditAccountWindow(selectedAccount)}
         updateAccount={updateAccount}
         />
-
+      <OpenUserAccountsDetailSheet
+      accounts={selectedUserAccounts}
+      status={openUserAccountsWindow}
+      onClose={() => toggleOpenUserAccountsWindow(null)}
+      />
     </>
   );
 };
