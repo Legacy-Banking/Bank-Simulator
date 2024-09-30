@@ -1,4 +1,5 @@
 import React from 'react'
+import YouTubeVideo from '@/components/YoutubeVideo'
 
 const Resources = () => {
   return (
@@ -9,6 +10,7 @@ const Resources = () => {
         <p className="text-xl font-medium text-[#FFFFFF] max-w-6xl mx-auto">
           This page will have information on how to navigate and use the online banking simulator. This will include tutorial videos of the website.
         </p>
+        <YouTubeVideo videoUrl="https://www.youtube.com/watch?v=fTTGALaRZoc" />
       </div>
     </section>
   )

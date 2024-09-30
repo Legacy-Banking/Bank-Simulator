@@ -1,6 +1,7 @@
 import { createClient } from "./supabase/client";
 import { referenceNumberGenerator } from './accbsbGenerator';
 import { bpayAction } from "./bpayAction";
+import { billerAction } from "./billerAction";
 import { transactionAction } from "./transactionAction";
 
 enum ScheduleType {
@@ -239,7 +240,8 @@ class ScheduleAction {
     private async executeBpay(schedule: any): Promise<void> {
         const { data:biller, error:billerError } = await this.supabase.from('billers').select('*').eq('biller_code', schedule.biller_code).single();
         if(biller){
-            await bpayAction.payBills(schedule.from_account,schedule.biller_name, schedule.biller_code, schedule.amount, schedule.description, schedule.schedule_ref, schedule.related_user[0]);
+            const billerReference=await billerAction.fetchReferenceNumberByBillerName(schedule.related_user[0],schedule.biller_name);
+            await bpayAction.payBills(schedule.from_account,schedule.biller_name, schedule.biller_code, billerReference!, schedule.amount, schedule.description, schedule.related_user[0]);
             await this.supabase.from('schedule_payments').update({status: 'completed'}).eq('id', schedule.id);
         }
     }
@@ -289,7 +291,7 @@ class ScheduleAction {
         if (shouldCompleteSchedule) {
             await this.supabase.from('schedule_payments').update({ status: 'completed' }).eq('id', schedule.id);
         } else {
-            await this.supabase.from('schedule_payments').update({ pay_at: this.formatToISOString(next_pay_at) }).eq('id', schedule.id);
+            await this.supabase.from('schedule_payments').update({ pay_at: this.formatToISOString(next_pay_at) ,status:'pending'}).eq('id', schedule.id);
         }
     }
     
