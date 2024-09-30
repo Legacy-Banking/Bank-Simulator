@@ -12,7 +12,6 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@
 import { useAppSelector } from "@/app/store/hooks"; // Import for user data
 
 
-
 // Define the props for the component
 type AdminBillDetailProps = {
     bill: AdminBill | null;
@@ -20,8 +19,12 @@ type AdminBillDetailProps = {
     onClose: () => void;
 };
 
-const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, assignedUsers, onClose }) => {
+const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, assignedUsers = [], onClose }) => {
     if (!bill) return null;
+
+    console.log('Biller Code:', bill.biller_code);
+
+    const safeAssignedUsers = Array.isArray(assignedUsers) ? assignedUsers : [];
 
     const user = useAppSelector((state) => state.user);
 
@@ -38,8 +41,7 @@ const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, assignedUs
                 {/* Bill details on the left */}
                 <div className="flex flex-col lg:flex-row gap-4 mt-4">
                     <div className="lg:w-[60%]">
-                        {/* Pass bill directly since `bill.bill` is not valid */}
-                        <SheetDetails bill={bill} biller={{ name: bill.biller }}  // Construct a Partial<Biller> object with the name
+                        <SheetDetails bill={bill} biller={{ name: bill.biller, biller_code: bill.biller_code }}
                         />
                     </div>
 
@@ -54,23 +56,31 @@ const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, assignedUs
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {assignedUsers.map((user, index) => (
-                                    <TableRow key={index} className="bg-white rounded-lg shadow-sm mb-2">
-                                        <TableCell className="p-2">
-                                            <div className="flex items-center">
-                                                <span className="inline-block w-8 h-8 rounded-full bg-gray-200 mr-2"></span>
-                                                {user.name}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="p-2">
-                                            <span
-                                                className={`px-2 py-1 text-sm font-medium rounded-lg ${getStatusClass(user.status)}`}
-                                            >
-                                                {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
-                                            </span>
+                                {safeAssignedUsers.length > 0 ? (
+                                    safeAssignedUsers.map((user, index) => (
+                                        <TableRow key={index} className="bg-white rounded-lg shadow-sm mb-2">
+                                            <TableCell className="p-2">
+                                                <div className="flex items-center">
+                                                    <span className="inline-block w-8 h-8 rounded-full bg-gray-200 mr-2"></span>
+                                                    {user.name}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="p-2">
+                                                <span
+                                                    className={`px-2 py-1 text-sm font-medium rounded-lg ${getStatusClass(user.status)}`}
+                                                >
+                                                    {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+                                                </span>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={2} className="text-center p-4">
+                                            No users assigned.
                                         </TableCell>
                                     </TableRow>
-                                ))}
+                                )}
                             </TableBody>
                         </Table>
                     </div>

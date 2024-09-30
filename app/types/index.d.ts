@@ -111,7 +111,8 @@ declare interface AdminBill {
   amount: number;
   due_date: Date;
   invoice_number: string;
-  status: string;
+  reference_number: string;
+  biller_code: string;
   assigned_users?: { name: string; status: 'overdue' | 'pending' | 'paid' }[];  // Add this if it should exist
 }
 

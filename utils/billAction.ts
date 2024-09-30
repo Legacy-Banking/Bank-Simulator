@@ -4,6 +4,21 @@ import { number } from "zod";
 import { referenceNumberGenerator, generateUniqueInvoiceNumber, calculateDueDate } from "./accbsbGenerator"
 import { inboxAction } from "./inboxAction";
 
+const fetchBillerCode = async (billerName: string) => {
+    const supabase = createClient();
+    const { data, error } = await supabase
+        .from('billers')
+        .select('biller_code')
+        .eq('name', billerName)
+        .single(); // single() ensures you're only fetching one record
+
+    if (error) {
+        throw new Error(`Error fetching biller_code: ${error.message}`);
+    }
+
+    return data.biller_code;
+}
+
 export const billAction = {
     fetchBillsbyUserId: async (user_id: string): Promise<Bill[]> => {
         const supabase = createClient();
@@ -16,7 +31,7 @@ export const billAction = {
             throw new Error(error.message);
         }
         const sortedBills = billAction.sortBill(data);
-        
+
         return sortedBills;
     },
     sortBill: (bills: Bill[]): Bill[] => {
@@ -25,25 +40,25 @@ export const billAction = {
             partial: 2,
             pending: 3,
             paid: 4
-          };
-          
-          const sortedBills = bills.sort((a: Bill, b: Bill) => {
+        };
+
+        const sortedBills = bills.sort((a: Bill, b: Bill) => {
             // Sort by status based on the defined priority (lower number has higher priority)
             const statusA = statusPriority[a.status] || 5; // Default to 5 if status is unknown
             const statusB = statusPriority[b.status] || 5;
-          
+
             if (statusA !== statusB) {
-              return statusA - statusB;
+                return statusA - statusB;
             }
-          
+
             // Ensure due_date is a Date object before comparing
             const dueDateA = new Date(a.due_date);
             const dueDateB = new Date(b.due_date);
-          
+
             // Sort by due date (earliest first)
             return dueDateA.getTime() - dueDateB.getTime();
-          });
-          
+        });
+
         return sortedBills;
     },
 
@@ -70,8 +85,8 @@ export const billAction = {
             status: 'unpaid',
             created_at: new Date(),
             due_date: calculateDueDate(),
-            invoice_number: invoiceNumber, 
-            reference_number: referenceNumber, 
+            invoice_number: invoiceNumber,
+            reference_number: referenceNumber,
         };
 
         const { data, error } = await supabase.from('bills').insert(newBill);
@@ -111,75 +126,111 @@ export const billAction = {
 
         return billerDetails;
     },
-     billItemRandomPartition : (amount: number): number[] => {
+    billItemRandomPartition: (amount: number): number[] => {
         const numItems = Math.floor(Math.random() * 5) + 1; // Random number of items (1-5)
         let remainingAmount = amount;
         const items: number[] = [];
         const minAmount = parseFloat((amount * 0.3).toFixed(2)); // 30% floor for each item
-      
+
         for (let i = 0; i < numItems - 1; i++) {
-          // Generate a random amount between the 30% floor and remainingAmount - (numItems - i - 1) * minAmount
-          const maxAmount = remainingAmount - (numItems - i - 1) * minAmount;
-          const item = parseFloat(
-            (Math.random() * (maxAmount - minAmount) + minAmount).toFixed(2)
-          );
-          items.push(item);
-          remainingAmount -= item;
+            // Generate a random amount between the 30% floor and remainingAmount - (numItems - i - 1) * minAmount
+            const maxAmount = remainingAmount - (numItems - i - 1) * minAmount;
+            const item = parseFloat(
+                (Math.random() * (maxAmount - minAmount) + minAmount).toFixed(2)
+            );
+            items.push(item);
+            remainingAmount -= item;
         }
-      
+
         // Push the remaining amount as the last item
         items.push(parseFloat(remainingAmount.toFixed(2)));
-      
+
         return items;
     },
-    fetchAssignedBills: async (user_id:string,biller_name:string):Promise<Partial<Bill>[]>=>{
-        const supabase = createClient();
-        const {data,error} = await supabase
-        .from('bills')
-        .select('*')
-        .eq('billed_user',user_id)
-        .eq('from',biller_name)
-        .neq('status','paid')
-        .neq('status','pending');
-        if (error){
-            throw error;
-        } 
-        return data;
-    },
-      
-    updateBillStatus: async (bill:Partial<Bill>,status:string):Promise<void>=>{
-        const invoice_number = bill.invoice_number;
-        const supabase = createClient();
-        const {data,error} = await supabase
-        .from('bills')
-        .update({status})
-        .eq('invoice_number',invoice_number);
-        if (error){
-            throw error;
-        }
-    },
-    updateBillAmount: async (bill:Partial<Bill>,amount:number):Promise<void>=>{
-        const invoice_number = bill.invoice_number;
-        const supabase = createClient();
-        const {data,error} = await supabase
-        .from('bills')
-        .update({amount})
-        .eq('invoice_number',invoice_number);
-        if (error){
-            throw error;
-        }
-    },
-    
-    fetchAdminBills: async (): Promise<AdminBill[]> => {
+    fetchAssignedBills: async (user_id: string, biller_name: string): Promise<Partial<Bill>[]> => {
         const supabase = createClient();
         const { data, error } = await supabase
-          .from('admin_bills') 
-          .select('*');
-    
+            .from('bills')
+            .select('*')
+            .eq('billed_user', user_id)
+            .eq('from', biller_name)
+            .neq('status', 'paid')
+            .neq('status', 'pending');
         if (error) {
-          throw new Error(`Failed to fetch admin bills: ${error.message}`);
+            throw error;
         }
-    
         return data;
-      },
+    },
+
+    updateBillStatus: async (bill: Partial<Bill>, status: string): Promise<void> => {
+        const invoice_number = bill.invoice_number;
+        const supabase = createClient();
+        const { data, error } = await supabase
+            .from('bills')
+            .update({ status })
+            .eq('invoice_number', invoice_number);
+        if (error) {
+            throw error;
+        }
+    },
+    updateBillAmount: async (bill: Partial<Bill>, amount: number): Promise<void> => {
+        const invoice_number = bill.invoice_number;
+        const supabase = createClient();
+        const { data, error } = await supabase
+            .from('bills')
+            .update({ amount })
+            .eq('invoice_number', invoice_number);
+        if (error) {
+            throw error;
+        }
+    },
+
+    // New createAdminBill function
+    createAdminBill: async (biller: Biller, description: string, amount: number, assignedUsers: { name: string; status: 'overdue' | 'pending' | 'paid' }[]) => {
+        const supabase = createClient();
+
+        // Fetch biller_code from the billers table
+        const billerCode = await fetchBillerCode(biller.name);
+
+        const newAdminBill: Partial<AdminBill> = {
+            biller: biller.name,
+            description: description,
+            amount: amount,
+            due_date: calculateDueDate(),
+            biller_code: billerCode, // Use the fetched biller_code here
+            assigned_users: assignedUsers,
+            created_at: new Date(),
+        };
+
+        // Insert the new admin bill into the database
+        const { data, error } = await supabase.from('admin_bills').insert(newAdminBill);
+
+        if (error) {
+            throw new Error(`Failed to create admin bill: ${error.message}`);
+        }
+
+        console.log('New admin bill created:', data);
+    },
+
+    fetchAdminBills: async (): Promise<AdminBill[]> => {
+        const supabase = createClient();
+
+        const { data: bills, error } = await supabase
+            .from('admin_bills')
+            .select('*');
+
+        if (error) {
+            throw new Error(`Failed to fetch admin bills: ${error.message}`);
+        }
+
+        // Fetch biller_code for each bill
+        const adminBillsWithBillerCode = await Promise.all(bills.map(async (bill) => {
+            const billerCode = await fetchBillerCode(bill.biller);
+            return { ...bill, biller_code: billerCode };
+        }));
+
+        console.log('Fetched admin bills with biller code:', adminBillsWithBillerCode);
+        return adminBillsWithBillerCode;
+    },
+
 };
