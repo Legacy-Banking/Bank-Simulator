@@ -413,7 +413,7 @@ export const billAction = {
         try {
             const { data, error } = await supabase
                 .from('admin_bills') // Replace 'admin_bills' with the actual table name in your database
-                .select('id, biller, amount, description, due_date, assigned_users')
+                .select('id, biller, amount, description, due_date, assigned_users, created_at')
                 .eq('id', billId)
                 .single(); // We expect a single row since we are fetching by ID
 
@@ -433,6 +433,76 @@ export const billAction = {
         }
     },
 
+    // fetchAssignedUsersStatus: async (selectedBill: AdminBillWithBiller): Promise<{ name: string; status: string }[]> => {
+    //     const supabase = createClient();
+
+    //     try {
+    //         console.log('Selected Bill:', selectedBill);
+
+    //         // Get the assigned users string from the selected bill
+    //         const assignedUsersString = selectedBill.assigned_users || '';
+    //         console.log('Assigned users string:', assignedUsersString);
+
+    //         // Split the string by ',' to get individual pairs of username|userid
+    //         const assignedUserPairs = assignedUsersString ? assignedUsersString.split(',') : [];
+    //         console.log('Assigned User Pairs:', assignedUserPairs);
+
+    //         if (assignedUserPairs.length === 0) {
+    //             console.log('No assigned users found.');
+    //             return [];
+    //         }
+
+    //         // Fetch assigned user details for each user ID
+    //         const assignedUsersDetails = await Promise.all(
+    //             assignedUserPairs.map(async (pair) => {
+    //                 const [username, userId] = pair.split('|');
+
+    //                 // If the userId is a UUID (based on regex), fetch from the 'bills' table
+    //                 if (userId) {
+    //                     console.log('Fetching user by UUID:', userId);
+
+    //                     const { data: bill, error } = await supabase
+    //                         .from('bills') // Ensure this table exists
+    //                         .select('billed_user, status')
+    //                         .eq('billed_user', userId)
+    //                         .eq('linked_bill', selectedBill.id)  // Ensure it’s linked to the correct bill
+    //                         .single();
+
+    //                     if (error || !bill) {
+    //                         console.error(`Error fetching user ${userId}:`, error?.message);
+    //                         return { name: 'Unknown', status: 'unpaid' }; // Default to unpaid if error
+    //                     }
+
+    //                     // Return the billed user's name and status
+    //                     return {
+    //                         name: username || 'Unknown',
+    //                         status: bill.status || 'unpaid', // Default to unpaid if no status
+    //                     };
+    //                 } else {
+    //                     // Otherwise, treat the userId as a username
+    //                     console.log('Treating userId as a username:', userId);
+    //                     return {
+    //                         name: userId,  // Username directly from the string
+    //                         status: 'unpaid',  // Default status for usernames
+    //                     };
+    //                 }
+    //             })
+    //         );
+
+    //         // Filter out null values and ensure TypeScript understands the correct type
+    //         const validAssignedUsers = assignedUsersDetails.filter(
+    //             (user): user is { name: string; status: string } => user !== null
+    //         );
+
+    //         console.log('Final assigned users details:', validAssignedUsers);
+    //         return validAssignedUsers;
+
+    //     } catch (error) {
+    //         console.error('Error fetching assigned users:', error);
+    //         throw error;
+    //     }
+    // }
+
     fetchAssignedUsersStatus: async (selectedBill: AdminBillWithBiller): Promise<{ name: string; status: string }[]> => {
         const supabase = createClient();
 
@@ -442,7 +512,7 @@ export const billAction = {
             // Get the assigned users string from the selected bill
             const assignedUsersString = selectedBill.assigned_users || '';
             console.log('Assigned users string:', assignedUsersString);
-    
+
             // Split the string by ',' to get individual pairs of username|userid
             const assignedUserPairs = assignedUsersString ? assignedUsersString.split(',') : [];
             console.log('Assigned User Pairs:', assignedUserPairs);
@@ -452,55 +522,38 @@ export const billAction = {
                 return [];
             }
 
-            // Fetch assigned user details for each user ID
-            const assignedUsersDetails = await Promise.all(
-                assignedUserPairs.map(async (pair) => {
-                    const [username, userId] = pair.split('|');
+            // Optimize the query by only fetching once and filtering in the database
+            const userIds = assignedUserPairs.map(pair => pair.split('|')[1]).filter(id => id);
 
-                    // If the userId is a UUID (based on regex), fetch from the 'bills' table
-                    if (userId) {
-                        console.log('Fetching user by UUID:', userId);
+            // Query all users at once, avoiding multiple API calls
+            const { data: usersData, error } = await supabase
+                .from('bills')
+                .select('billed_user, status')
+                .in('billed_user', userIds)
+                .eq('linked_bill', selectedBill.id);  // Ensure it’s linked to the correct bill
 
-                        const { data: bill, error } = await supabase
-                            .from('bills') // Ensure this table exists
-                            .select('billed_user, status')
-                            .eq('billed_user', userId)
-                            .eq('linked_bill', selectedBill.id)  // Ensure it’s linked to the correct bill
-                            .single();
+            if (error) {
+                console.error('Error fetching users by UUID:', error.message);
+                return assignedUserPairs.map(() => ({ name: 'Unknown', status: 'unpaid' }));
+            }
 
-                        if (error || !bill) {
-                            console.error(`Error fetching user ${userId}:`, error?.message);
-                            return { name: 'Unknown', status: 'unpaid' }; // Default to unpaid if error
-                        }
+            // Match the users with their statuses and return
+            const assignedUsersDetails = assignedUserPairs.map(pair => {
+                const [username, userId] = pair.split('|');
+                const userStatus = usersData?.find(u => u.billed_user === userId)?.status || 'unpaid';
+                return {
+                    name: username || 'Unknown',
+                    status: userStatus
+                };
+            });
 
-                        // Return the billed user's name and status
-                        return {
-                            name: username || 'Unknown',
-                            status: bill.status || 'unpaid', // Default to unpaid if no status
-                        };
-                    } else {
-                        // Otherwise, treat the userId as a username
-                        console.log('Treating userId as a username:', userId);
-                        return {
-                            name: userId,  // Username directly from the string
-                            status: 'unpaid',  // Default status for usernames
-                        };
-                    }
-                })
-            );
-
-            // Filter out null values and ensure TypeScript understands the correct type
-            const validAssignedUsers = assignedUsersDetails.filter(
-                (user): user is { name: string; status: string } => user !== null
-            );
-
-            console.log('Final assigned users details:', validAssignedUsers);
-            return validAssignedUsers;
-
+            console.log('Final assigned users details:', assignedUsersDetails);
+            return assignedUsersDetails;
         } catch (error) {
             console.error('Error fetching assigned users:', error);
             throw error;
         }
     }
+
 
 };

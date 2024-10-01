@@ -18,15 +18,21 @@ const AdminBillsTable = () => {
   const [isAssignSheetOpen, setIsAssignSheetOpen] = useState(false);
   const [isUnassignSheetOpen, setIsUnassignSheetOpen] = useState(false);
   const [selectedBill, setSelectedBill] = useState<AdminBillWithBiller | null>(null);
+  const [isAdminBillSheetOpen, setIsAdminBillSheetOpen] = useState(false);
 
   // Function to open the admin bill details popup
   const openBillDetails = (bill: AdminBillWithBiller) => {
-    setSelectedBill(bill);
+    if (!isAssignSheetOpen && !isUnassignSheetOpen && !showDeleteDialog) {
+      setSelectedBill(bill);
+      setIsAdminBillSheetOpen(true);
+    }
   };
 
   // Function to close the admin bill details popup
   const closeBillDetails = () => {
+    setIsAdminBillSheetOpen(false);
     setSelectedBill(null);
+
   };
 
   useEffect(() => {
@@ -42,6 +48,20 @@ const AdminBillsTable = () => {
     };
     fetchData();
   }, []);
+
+  // Function to fetch updated assigned users for a specific bill
+  const fetchUpdatedAssignedUsers = async (billId: string) => {
+    try {
+      const updatedBill = await billAction.fetchAdminBillById(billId);
+      setBills((prevBills) =>
+        prevBills.map((bill) =>
+          bill.id === billId ? { ...bill, assigned_users: updatedBill.assigned_users } : bill
+        )
+      );
+    } catch (error) {
+      console.error("Error fetching updated assigned users:", error);
+    }
+  };
 
   // Delete the bill and remove it from the state
   const handleDelete = async () => {
@@ -127,13 +147,29 @@ const AdminBillsTable = () => {
   ];
 
   const handleAssignUserClick = (bill: AdminBillWithBiller) => {
+    closeBillDetails();
     setSelectedBill(bill); // Set the bill details for assignment
     setIsAssignSheetOpen(true); // Open the AssignUserSheet
   };
 
   const handleUnassignUserClick = (bill: AdminBillWithBiller) => {
+    closeBillDetails();
     setSelectedBill(bill); // Set the bill details for unassignment
     setIsUnassignSheetOpen(true); // Open the UnassignUserSheet
+  };
+
+  const handleDeleteClick = (bill: AdminBillWithBiller) => {
+    closeBillDetails(); // Close the bill details sheet when opening the delete confirmation
+    setDeleteBillId(bill.id); // Set the bill ID to delete
+    setShowDeleteDialog(true); // Show the confirmation dialog
+  };
+
+  // This function will be passed to AssignUserSheet to update the assigned users after assignment
+  const handleAssignComplete = async (billId: string) => {
+    await fetchUpdatedAssignedUsers(billId);
+    const updatedBill = await billAction.fetchAdminBillById(billId); // Re-fetch the entire bill including assigned users
+    setSelectedBill(updatedBill); // Update the selectedBill with the newly fetched assigned users
+    setIsAssignSheetOpen(false); // Close the assign sheet
   };
 
   return (
@@ -198,21 +234,24 @@ const AdminBillsTable = () => {
                 <TableCell>
                   <div className="flex flex-col lg:flex-row justify-start gap-6 px-4">
                     <Button className="bg-white-100 border border-gray-300 p-2"
-                      onClick={() => handleAssignUserClick(bill)}
+                      // onClick={() => handleAssignUserClick(bill)}
+                      onClick={(e) => { e.stopPropagation(); handleAssignUserClick(bill); }}
                     >
                       <UserPlus className="inline h-6 w-6" fill="#99e087" />
                     </Button>
                     <Button className="bg-white-100 border border-gray-300 p-2"
-                      onClick={() => handleUnassignUserClick(bill)}
+                      // onClick={() => handleUnassignUserClick(bill)}
+                      onClick={(e) => { e.stopPropagation(); handleUnassignUserClick(bill); }}
                     >
                       <UserMinus className="inline h-6 w-6" fill="#F87171" />
                     </Button>
                     <Button
                       className="bg-white-100 border border-gray-300 p-2"
-                      onClick={() => {
-                        setDeleteBillId(bill.id); // Set the bill ID to delete
-                        setShowDeleteDialog(true); // Show the confirmation dialog
-                      }}
+                      // onClick={() => {
+                      //   setDeleteBillId(bill.id); // Set the bill ID to delete
+                      //   setShowDeleteDialog(true); // Show the confirmation dialog
+                      // }}
+                      onClick={(e) => { e.stopPropagation(); handleDeleteClick(bill); }}
                     >
                       <Trash2Icon className="inline h-6 w-6" fill="#F87171" stroke="black" strokeWidth={1} />
                     </Button>
@@ -225,7 +264,7 @@ const AdminBillsTable = () => {
 
       </Table>
 
-      {selectedBill && (
+      {isAdminBillSheetOpen && selectedBill && (
         <AdminBillDetailSheet
           bill={selectedBill}
           onClose={closeBillDetails}
@@ -250,6 +289,7 @@ const AdminBillsTable = () => {
             due_date={new Date(selectedBill.due_date)}
             linkedBill={selectedBill.id}
             assignedUsers={selectedBill.assigned_users || ""}
+            onAssignComplete={handleAssignComplete}
           />
         </>
       )}
