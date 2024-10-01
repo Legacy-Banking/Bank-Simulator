@@ -170,6 +170,15 @@ const AdminBillsTable = () => {
     const updatedBill = await billAction.fetchAdminBillById(billId); // Re-fetch the entire bill including assigned users
     setSelectedBill(updatedBill); // Update the selectedBill with the newly fetched assigned users
     setIsAssignSheetOpen(false); // Close the assign sheet
+    setIsAdminBillSheetOpen(true); // Reopen the Admin Bill Sheet
+  };
+
+  const handleUnassignComplete = async (billId: string) => {
+    await fetchUpdatedAssignedUsers(billId);
+    const updatedBill = await billAction.fetchAdminBillById(billId); // Re-fetch the entire bill including assigned users
+    setSelectedBill(updatedBill); // Update the selectedBill with the newly fetched assigned users
+    setIsUnassignSheetOpen(false); // Close the unassign sheet
+    setIsAdminBillSheetOpen(true); // Reopen the Admin Bill Sheet
   };
 
   return (
@@ -307,6 +316,7 @@ const AdminBillsTable = () => {
             due_date={new Date(selectedBill.due_date)}
             linkedBill={selectedBill.id}
             assignedUsers={selectedBill.assigned_users || ""}
+            onUnassignComplete={handleUnassignComplete}
           />
         </>
       )}

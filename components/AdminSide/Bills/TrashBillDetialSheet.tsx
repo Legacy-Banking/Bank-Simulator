@@ -24,11 +24,13 @@ const TrashBillDetailSheet: React.FC<TrashBillDetailSheetProps> = ({ status, onC
     <Dialog open={status} onOpenChange={onClose}>
       <DialogContent className="bg-white-100 p-6 rounded-lg shadow-md">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-semibold font-inter mb-10">Confirm Delete</DialogTitle>
-          <DialogDescription className="font-inter text-base text-blackText-200 border-blue-25 border-y-2 py-6">
-            Are you sure you want to delete this bill permanently? <br />
-            This action will also delete all assigned bills and related messages. <br />
-            This action cannot be undone.
+          <DialogTitle className="text-2xl font-bold font-inter mb-10">Confirm Delete</DialogTitle>
+          <DialogDescription className="font-inter text-lg text-blackText-200 border-blue-25 border-y-2 py-6">
+            <span className="text-xl font-bold">Are you sure you want to delete this bill permanently?</span>
+            <span className="mt-4 block">
+              This action will also delete all <span className="font-semibold">assigned bills</span> and related <span className="font-semibold">messages</span>.
+            </span>
+            <span className="text-red-500 text-xl font-bold mt-4 block">This action is final and cannot be undone</span>
           </DialogDescription>
         </DialogHeader>
 
@@ -36,7 +38,7 @@ const TrashBillDetailSheet: React.FC<TrashBillDetailSheetProps> = ({ status, onC
           <Button
             onClick={onClose}
             variant="outline"
-            className="uppercase font-inter font-medium tracking-wider border border-gray-300 hover:bg-slate-200"
+            className="uppercase bg-white-100 font-inter font-medium tracking-wider border border-gray-300 hover:bg-slate-200"
           >
             Cancel
           </Button>
