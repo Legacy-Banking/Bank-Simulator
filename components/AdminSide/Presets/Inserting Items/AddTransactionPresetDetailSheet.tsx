@@ -98,14 +98,14 @@ const AddTransactionPresetDetailSheet: React.FC<TransactionPresetDetailSheetProp
             <form className="flex flex-col w-full rounded-md text-[#344054]">
             <label className="">Recipient</label>
             <input
-                className="rounded-md px-3 py-2 mt-2 border mb-5 outline outline-1 outline-gray-400 text-base drop-shadow-sm read-only:bg-gray-100"
+                className="rounded-md px-3 py-2 mt-2 border mb-5 outline-1 outline-blue-25 text-base drop-shadow-sm read-only:bg-gray-100"
                 placeholder="e.g. Jack Smith"
                 value={recipient}
                 onChange={(e) => setRecipient(e.target.value)}
                 required
             />
 
-            <label className="">Date Issued</label>
+            <label className="py-2">Date Issued</label>
             <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
               <PopoverTrigger asChild>
                 <Button
@@ -119,7 +119,7 @@ const AddTransactionPresetDetailSheet: React.FC<TransactionPresetDetailSheetProp
                   {dateIssued ? format(dateIssued, "PPP") : <span>Pick a date</span>}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 bg-slate-100 z-[9999]">
+              <PopoverContent className="w-auto p-0 bg-slate-100 z-[9999] pt-4">
               <Calendar
                 initialFocus
                 mode="single"
@@ -128,9 +128,9 @@ const AddTransactionPresetDetailSheet: React.FC<TransactionPresetDetailSheetProp
               />
               </PopoverContent>
             </Popover>
-            <label className="">Amount</label>
+            <label className="pt-6">Amount</label>
             <input
-                className="rounded-md px-3 py-2 mt-2 border mb-5 outline outline-1 outline-gray-400 text-base drop-shadow-sm read-only:bg-gray-100"
+                className="rounded-md px-3 py-2 mt-2 border mb-5 outline-1 outline-blue-25 text-base drop-shadow-sm read-only:bg-gray-100"
                 placeholder="e.g. 1000 means Jack Smith pays this person $1000.00 do (-)"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}

@@ -88,14 +88,14 @@ const AddBillerDetailSheet: React.FC<BillerDetailSheetProps> = ({ status, onClos
             <form className="flex flex-col w-full rounded-md text-[#344054]">
             <label className="">Biller Code</label>
             <input
-                className="rounded-md px-3 py-2 mt-2 border mb-5 outline outline-1 outline-gray-400 text-base drop-shadow-sm read-only:bg-gray-100"
+                className="rounded-md px-3 py-2 mt-2 border mb-5 outline-1 outline-blue-25 text-base drop-shadow-sm read-only:bg-gray-100"
                 placeholder="e.g. 1022"
                 value={billerCode}
                 onChange={(e) => setBillerCode(e.target.value)}
                 required
             />
             <label className="">Biller Name</label>
-            <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " 
+            <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline-1 outline-blue-25 placeholder-gray-400 text-base drop-shadow-sm " 
                     placeholder="Melbourne Hospital" 
                     value={billerName} 
                     onChange={(e) => setBillerName(e.target.value)} 

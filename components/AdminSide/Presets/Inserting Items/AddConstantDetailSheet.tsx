@@ -132,7 +132,7 @@ const AddConstantDetailSheet: React.FC<ConstantDetailSheetProps> = ({ status, on
             <form className="flex flex-col w-full rounded-md text-[#344054]">
             <label className="">Key</label>
             <input
-                className="rounded-md px-3 py-2 mt-2 border mb-5 outline outline-1 outline-gray-400 text-base drop-shadow-sm read-only:bg-gray-100"
+                className="rounded-md px-3 py-2 mt-2 border mb-5 outline-1 outline-blue-25 text-base drop-shadow-sm read-only:bg-gray-100"
                 placeholder="e.g. title"
                 value={key}
                 onChange={(e) => setKey(e.target.value)}
@@ -140,7 +140,7 @@ const AddConstantDetailSheet: React.FC<ConstantDetailSheetProps> = ({ status, on
             />
 
             <label className="">Content</label>
-            <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " 
+            <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline-1 outline-blue-25 placeholder-gray-400 text-base drop-shadow-sm " 
                     placeholder="e.g. Learning to store money and be rich!" 
                     value={content} 
                     onChange={(e) => setContent(e.target.value)} 
@@ -148,7 +148,7 @@ const AddConstantDetailSheet: React.FC<ConstantDetailSheetProps> = ({ status, on
 
             <label className="">Page Key</label>
             <select 
-            className='rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm '
+            className='rounded-md px-3 py-2 mt-2 border mb-6 outline-1 outline-blue-25 placeholder-gray-400 text-base drop-shadow-sm '
             title='Page Key'
             value={pageKey}
             onChange={(e) => setPageKey(e.target.value)}>

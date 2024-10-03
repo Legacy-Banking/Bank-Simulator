@@ -83,7 +83,7 @@ const AddAccountPresetDetailSheet: React.FC<AccountPresetDetailSheetProps> = ({ 
             <form className="flex flex-col w-full rounded-md text-[#344054]">
             <label className="">Account Type</label>
             <input
-                className="rounded-md px-3 py-2 mt-2 border mb-5 outline outline-1 outline-gray-400 text-base drop-shadow-sm read-only:bg-gray-100"
+                className="rounded-md px-3 py-2 mt-2 border mb-5 outline-1 outline-blue-25 text-base drop-shadow-sm read-only:bg-gray-100"
                 placeholder="e.g. personal"
                 value={accountType}
                 onChange={(e) => setAccountType(e.target.value)}
@@ -91,7 +91,7 @@ const AddAccountPresetDetailSheet: React.FC<AccountPresetDetailSheetProps> = ({ 
             />
 
             <label className="">Starting Balance</label>
-            <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " 
+            <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline-1 outline-blue-25 placeholder-gray-400 text-base drop-shadow-sm " 
                     placeholder="e.g. 100000.00 [don't include commas, symbols, and spaces]" 
                     value={startingBalance} 
                     onChange={(e) => setStartingBalance(e.target.value)} 
