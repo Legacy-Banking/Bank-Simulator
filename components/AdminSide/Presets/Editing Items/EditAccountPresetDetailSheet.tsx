@@ -44,7 +44,7 @@ const updateAccountPresetById = async (
     return { success: false, message: "No Account Preset is selected" };
   }
 
-  // Update the accountPreset in the 'admin_presets_accountPresets' table
+  // Update the accountPreset in the 'account_presets' table
   const { error } = await supabase
     .from('account_presets')
     .update({
@@ -58,11 +58,11 @@ const updateAccountPresetById = async (
     return { success: false, message: error.message };
   }
   updateAccountPreset();
-  return { success: true, message: 'AccountPreset updated successfully' };
+  return { success: true, message: 'Account Preset updated successfully' };
 };
 
 const handleDetailsUpdate = async () => {
-  const accountPresetId = accountPreset?.id // Replace with the actual user ID from your app logic
+  const accountPresetId = accountPreset?.id 
 
   const result = await updateAccountPresetById(accountPresetId, accountPresetType, startingBalance);
 
@@ -86,7 +86,7 @@ const handleDetailsUpdate = async () => {
 
         <form className="flex flex-col w-full rounded-md text-[#344054]">
           <label className="">Account Type</label>
-          <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " 
+          <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline-1 outline-blue-25 placeholder-gray-400 text-base drop-shadow-sm " 
                   placeholder="Enter accountPreset code e.g. (1022)"  
                   value={accountPresetType} 
                   onChange={(e) => setAccountPresetType(e.target.value)} 
@@ -95,7 +95,7 @@ const handleDetailsUpdate = async () => {
 
           <label className="">Starting Balance</label>
           <input
-            className="rounded-md px-3 py-2 mt-2 border mb-5 outline outline-1 outline-gray-400 text-base drop-shadow-"
+            className="rounded-md px-3 py-2 mt-2 border mb-5 outline-1 outline-blue-25 text-base drop-shadow-"
             placeholder="Enter accountPreset name e.g. (Melbourne Hospital)"
             value={startingBalance}
             onChange={(e) => setStartingBalance(e.target.value)}

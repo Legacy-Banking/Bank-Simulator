@@ -13,14 +13,17 @@ import {
 // import TransactionDetailSheet from './TransactionDetailSheet'; // Import the sheet component
 import { cn, formatAmount, formatDateTime } from "@/lib/utils";
 import { Button } from '@/components/ui/button';
+import EditTransactionPresetDetailSheet from './Editing Items/EditTransactionPresetDetailSheet';
+import TrashTransactionPresetDetailSheet from './Deleting Items/TrashTransactionPresetDetailSheet';
 
 // TransactionsTable component
-export const TransactionAdminTable = ({ transactionPresets = [], setShowUpdatePopUp, setShowDeletePopUp }: TransactionPresetTableProps) => {
+export const TransactionAdminTable = ({ transactionPresets = [], setShowUpdatePopUp, setShowDeletePopUp, onEditStatus }: TransactionPresetTableProps) => {
   const [selectedTransaction, setSelectedTransaction] = useState<TransactionPresetType | null>(null);
   const [deleteTransactionWindow, setDeleteTransactionWindow] = useState(false);
   const [editTransactionWindow, setEditTransactionWindow] = useState(false);
 
-  const toggleDeleteTransactionWindow = () => {
+  const toggleDeleteTransactionWindow = (acc : TransactionPresetType | null) => {
+    setSelectedTransaction(acc);
     setDeleteTransactionWindow((prevState) => !prevState);
   };
 
@@ -32,14 +35,14 @@ export const TransactionAdminTable = ({ transactionPresets = [], setShowUpdatePo
   };
 
   const deleteTransaction = () => {
-    // currently empty but this will delete the selected account
-    toggleDeleteTransactionWindow();
+    toggleDeleteTransactionWindow(null);
     setShowDeletePopUp(true);
+    onEditStatus();
   }
   const updateTransaction = () => {
     toggleEditTransactionWindow(null);
     setShowUpdatePopUp(true);
-    // currently empty but this will update the selected account
+    onEditStatus();
   }
 
 
@@ -86,7 +89,7 @@ export const TransactionAdminTable = ({ transactionPresets = [], setShowUpdatePo
                 
                 <TableCell >
                     <Button onClick={() => toggleEditTransactionWindow(acc)} className="p-0 ml-4"> <img src="../Edit.png" alt="Edit button" /></Button>
-                    <Button onClick={toggleDeleteTransactionWindow} className="p-0 ml-4"> <img src="../Delete.png" alt="Delete button" /></Button>
+                    <Button onClick={() => toggleDeleteTransactionWindow(acc)} className="p-0 ml-4"> <img src="../Delete.png" alt="Delete button" /></Button>
                 </TableCell>
               </TableRow>
             );
@@ -94,18 +97,18 @@ export const TransactionAdminTable = ({ transactionPresets = [], setShowUpdatePo
         </TableBody>
       </Table>
 
-      {/* <TrashTransactionDetailSheet
-        account={selectedTransaction}
+      <TrashTransactionPresetDetailSheet
+        transactionPreset={selectedTransaction}
         status={deleteTransactionWindow}
-        onClose={toggleDeleteTransactionWindow}
-        deleteTransaction={deleteTransaction}
+        onClose={() => toggleDeleteTransactionWindow(selectedTransaction)}
+        deleteTransactionPreset={deleteTransaction}
       />
-      <EditTransactionDetailSheet
-        account={selectedTransaction}
+      <EditTransactionPresetDetailSheet
+        transactionPreset={selectedTransaction}
         status={editTransactionWindow}
         onClose={() => toggleEditTransactionWindow(selectedTransaction)}
-        updateTransaction={updateTransaction}
-        /> */}
+        updateTransactionPreset={updateTransaction}
+        />
 
     </>
   );

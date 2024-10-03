@@ -56,7 +56,8 @@ const TrashAccountDetailSheet: React.FC<AccountPresetDetailSheetProps> = ({ acco
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold font-inter mb-10">Confirm Delete</DialogTitle>
           <DialogDescription className="text-base font-inter text-[#191919] border-blue-25 border-y-2 py-4">
-          Are you sure you want to delete Account Preset permanently. <br />
+          Are you sure you want to delete Account Preset <br />
+          <span className='text-blue-25'>{accountPreset?.account_type}</span> permanently. <br /><br />
           You can’t undo this action.
           </DialogDescription>
         </DialogHeader>
