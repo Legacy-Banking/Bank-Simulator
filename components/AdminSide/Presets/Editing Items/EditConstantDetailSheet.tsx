@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -102,8 +102,10 @@ const fetchEnumValues = async () => {
   
   setEnumOptions(data?.map((item: { page_key_values: string }) => item.page_key_values) || []);
 };
+  useEffect(() => {
+    fetchEnumValues();
 
-fetchEnumValues();
+  }, [])
 
 
 

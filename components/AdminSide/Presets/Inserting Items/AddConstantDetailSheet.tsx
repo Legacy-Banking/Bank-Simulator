@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -72,8 +72,10 @@ const AddConstantDetailSheet: React.FC<ConstantDetailSheetProps> = ({ status, on
     setEnumOptions(data?.map((item: { page_key_values: string }) => item.page_key_values) || []);
   };
   
-  fetchEnumValues();
-  
+  useEffect(() => {
+    fetchEnumValues();
+
+  }, []);
 
   const addConstant = async (key : string, content : string, pageKey : string) => {
     // go to supabase and insert into the table

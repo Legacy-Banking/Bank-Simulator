@@ -12,7 +12,8 @@ import { cn, formatAmount, formatDateTime } from "@/lib/utils"
 import { createClient } from '@/utils/supabase/client';
 import { Popover, PopoverTrigger, PopoverContent } from '@radix-ui/react-popover';
 import { setDate } from 'date-fns';
-import { CalendarIcon, Calendar } from 'lucide-react';
+import { CalendarIcon} from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
 import { format } from "date-fns"
 
 import { date } from 'zod';
@@ -35,6 +36,12 @@ const AddTransactionPresetDetailSheet: React.FC<TransactionPresetDetailSheetProp
   const [recipient, setRecipient] = useState('');
   const [dateIssued, setDateIssued] = React.useState<Date>()
   const [amount, setAmount] = useState('');
+  const [popoverOpen, setPopoverOpen] = useState(false);
+
+  const handleDateSelect = (date: Date | undefined) => {
+    setDateIssued(date);  // Set the selected date
+    setPopoverOpen(false);  // Close the popover when date is selected
+  };
 
   const addTransactionPreset = async () => {
     // go to supabase and insert into the table
@@ -99,7 +106,7 @@ const AddTransactionPresetDetailSheet: React.FC<TransactionPresetDetailSheetProp
             />
 
             <label className="">Date Issued</label>
-            <Popover>
+            <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant={"outline"}
@@ -112,14 +119,12 @@ const AddTransactionPresetDetailSheet: React.FC<TransactionPresetDetailSheetProp
                   {dateIssued ? format(dateIssued, "PPP") : <span>Pick a date</span>}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 bg-slate-100">
+              <PopoverContent className="w-auto p-0 bg-slate-100 z-[9999]">
               <Calendar
+                initialFocus
                 mode="single"
-                values={dateIssued ? dateIssued.toISOString() : undefined}
-                onChange={(dateIssued) => {
-                  console.log('Selected date structure:', dateIssued); // Log the entire argument to understand its structure
-                  setDateIssued(new Date()); // Assuming dateIssued is a valid date string or object
-                }}
+                selected={dateIssued}
+                onSelect={handleDateSelect}
               />
               </PopoverContent>
             </Popover>
@@ -127,7 +132,7 @@ const AddTransactionPresetDetailSheet: React.FC<TransactionPresetDetailSheetProp
             <input
                 className="rounded-md px-3 py-2 mt-2 border mb-5 outline outline-1 outline-gray-400 text-base drop-shadow-sm read-only:bg-gray-100"
                 placeholder="e.g. 1000 means Jack Smith pays this person $1000.00 do (-)"
-                value={recipient}
+                value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 required
             />

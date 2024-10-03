@@ -59,7 +59,7 @@ export const TransactionAdminTable = ({ transactionPresets = [], setShowUpdatePo
         <TableBody>
           {transactionPresets.map((acc: TransactionPresetType) => {
             const recipient = acc.recipient;
-            const date = acc.date_issued;
+            const date = new Date(acc.date_issued);
             const amount = acc.amount;
 
             return (
@@ -75,7 +75,7 @@ export const TransactionAdminTable = ({ transactionPresets = [], setShowUpdatePo
                   </div>
                 </TableCell>
 
-                <TableCell className="font-inter min-w-32 pl-2 pr-10 text-[#475467]">
+                <TableCell className="font-inter min-w-32 pl-4 pr-10 text-[#475467]">
                   {date.toDateString()}
                 </TableCell>
 
