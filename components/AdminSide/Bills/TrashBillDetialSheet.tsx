@@ -24,7 +24,7 @@ const TrashBillDetailSheet: React.FC<TrashBillDetailSheetProps> = ({ status, onC
     <Dialog open={status} onOpenChange={onClose}>
       <DialogContent className="bg-white-100 p-6 rounded-lg shadow-md">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold font-inter mb-10">Confirm Delete</DialogTitle>
+          <DialogTitle className="text-xl font-semi-bold font-inter mb-10">Confirm Delete</DialogTitle>
           <DialogDescription className="font-inter text-lg text-blackText-200 border-blue-25 border-y-2 py-6">
             <span className="text-xl font-bold">Are you sure you want to delete this bill permanently?</span>
             <span className="mt-4 block">

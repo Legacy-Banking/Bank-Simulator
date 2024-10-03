@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { Spinner } from "@/components/Spinner"; // Import the new Spinner component
+
 import {
   Dialog,
   DialogContent,
@@ -43,10 +45,12 @@ const UnassignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bi
   const [activeOnly, setActiveOnly] = useState(false);
   const [users, setUsers] = useState<{ id: string; owner_username: string; last_sign_in_at: string | null }[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false); // Loading state
+  const [loading, setLoading] = useState<boolean>(true); // Loading state
+  const [unassigning, setUnassigning] = useState<boolean>(false); // State to handle unassigning users
 
   const fetchUsers = async () => {
     try {
+      setLoading(true); // Start loading when fetching users
       // Fetch the current assigned users from the linkedBill (admin bill)
       const { assigned_users: currentAssignedUsers } = await billAction.fetchAdminBillById(linkedBill); // Assume you have a function to fetch the bill by ID
 
@@ -79,6 +83,8 @@ const UnassignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bi
 
     } catch (error) {
       console.error("Failed to fetch users:", error);
+    } finally {
+      setLoading(false); // Stop loading after fetch
     }
   };
 
@@ -110,7 +116,7 @@ const UnassignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bi
       return;
     }
 
-    setLoading(true); // Start loading
+    setUnassigning(true); // Start unassigning
 
     try {
       // Call unassignAdminBill to remove references from "bills" and "messages" tables
@@ -141,12 +147,14 @@ const UnassignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bi
 
       await onUnassignComplete(linkedBill);
 
+      setUnassigning(false); // Stop unassigning before closing
+
       // Optionally, you can close the dialog or reset the selected users
       onClose();
 
     } catch (error) {
       console.error("Failed to assign bills to users:", error);
-      setLoading(false); // Stop loading on error
+      setUnassigning(false); // Stop unassigning on error
     }
   };
 
@@ -164,7 +172,7 @@ const UnassignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bi
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-white-100 p-6 max-w-2xl h-full max-h-[90vh] 3xl:max-h-[70vh] rounded-lg">
+      <DialogContent className="bg-white-100 p-6 max-w-2xl h-full max-h-[90vh] 3xl:max-h-[70vh] rounded-lg flex flex-col justify-between">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold font-inter">Unassign User</DialogTitle>
           <DialogDescription className="text-gray-600 mt-2 font-inter">
@@ -186,56 +194,64 @@ const UnassignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bi
           </div>
         </div>
 
-        {/* User List Table */}
-        <div className="overflow-y-auto h-full max-h-[60vh] min-h-[600px] border-t border-b border-gray-300 rounded-tl-2xl rounded-tr-2xl">
-          <Table>
-            <TableHeader className="bg-blue-200">
-              <TableRow>
-                <TableHead className="px-8 text-left text-sm font-normal font-inter tracking-wider text-white-100">Username</TableHead>
-                <TableHead className="font-inter font-normal text-white-100 whitespace-nowrap">
-                  <div className="flex justify-end items-center space-x-4 mr-12">
-                    <span>Unassign All</span>
-                    <Checkbox
-                      checked={selectedUsers.length === filteredUsers.length}
-                      onCheckedChange={() =>
-                        setSelectedUsers(
-                          selectedUsers.length === filteredUsers.length ? [] : filteredUsers.map((user) => user.id)
-                        )
-                      }
-                      className="custom-checkbox border-white-100"
-                    />
-                  </div>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredUsers.map((user) => (
-                <TableRow key={user.id}
-                  className="border-t border-gray-200 hover:bg-gray-200"
-                  onClick={() => handleSelectUser(user.id)}>
-                  <TableCell className="px-8 font-inter text-sm word-break: break-all">{user.owner_username}</TableCell>
-                  <TableCell className="px-8">
-                    <div className="text-right mr-12">
-                      <Checkbox
-                        checked={selectedUsers.includes(user.id)}
-                        onCheckedChange={() => handleSelectUser(user.id)}
-                        className="custom-checkbox"
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        {/* User List Table or Loader */}
+        <div className="min-h-[400px] flex-grow overflow-auto"> {/* Same layout as AssignUserSheet */}
+          {loading ? (
+            <div className="flex justify-center items-center h-full">
+              <Spinner className="size=medium text-sm">Loading...</Spinner>
+            </div>
+          ) : (
+            <div className="overflow-y-auto h-full max-h-[60vh] border-t border-b border-gray-300 rounded-tl-2xl rounded-tr-2xl">
+              <Table>
+                <TableHeader className="bg-blue-200">
+                  <TableRow>
+                    <TableHead className="px-8 text-left text-sm font-normal font-inter tracking-wider text-white-100">Username</TableHead>
+                    <TableHead className="font-inter font-normal text-white-100 whitespace-nowrap">
+                      <div className="flex justify-end items-center space-x-4 mr-12">
+                        <span>Unassign All</span>
+                        <Checkbox
+                          checked={selectedUsers.length === filteredUsers.length}
+                          onCheckedChange={() =>
+                            setSelectedUsers(
+                              selectedUsers.length === filteredUsers.length ? [] : filteredUsers.map((user) => user.id)
+                            )
+                          }
+                          className="custom-checkbox border-white-100"
+                        />
+                      </div>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredUsers.map((user) => (
+                    <TableRow key={user.id} className="border-t border-gray-200 hover:bg-gray-200" onClick={() => handleSelectUser(user.id)}>
+                      <TableCell className="px-8 font-inter text-sm word-break: break-all">{user.owner_username}</TableCell>
+                      <TableCell className="px-8">
+                        <div className="text-right mr-12">
+                          <Checkbox
+                            checked={selectedUsers.includes(user.id)}
+                            onCheckedChange={() => handleSelectUser(user.id)}
+                            className="custom-checkbox"
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </div>
 
-        {/* Assign Button */}
-        <DialogFooter>
-          <Button onClick={handleUnassignUsers} className="w-full bg-blue-gradient hover:bg-blue-200 hover:underline text-white-100 transition-all duration-200" disabled={loading}>
-            {loading ? 'Unassigning...' : 'Unassign Users'}
-          </Button>
-        </DialogFooter>
+        {/* Unassign Button */}
+        {!loading && (
+          <DialogFooter>
+            <Button onClick={handleUnassignUsers} className="w-full bg-blue-gradient hover:bg-blue-200 hover:underline text-white-100 transition-all duration-200" disabled={unassigning}>
+              {unassigning ? 'Unassigning...' : 'Unassign Users'}
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );
