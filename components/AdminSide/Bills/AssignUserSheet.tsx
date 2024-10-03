@@ -186,7 +186,7 @@ const AssignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bill
 
         {/* Search & Toggle Active Users */}
         <div className="flex items-center justify-between py-4">
-          <Input placeholder="Search Users" className="w-2/5 font-inter bg-white-100" />
+          {/* <Input placeholder="Search Users" className="w-2/5 font-inter bg-white-100" /> */}
           <SearchBar inputValue={inputValue} setInputValue={setInputValue} />
           <div className="flex items-center gap-2 ml-4">
             <span className="text-sm font-inter">Active Users</span>
