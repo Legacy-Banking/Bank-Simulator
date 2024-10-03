@@ -187,7 +187,7 @@ const UnassignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bi
         </div>
 
         {/* User List Table */}
-        <div className="overflow-y-auto h-full max-h-[60vh] border-t border-b border-gray-300 rounded-tl-2xl">
+        <div className="overflow-y-auto h-full max-h-[60vh] min-h-[600px] border-t border-b border-gray-300 rounded-tl-2xl rounded-tr-2xl">
           <Table>
             <TableHeader className="bg-blue-200">
               <TableRow>
