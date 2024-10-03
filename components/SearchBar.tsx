@@ -1,5 +1,6 @@
-"use client";
+"use client"
 import React, { useState, useRef } from 'react';
+import { Search } from "lucide-react"; // Import the Search icon from Lucide
 
 interface SearchBarProps {
     inputValue: string;
@@ -23,26 +24,24 @@ function SearchBar({ inputValue, setInputValue }: SearchBarProps) {
     };
 
     return (
-        <div className='relative w-64 h-10'>
+        <div className='w-64 h-10 border-[#D7D7D7] border-2 rounded-lg py-2 px-4 flex bg-[#FFFF] text-[#667085] font-semibold items-center'>
+            {!inputValue && (
+                <Search
+                    className='mr-2 scale-92 transition-opacity duration-300 cursor-text opacity-100'
+                    onClick={handleMagnifierClick}
+                />
+            )}
             <input
                 ref={inputRef}
                 placeholder="Search Users"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                className="w-full text-base h-full pl-12 pr-4 border-2 border-[#D7D7D7] rounded-lg focus:outline-none focus:ring focus:ring-[#99CCF3] focus:border-[#0052CC] bg-white-100 text-[#667085] font-semibold placeholder-[#667085]"
+                className="w-full outline-none focus:ring-0"
             />
-            {!inputValue && (
-                <img
-                    src="/magnifier.png"
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 scale-75 cursor-pointer"
-                    alt="search bar"
-                    onClick={handleMagnifierClick}
-                />
-            )}
             {inputValue && (
                 <button
                     onClick={handleClearInput}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#667085] scale-125 cursor-pointer"
+                    className="ml-2 text-[#667085] scale-125 transition-opacity duration-300 cursor-pointer focus:outline-none"
                 >
                     &#x2715;
                 </button>
