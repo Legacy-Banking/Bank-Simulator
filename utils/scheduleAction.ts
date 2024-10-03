@@ -236,6 +236,7 @@ class ScheduleAction {
             await transactionAction.createTransaction(fromAccount, toAccount, schedule.amount, schedule.description, "pay anyone");
             await this.supabase.from('schedule_payments').update({status: 'completed'}).eq('id', schedule.id);
         }
+        console.log('transaction executed')
     }
     private async executeBpay(schedule: any): Promise<void> {
         const { data:biller, error:billerError } = await this.supabase.from('billers').select('*').eq('biller_code', schedule.biller_code).single();
@@ -285,6 +286,8 @@ class ScheduleAction {
                     shouldCompleteSchedule = true;
                 }
                 break;
+            default:
+                break;
         }
     
         // Update next pay_at or complete the schedule if needed
@@ -293,6 +296,7 @@ class ScheduleAction {
         } else {
             await this.supabase.from('schedule_payments').update({ pay_at: this.formatToISOString(next_pay_at) ,status:'pending'}).eq('id', schedule.id);
         }
+        console.log(`Recurring payment updated for schedule: ${schedule.id}, pay_at updated to: ${next_pay_at}`);
     }
     
     
