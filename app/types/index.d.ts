@@ -96,12 +96,28 @@ declare interface Bill {
   status: string;
   invoice_number: string;
   reference_number: string;
+  linked_bill: string;
 
   invoice_date: string;
   billed_to: string;
   total: string;
   tax: string;
 }
+
+declare interface AdminBill {
+  id: string;
+  created_at: Date;
+  biller: string;
+  description: string;
+  amount: number;
+  due_date: Date;
+  assigned_users: string;
+}
+
+interface AdminBillWithBiller extends AdminBill {
+  biller: Biller;
+}
+
 declare interface BillDetails {
   bill: Partial<Bill>;
   biller: Partial<Biller>;
@@ -133,6 +149,7 @@ declare interface Message {
   read: boolean;
   type: string;
   bill_id: string;
+  linked_bill: string;
 }
 
 declare interface Card {
