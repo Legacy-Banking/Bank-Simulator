@@ -34,7 +34,7 @@ const AccountsPage = () => {
   const filteredAccounts = accounts.filter((account) =>
     (account.owner_username ?? '').toLowerCase().includes(inputValue.toLowerCase())
   );
-
+  
   const uniqueAccounts = filteredAccounts.filter((account, index, self) =>
     index === self.findIndex((t) => t.owner === account.owner)
   );
@@ -70,7 +70,7 @@ const AccountsPage = () => {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <div className='flex flex-auto bg-white-100'>
+    <div className='flex flex-auto bg-gray-100'>
       <div className='px-8 py-6 flex flex-col flex-auto border-[#a0b1b1] border-x-2'>
         <div className='px-8 py-2 border-b-2 border-[#D7D7D7]'>
           <h1 className='text-3xl font-semibold leading-9'>Admin Dashboard</h1>

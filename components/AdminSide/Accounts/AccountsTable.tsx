@@ -99,6 +99,7 @@ export const AccountsTable = ({ accounts = [], setShowUpdatePopUp, setShowDelete
       </Table>
 
       <TrashAccountDetailSheet
+        account={selectedAccount}
         status={deleteAccountWindow}
         onClose={toggleDeleteAccountWindow}
         deleteAccount={deleteAccount}
@@ -107,7 +108,8 @@ export const AccountsTable = ({ accounts = [], setShowUpdatePopUp, setShowDelete
         account={selectedAccount}
         status={editAccountWindow}
         onClose={() => toggleEditAccountWindow(selectedAccount)}
-        updateAccount={updateAccount}/>
+        updateAccount={updateAccount}
+        />
 
     </>
   );

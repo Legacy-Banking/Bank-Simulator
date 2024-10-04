@@ -124,10 +124,28 @@ declare interface BillDetails {
 }
 declare interface Biller {
   id: string;
-  name: string;
   biller_code: string;
-  biller_details: string;
+  name: string;
+  save_biller_status: boolean;
+  reference_number: string;
 
+}
+declare interface AccountPresetType {
+  id: string;
+  account_type: string;
+  starting_balance: number;
+}
+declare interface TransactionPresetType {
+  id: string;
+  recipient: string;
+  amount: number;
+  date_issued: Date;
+}
+declare interface Constant {
+  id: string;
+  key: string;
+  content: string;
+  page_key: string;
 }
 declare interface SavedBiller {
   id: string;
@@ -193,6 +211,30 @@ type AccountsTableProps = {
   accounts: Account[];
   setShowUpdatePopUp: React.Dispatch<React.SetStateAction<boolean>>;
   setShowDeletePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+}
+type AccountPresetTableProps = {
+  accountTypes: AccountPresetType[];
+  setShowUpdatePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowDeletePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+  onEditStatus: () => void;
+}
+type TransactionPresetTableProps = {
+  transactionPresets: TransactionPresetType[];
+  setShowUpdatePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowDeletePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+  onEditStatus: () => void;
+}
+type BillersTableProps = {
+  billers: Biller[];
+  setShowUpdatePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowDeletePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+  onEditStatus: () => void;
+}
+type ConstantsTableProps = {
+  constants: Constant[];
+  setShowUpdatePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowDeletePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+  onEditStatus: () => void;
 }
 
 type TransactionTableProps = {
