@@ -207,7 +207,7 @@ const AssignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bill
         <div className="min-h-[400px] flex-grow overflow-auto"> {/* Use the same height for consistency */}
           {loading ? (
             <div className="flex justify-center items-center h-full">
-              <Spinner className="size=medium text-sm">Loading...</Spinner>
+              <Spinner size="large" className="text-blue-500" />
             </div>
           ) : (
             <div className="overflow-y-auto h-full max-h-[60vh] border-t border-b border-gray-300 rounded-tl-2xl rounded-tr-2xl">
