@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -32,7 +32,35 @@ const EditAccountPresetDetailSheet: React.FC<AccountPresetDetailSheetProps> = ({
 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [enumOptions, setEnumOptions] = useState<string[]>([]);
 
+
+  const fetchEnumValues = async () => {
+    const data  = [
+      {
+        "account_type": "savings"
+      },
+      {
+        "account_type": "personal"
+      },
+      {
+        "account_type": "credit"
+      },
+      {
+        "account_type": "debit"
+      },
+      {
+        "account_type": "other"
+      }
+    ];
+    
+    setEnumOptions(data?.map((item: { account_type: string }) => item.account_type) || []);
+  };
+  
+  useEffect(() => {
+    fetchEnumValues();
+
+  }, []);
   const supabase = createClient();
   // Function to update password by user ID
 const updateAccountPresetById = async (
@@ -86,11 +114,21 @@ const handleDetailsUpdate = async () => {
 
         <form className="flex flex-col w-full rounded-md text-[#344054]">
           <label className="">Account Type</label>
-          <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline-1 outline-blue-25 placeholder-gray-400 text-base drop-shadow-sm " 
-                  placeholder="Enter accountPreset code e.g. (1022)"  
-                  value={accountPresetType} 
-                  onChange={(e) => setAccountPresetType(e.target.value)} 
-                  required />
+          <select 
+            className='rounded-md px-3 py-2 mt-2 border mb-6 outline-1 outline-blue-25 placeholder-gray-400 text-base drop-shadow-sm '
+            title='Account Type'
+            value={accountPresetType}
+            onChange={(e) => setAccountPresetType(e.target.value)}>
+              <option value="" disabled>
+                Select Account Type
+              </option>
+              {enumOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+
           
 
           <label className="">Starting Balance</label>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -28,6 +28,35 @@ const AddAccountPresetDetailSheet: React.FC<AccountPresetDetailSheetProps> = ({ 
 
   const [accountType, setAccountType] = useState('');
   const [startingBalance, setStartingBalance] = useState('');
+  const [enumOptions, setEnumOptions] = useState<string[]>([]);
+
+
+  const fetchEnumValues = async () => {
+    const data  = [
+      {
+        "account_type": "savings"
+      },
+      {
+        "account_type": "personal"
+      },
+      {
+        "account_type": "credit"
+      },
+      {
+        "account_type": "debit"
+      },
+      {
+        "account_type": "other"
+      }
+    ];
+    
+    setEnumOptions(data?.map((item: { account_type: string }) => item.account_type) || []);
+  };
+  
+  useEffect(() => {
+    fetchEnumValues();
+
+  }, []);
 
   const addAccountPreset = async (accountType : string, startingBalance : string) => {
     // go to supabase and insert into the table
@@ -82,13 +111,21 @@ const AddAccountPresetDetailSheet: React.FC<AccountPresetDetailSheetProps> = ({ 
         </DialogHeader>
             <form className="flex flex-col w-full rounded-md text-[#344054]">
             <label className="">Account Type</label>
-            <input
-                className="rounded-md px-3 py-2 mt-2 border mb-5 outline-1 outline-blue-25 text-base drop-shadow-sm read-only:bg-gray-100"
-                placeholder="e.g. personal"
-                value={accountType}
-                onChange={(e) => setAccountType(e.target.value)}
-                required
-            />
+            <select 
+            className='rounded-md px-3 py-2 mt-2 border mb-6 outline-1 outline-blue-25 placeholder-gray-400 text-base drop-shadow-sm '
+            title='Account Type'
+            value={accountType}
+            onChange={(e) => setAccountType(e.target.value)}>
+              <option value="" disabled>
+                Select Account Type
+              </option>
+              {enumOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+
 
             <label className="">Starting Balance</label>
             <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline-1 outline-blue-25 placeholder-gray-400 text-base drop-shadow-sm " 
