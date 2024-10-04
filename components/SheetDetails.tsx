@@ -85,9 +85,9 @@ const SheetDetails = (bills: BillDetails) => {
       <div className="flex justify-start mb-4 text-xs">
         <div className="text-left">
           <h3 className="text-sm font-semibold mb-1 ">Payment Details</h3>
-          <p>Biller Code: {biller.biller_code}</p>
+          <p>Biller Code: {biller.biller_code ?? 'N/A'}</p>
           <p>Biller Name: {biller.name}</p>
-          <p>Reference Number: {bill.reference_number}</p>
+          <p>Reference Number: {bill.reference_number || "N/A"}</p>
         </div>
       </div>
 
