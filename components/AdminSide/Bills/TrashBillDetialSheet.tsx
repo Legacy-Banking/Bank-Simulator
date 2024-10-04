@@ -26,11 +26,11 @@ const TrashBillDetailSheet: React.FC<TrashBillDetailSheetProps> = ({ status, onC
         <DialogHeader>
           <DialogTitle className="text-xl font-semi-bold font-inter mb-10">Confirm Delete</DialogTitle>
           <DialogDescription className="font-inter text-lg text-blackText-200 border-blue-25 border-y-2 py-6">
-            <span className="text-xl font-bold">Are you sure you want to delete this bill permanently?</span>
-            <span className="mt-4 block">
-              This action will also delete all <span className="font-semibold">assigned bills</span> and related <span className="font-semibold">messages</span>.
+            <span className="text-base font-bold">Are you sure you want to delete this bill permanently?</span>
+            <span className="text-base mt-4 block">
+              This action will also delete all <span className="text-base font-semibold">assigned bills</span> and related <span className="text-base font-semibold">messages</span>.
             </span>
-            <span className="text-red-500 text-xl font-bold mt-4 block">This action is final and cannot be undone</span>
+            <span className="text-red-500 text-base font-bold mt-4 block">This action is final and cannot be undone</span>
           </DialogDescription>
         </DialogHeader>
 
