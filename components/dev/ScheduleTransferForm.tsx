@@ -68,7 +68,6 @@ const ScheduleTransferForm: React.FC<ScheduleTransferProps> = ({ user_id }) => {
                         amount,
                         description,
                         schedule,
-                        [fromAcc.owner, toAcc.owner],
                     );
                     alert('Transfer scheduled successfully!');
                 } catch (error) {
@@ -87,6 +86,7 @@ const ScheduleTransferForm: React.FC<ScheduleTransferProps> = ({ user_id }) => {
             if (fromAcc) {
                 const schedule = new Date();
                 schedule.setDate(schedule.getDate() + 1);
+                scheduleAction.setScheduleType('bpay_schedule');
 
                 try {
                     if (isRecurring) {

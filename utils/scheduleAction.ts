@@ -4,13 +4,13 @@ import { bpayAction } from "./bpayAction";
 import { billerAction } from "./billerAction";
 import { transactionAction } from "./transactionAction";
 
-enum ScheduleType {
+export enum ScheduleType {
     transfer_schedule = 'transfer_schedule',
     bpay_schedule = 'bpay_schedule',
     transfer_recur = 'transfer_recur',
     bpay_recur = 'bpay_recur'
 }
-enum PayInterval{
+export enum PayInterval{
     weekly = 'weekly',
     fortnightly = 'fortnightly',
     monthly = 'monthly',
@@ -136,18 +136,20 @@ class ScheduleAction {
           }
     }
     private formatToISOString(date: Date): string {
+        if (!date) {
+            return '';
+        }
         return date.toISOString(); // this gives the date in "YYYY-MM-DDTHH:mm:ss.sssZ" format
     }
     
 
 
     // Unified method to create a schedule entry
-    public async createScheduleEntry(fromAccount: Account, toAccount: Account | null, biller_name: string | null, biller_code: string | null, reference_number: string | null, amount: number, description: string, schedule: Date, related_user: string[]): Promise<string> {
+    public async createScheduleEntry(fromAccount: Account, toAccount: Account | null, biller_name: string | null, biller_code: string | null, reference_number: string | null, amount: number, description: string, schedule: Date): Promise<string> {
         const schedule_ref = referenceNumberGenerator();
     
         let payload: any = {
             pay_at: this.formatToISOString(schedule),
-            related_user: related_user,
             from_account: fromAccount.id,
             to_account: toAccount ? toAccount.id : null,
             amount: amount,
@@ -162,6 +164,7 @@ class ScheduleAction {
             payload.biller_code = biller_code;
             payload.reference_number = reference_number;
         }
+        console.log(payload);
 
         const { data, error } = await this.supabase.from('schedule_payments').insert([payload]);
 
@@ -180,13 +183,17 @@ class ScheduleAction {
 
     private async attachRecurEntry(schedule_ref: string): Promise<void> {
         const { data: schedule_payment, error } = await this.supabase.from('schedule_payments').select('*').eq('schedule_ref', schedule_ref).single();
-        const { data: recur_payment, error: recur_error } = await this.supabase.from('recurring_payments').insert([{
+
+        const payload={
             interval: this.parseFrequencyToInterval(this.payInterval),
             related_schedule: schedule_payment.id,
             recur_rule: this.recur_rule,
-            end_date: this.formatToISOString(this.end_date),
+            end_date: this.formatToISOString(this.end_date||new Date()),
             recur_count_dec: this.recur_count_dec
-        }]).select('id').single(); 
+        }
+        console.log(payload);
+        const { data: recur_payment, error: recur_error } = await this.supabase.from('recurring_payments').insert([payload]).select('id').single(); 
+        console.log(recur_error)
         await this.supabase.from('schedule_payments').update({ recurring_payment: recur_payment.id }).eq('id', schedule_payment.id);  
     }
     
