@@ -1,10 +1,12 @@
 "use client"
 import React, { useState, useRef } from 'react';
-import { string } from 'zod';
+import { Search } from "lucide-react"; // Import the Search icon from Lucide
+
 interface SearchBarProps {
     inputValue: string;
     setInputValue: React.Dispatch<React.SetStateAction<string>>;
-  }
+}
+
 function SearchBar({ inputValue, setInputValue }: SearchBarProps) {
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -22,21 +24,19 @@ function SearchBar({ inputValue, setInputValue }: SearchBarProps) {
     };
 
     return (
-        <div className='w-64 h-10 border-[#D7D7D7] border-2 rounded-lg py-2 px-4 flex text-[#667085] font-semibold items-center'>
+        <div className='w-64 h-10 border-[#D7D7D7] border-2 rounded-lg py-2 px-4 flex bg-[#FFFF] text-[#667085] font-semibold items-center'>
             {!inputValue && (
-                <img
-                    src="/magnifier.png"
-                    className='mr-2 scale-75 transition-opacity duration-300 cursor-text opacity-100'
-                    alt="search bar"
+                <Search
+                    className='mr-2 scale-92 transition-opacity duration-300 cursor-text opacity-100'
                     onClick={handleMagnifierClick}
                 />
             )}
             <input
                 ref={inputRef}
-                placeholder="Search User"
+                placeholder="Search Users"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                className="w-full outline-none focus:ring-0 bg-gray-100"
+                className="w-full outline-none focus:ring-0"
             />
             {inputValue && (
                 <button

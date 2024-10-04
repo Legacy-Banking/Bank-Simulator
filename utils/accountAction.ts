@@ -113,26 +113,26 @@ export const accountAction = {
             throw new Error(error.message);
         }
     },
-    signUpInitialization: async (user_id: string, owner_username:string): Promise<void> => {
+    signUpInitialization: async (user_id: string, owner_username: string): Promise<void> => {
         const { bsb: perbsb, acc: peracc } = accbsbGenerator();
         const { bsb: savbsb, acc: savacc } = accbsbGenerator();
         const bills = [
             {
                 biller: {
                     id: '1',
-                    name:'Melbourne Electricity',
+                    name: 'Melbourne Electricity',
                     biller_code: '2513',
-                }as Biller,
+                } as Biller,
                 amount: 100,
                 description: 'Electricity Bill'
             },
             {
-                biller:{
-                    id:'2',
-                    name:'Daily News',
-                    biller_code:'8351'
+                biller: {
+                    id: '2',
+                    name: 'Daily News',
+                    biller_code: '8351'
 
-                }as Biller,
+                } as Biller,
                 amount: 28.8,
                 description: 'Monthly Subscription'
             }
@@ -141,11 +141,11 @@ export const accountAction = {
         const accounts: Partial<Account>[] = [
             {
                 type: AccountType.PERSONAL,
-                balance: 1000,
+                balance: 1500,
                 owner: user_id,
                 bsb: perbsb,
                 acc: peracc,
-                opening_balance: 1000,
+                opening_balance: 500,
                 owner_username: owner_username
             },
             {
@@ -170,15 +170,15 @@ export const accountAction = {
 
         for (const account of accounts) {
             await accountAction.createAccount(account as Account);
-        }        
+        }
         await cardAction.cardSignUpInitialization(user_id);
 
         await billerAction.createDefaultSavedBillers(user_id);
 
         for (const bill of bills) {
             await billAction.createBill(user_id, bill.biller, bill.amount, bill.description);
-        }        
-        
+        }
+
 
     },
 
