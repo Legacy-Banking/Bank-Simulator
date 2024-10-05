@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { userAction } from '@/utils/userAction'
+import { userAction } from '@/lib/actions/userAction'
 
 const AdminButton = () => {
     const [users, setUsers] = useState<User[]>([])

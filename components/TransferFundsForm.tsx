@@ -11,7 +11,7 @@ import { Button } from "./ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
-import { transactionAction } from '@/utils/transactionAction'; // Import the transaction action
+import { transactionAction } from '@/lib/actions/transactionAction'; // Import the transaction action
 
 // Zod schema for form validation, now using number for IDs
 const formSchema = z.object({
@@ -66,7 +66,7 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
       router.push("/dashboard");
     } catch (error) {
       console.error("Submitting create transfer request failed: ", error);
-    
+
       // Check if the error is an instance of Error and has a message property
       if (error instanceof Error) {
         setError(error.message || "An error occurred during the transfer.");
@@ -74,7 +74,7 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
         setError("An unexpected error occurred during the transfer.");
       }
     }
-    
+
 
     setIsLoading(false);
   };
@@ -100,7 +100,7 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
                       accounts={accounts}
                       onChange={(id) => {
                         if (id) {
-                          form.setValue("fromBank", id);  
+                          form.setValue("fromBank", id);
                           console.log("From Bank Changed: ", id);
                         }
                       }}
@@ -133,7 +133,7 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
                       accounts={accounts}
                       onChange={(id) => {
                         if (id) {
-                          form.setValue("toBank", id);  
+                          form.setValue("toBank", id);
                           console.log("To Bank Changed: ", id);
                         }
                       }}

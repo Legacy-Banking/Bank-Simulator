@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import { useAppSelector } from '@/app/store/hooks'
+import { useAppSelector } from '@/store/hooks'
 
 const UserState = () => {
     const user = useAppSelector(state => state.user)

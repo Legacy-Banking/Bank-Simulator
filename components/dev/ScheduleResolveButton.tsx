@@ -1,5 +1,5 @@
 import React from 'react'
-import { scheduleAction } from '@/utils/scheduleAction'
+import { scheduleAction } from '@/lib/actions/scheduleAction'
 
 const ScheduleResolveButton = () => {
     const onClick = () => {

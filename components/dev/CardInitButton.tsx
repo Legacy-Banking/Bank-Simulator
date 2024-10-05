@@ -1,5 +1,5 @@
 import React from 'react';
-import { cardAction } from '@/utils/cardAction'; // Adjust the import path if needed
+import { cardAction } from '@/lib/actions/cardAction'; // Adjust the import path if needed
 
 const CardInitButton: React.FC<{ user_id: string }> = ({ user_id }) => {
     // Function to handle the button click

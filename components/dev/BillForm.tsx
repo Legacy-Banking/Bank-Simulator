@@ -1,6 +1,6 @@
-import { billerAction } from '@/utils/billerAction';
-import { userAction } from '@/utils/userAction';
-import { billAction } from '@/utils/billAction';
+import { billerAction } from '@/lib/actions/billerAction';
+import { userAction } from '@/lib/actions/userAction';
+import { billAction } from '@/lib/actions/billAction';
 import { useEffect, useState } from 'react';
 
 const BillForm = () => {

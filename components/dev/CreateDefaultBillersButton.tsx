@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { billerAction } from '@/utils/billerAction';
+import { billerAction } from '@/lib/actions/billerAction';
 
 interface CreateDefaultBillersButtonProps {
   user_id: string;

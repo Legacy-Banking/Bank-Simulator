@@ -1,5 +1,5 @@
 'use client'
-import { useAppSelector } from "@/app/store/userSlice";
+import { useAppSelector } from "@/store/userSlice";
 import Link from "next/link";
 import React from 'react'
 

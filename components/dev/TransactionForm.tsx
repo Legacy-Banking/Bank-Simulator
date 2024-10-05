@@ -1,5 +1,5 @@
 import React from 'react'
-import { transactionAction } from '@/utils/transactionAction'
+import { transactionAction } from '@/lib/actions/transactionAction'
 
 type TransactionFormProps = {
     fromAccount: Account;
