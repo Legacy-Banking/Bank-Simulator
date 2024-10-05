@@ -5,6 +5,10 @@ export const transactionAction = {
     createTransaction: async (fromAccount: Account, toAccount: Account, amount: number, description: string, transactionType: string): Promise<void> => {
         const supabase = createClient();
 
+        if (amount === 0) {
+            throw new Error('Transaction amount cannot be zero.');
+        }
+
         const fromNewBalance = fromAccount.balance - amount;
         const toNewBalance = toAccount.balance + amount;
 
