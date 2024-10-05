@@ -22,31 +22,45 @@ type AccountDetailSheetProps = {
   updateAccount: () => void;
 };
 
-const EditAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, status, onClose, updateAccount }) => {
+const EditAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, status, onClose , updateAccount}) => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const handlePasswordUpdate = async () => {
-    if (newPassword !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
+  const supabase = createClient();
+  // Function to update password by user ID
+const updatePasswordById = async (userId: string | undefined, newPassword: string) => {
+  if (userId == undefined) {
+    return { success: false, message: "No user is selected" }
+  }
+  const { error } = await supabase.auth.admin.updateUserById(userId, {
+    password: newPassword,
+  })
 
-    const supabase = createClient();
-    // Call Supabase to update the user's password
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) {
+    setError(error.message);
+    console.error('Error updating password:', error.message)
+    return { success: false, message: error.message }
+  }
 
-    if (error) {
-      setError('Failed to update password: ' + error.message);
-    } else {
-      setError('');
-      setSuccess('Password updated successfully');
-      updateAccount();
-      onClose();
-    }
-  };
+  return { success: true, message: 'Password updated successfully' }
+}
+    
+const handlePasswordUpdate = async () => {
+  const userId = account?.owner; // Replace with the actual user ID from your app logic
+
+  const result = await updatePasswordById(userId, newPassword);
+
+  if (result.success) {
+    console.log(result.message);
+    // Show success notification
+  } else {
+    console.log(result.message);
+    // Show error notification
+  }
+};
+
 
   if (!status) return null;
 
