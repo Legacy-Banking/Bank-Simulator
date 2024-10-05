@@ -1,8 +1,8 @@
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { AppDispatch } from "@/app/store/store";
-import { updateUserId } from '@/app/store/userSlice'
+import { AppDispatch } from "@/store/store";
+import { updateUserId } from '@/store/userSlice'
 
 
 let idleTimeout: NodeJS.Timeout | null = null;

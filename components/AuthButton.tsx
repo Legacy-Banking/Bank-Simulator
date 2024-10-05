@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
-import { useAppDispatch } from "@/app/store/hooks";
-import { updateUserId } from "@/app/store/userSlice";
+import { useAppDispatch } from "@/store/hooks";
+import { updateUserId } from "@/store/userSlice";
 import { useRouter } from "next/navigation";
 type User = {
   email: string

@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn, formatAmount, formatDateTime } from "@/lib/utils"
 
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 import { create } from 'domain';
 import Switch from '@mui/material/Switch';
 
@@ -24,7 +24,7 @@ type BillerDetailSheetProps = {
 };
 
 
-const EditBillerDetailSheet: React.FC<BillerDetailSheetProps> = ({ biller, status, onClose , updateBiller}) => {
+const EditBillerDetailSheet: React.FC<BillerDetailSheetProps> = ({ biller, status, onClose, updateBiller }) => {
 
   if (!status) return null;
   const [billerCode, setBillerCode] = useState(biller?.biller_code);
@@ -40,64 +40,64 @@ const EditBillerDetailSheet: React.FC<BillerDetailSheetProps> = ({ biller, statu
 
   const supabase = createClient();
   // Function to update password by user ID
-const updateBillerById = async (
-  billerId: string | undefined, 
-  billerCode: string | undefined, 
-  billerName: string | undefined, 
-) => {
-  if (!billerId) {
-    return { success: false, message: "No biller is selected" };
-  }
+  const updateBillerById = async (
+    billerId: string | undefined,
+    billerCode: string | undefined,
+    billerName: string | undefined,
+  ) => {
+    if (!billerId) {
+      return { success: false, message: "No biller is selected" };
+    }
 
-  // Update the biller in the 'admin_presets_billers' table
-  const { error } = await supabase
-    .from('billers')
-    .update({
-      biller_code: billerCode,
-      name: billerName,
-      save_biller_status: checked,
-    })
-    .eq('id', billerId); // Make sure to match by the biller's ID
+    // Update the biller in the 'admin_presets_billers' table
+    const { error } = await supabase
+      .from('billers')
+      .update({
+        biller_code: billerCode,
+        name: billerName,
+        save_biller_status: checked,
+      })
+      .eq('id', billerId); // Make sure to match by the biller's ID
 
-  if (error) {
-    console.error('Error updating biller:', error.message);
-    return { success: false, message: error.message };
-  }
-  updateBiller();
-  return { success: true, message: 'Biller updated successfully' };
-};
+    if (error) {
+      console.error('Error updating biller:', error.message);
+      return { success: false, message: error.message };
+    }
+    updateBiller();
+    return { success: true, message: 'Biller updated successfully' };
+  };
 
-const handleDetailsUpdate = async () => {
-  const billerId = biller?.id // Replace with the actual user ID from your app logic
+  const handleDetailsUpdate = async () => {
+    const billerId = biller?.id // Replace with the actual user ID from your app logic
 
-  const result = await updateBillerById(billerId, billerCode, billerName);
+    const result = await updateBillerById(billerId, billerCode, billerName);
 
-  if (result.success) {
-    console.log(result.message);
-    // Show success notification
-  } else {
-    console.log(result.message);
-    // Show error notification
-  }
-};
+    if (result.success) {
+      console.log(result.message);
+      // Show success notification
+    } else {
+      console.log(result.message);
+      // Show error notification
+    }
+  };
 
 
   return (
     <Dialog open={!!status} onOpenChange={onClose}>
       <DialogContent className="bg-white-100 p-6">
         <DialogHeader>
-          
+
           <DialogTitle className="text-2xl font-semibold font-inter mb-8">Edit Details</DialogTitle>
         </DialogHeader>
 
         <form className="flex flex-col w-full rounded-md text-[#344054]">
           <label className="">Biller Code</label>
-          <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline-1 outline-blue-25 placeholder-gray-400 text-base drop-shadow-sm " 
-                  placeholder="Enter biller code e.g. (1022)"  
-                  value={billerCode} 
-                  onChange={(e) => setBillerCode(e.target.value)} 
-                  required />
-          
+          <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline-1 outline-blue-25 placeholder-gray-400 text-base drop-shadow-sm "
+            placeholder="Enter biller code e.g. (1022)"
+            value={billerCode}
+            onChange={(e) => setBillerCode(e.target.value)}
+            required />
+
 
           <label className="">Biller Name</label>
           <input
@@ -109,19 +109,19 @@ const handleDetailsUpdate = async () => {
           />
           <label className="">Save Biller Status?</label>
           <Switch
-              checked={checked}
-              onChange={handleChange}
-              inputProps={{ 'aria-label': 'controlled' }}
-            />
+            checked={checked}
+            onChange={handleChange}
+            inputProps={{ 'aria-label': 'controlled' }}
+          />
         </form>
 
-          {/* Error Message */}
-          {error && (
-            <div className="text-red-200">
-              *<Button className="delete" onClick={() => setError('')}></Button>
-              {error}
-            </div>
-          )}
+        {/* Error Message */}
+        {error && (
+          <div className="text-red-200">
+            *<Button className="delete" onClick={() => setError('')}></Button>
+            {error}
+          </div>
+        )}
         {/* Footer with Close button */}
         <DialogFooter className="mt-8 flex ">
           <Button onClick={handleDetailsUpdate} className="w-2/3 uppercase font-inter tracking-wider bg-blue-25 hover:bg-blue-200 text-white-100">Update</Button>

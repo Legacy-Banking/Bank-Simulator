@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { createClient as supabaseClient } from './supabase/client';
+import { createClient as supabaseClient } from '../supabase/client';
 export const userAction = {
     //this should be admin only
     fetchAllUsers: async (): Promise<User[]> => {

@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn, formatAmount, formatDateTime } from "@/lib/utils"
 
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 import { create } from 'domain';
 import Switch from '@mui/material/Switch';
 
@@ -24,7 +24,7 @@ type AccountPresetDetailSheetProps = {
 };
 
 
-const EditAccountPresetDetailSheet: React.FC<AccountPresetDetailSheetProps> = ({ accountPreset, status, onClose , updateAccountPreset}) => {
+const EditAccountPresetDetailSheet: React.FC<AccountPresetDetailSheetProps> = ({ accountPreset, status, onClose, updateAccountPreset }) => {
 
   if (!status) return null;
   const [accountPresetType, setAccountPresetType] = useState(accountPreset?.account_type);
@@ -36,7 +36,7 @@ const EditAccountPresetDetailSheet: React.FC<AccountPresetDetailSheetProps> = ({
 
 
   const fetchEnumValues = async () => {
-    const data  = [
+    const data = [
       {
         "account_type": "savings"
       },
@@ -53,83 +53,83 @@ const EditAccountPresetDetailSheet: React.FC<AccountPresetDetailSheetProps> = ({
         "account_type": "other"
       }
     ];
-    
+
     setEnumOptions(data?.map((item: { account_type: string }) => item.account_type) || []);
   };
-  
+
   useEffect(() => {
     fetchEnumValues();
 
   }, []);
   const supabase = createClient();
   // Function to update password by user ID
-const updateAccountPresetById = async (
-  accountPresetId: string | undefined, 
-  accountPresetType: string | undefined, 
-  startingBalance: string | undefined, 
-) => {
-  if (!accountPresetId) {
-    return { success: false, message: "No Account Preset is selected" };
-  }
+  const updateAccountPresetById = async (
+    accountPresetId: string | undefined,
+    accountPresetType: string | undefined,
+    startingBalance: string | undefined,
+  ) => {
+    if (!accountPresetId) {
+      return { success: false, message: "No Account Preset is selected" };
+    }
 
-  // Update the accountPreset in the 'account_presets' table
-  const { error } = await supabase
-    .from('account_presets')
-    .update({
-      account_type: accountPresetType,
-      starting_balance: startingBalance,
-    })
-    .eq('id', accountPresetId); // Make sure to match by the accountPreset's ID
+    // Update the accountPreset in the 'account_presets' table
+    const { error } = await supabase
+      .from('account_presets')
+      .update({
+        account_type: accountPresetType,
+        starting_balance: startingBalance,
+      })
+      .eq('id', accountPresetId); // Make sure to match by the accountPreset's ID
 
-  if (error) {
-    console.error('Error updating accountPreset:', error.message);
-    return { success: false, message: error.message };
-  }
-  updateAccountPreset();
-  return { success: true, message: 'Account Preset updated successfully' };
-};
+    if (error) {
+      console.error('Error updating accountPreset:', error.message);
+      return { success: false, message: error.message };
+    }
+    updateAccountPreset();
+    return { success: true, message: 'Account Preset updated successfully' };
+  };
 
-const handleDetailsUpdate = async () => {
-  const accountPresetId = accountPreset?.id 
+  const handleDetailsUpdate = async () => {
+    const accountPresetId = accountPreset?.id
 
-  const result = await updateAccountPresetById(accountPresetId, accountPresetType, startingBalance);
+    const result = await updateAccountPresetById(accountPresetId, accountPresetType, startingBalance);
 
-  if (result.success) {
-    console.log(result.message);
-    // Show success notification
-  } else {
-    console.log(result.message);
-    // Show error notification
-  }
-};
+    if (result.success) {
+      console.log(result.message);
+      // Show success notification
+    } else {
+      console.log(result.message);
+      // Show error notification
+    }
+  };
 
 
   return (
     <Dialog open={!!status} onOpenChange={onClose}>
       <DialogContent className="bg-white-100 p-6">
         <DialogHeader>
-          
+
           <DialogTitle className="text-2xl font-semibold font-inter mb-8">Edit Details</DialogTitle>
         </DialogHeader>
 
         <form className="flex flex-col w-full rounded-md text-[#344054]">
           <label className="">Account Type</label>
-          <select 
+          <select
             className='rounded-md px-3 py-2 mt-2 border mb-6 outline-1 outline-blue-25 placeholder-gray-400 text-base drop-shadow-sm '
             title='Account Type'
             value={accountPresetType}
             onChange={(e) => setAccountPresetType(e.target.value)}>
-              <option value="" disabled>
-                Select Account Type
+            <option value="" disabled>
+              Select Account Type
+            </option>
+            {enumOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
               </option>
-              {enumOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+            ))}
+          </select>
 
-          
+
 
           <label className="">Starting Balance</label>
           <input
@@ -141,13 +141,13 @@ const handleDetailsUpdate = async () => {
           />
         </form>
 
-          {/* Error Message */}
-          {error && (
-            <div className="text-red-200">
-              *<Button className="delete" onClick={() => setError('')}></Button>
-              {error}
-            </div>
-          )}
+        {/* Error Message */}
+        {error && (
+          <div className="text-red-200">
+            *<Button className="delete" onClick={() => setError('')}></Button>
+            {error}
+          </div>
+        )}
         {/* Footer with Close button */}
         <DialogFooter className="mt-8 flex ">
           <Button onClick={handleDetailsUpdate} className="w-2/3 uppercase font-inter tracking-wider bg-blue-25 hover:bg-blue-200 text-white-100">Update</Button>

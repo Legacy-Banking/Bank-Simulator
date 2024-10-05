@@ -1,4 +1,4 @@
-import { createClient } from "./supabase/client";
+import { createClient } from "../supabase/client";
 
 function accbsbGenerator(): { bsb: string, acc: string } {
     // Generate a 6-digit BSB number as a string

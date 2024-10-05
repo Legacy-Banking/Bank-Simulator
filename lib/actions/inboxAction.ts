@@ -1,4 +1,4 @@
-import { createClient } from "./supabase/client";
+import { createClient } from "../supabase/client";
 
 export const inboxAction = {
     createMessage: async (fromName: string, user_id: string, description: string, type: string, bill_id: string, linked_bill: string): Promise<void> => {

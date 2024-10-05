@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { createClient } from '@/utils/supabase/client';
-import { useAppSelector } from '@/app/store/hooks';
-import { accbsbGenerator } from '@/utils/accbsbGenerator';
+import { createClient } from '@/lib/supabase/client';
+import { useAppSelector } from '@/store/hooks';
+import { accbsbGenerator } from '@/lib/utils/accbsbGenerator';
 
 const handleFormSubmit = async (account: Partial<Account>, user_id: string) => {
     const supabase = createClient();

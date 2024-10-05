@@ -1,6 +1,6 @@
 
-import { createClient } from "./supabase/client";
-import { card_detailGenerator } from "./accbsbGenerator";
+import { createClient } from "../supabase/client";
+import { card_detailGenerator } from "../utils/accbsbGenerator";
 import { accountAction } from "./accountAction";
 
 enum AccountType {

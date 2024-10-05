@@ -1,8 +1,8 @@
 'use client'
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { useEffect } from "react";
-import { useAppSelector, useAppDispatch } from "@/app/store/hooks";
-import { updateUserId } from "@/app/store/userSlice";
+import { useAppSelector, useAppDispatch } from "@/store/hooks";
+import { updateUserId } from "@/store/userSlice";
 import RootNavbar from "@/components/RootNavbar";
 import SpecialNavbar from "@/components/SpecialNavbar";
 import { useRouter } from "next/navigation";
@@ -39,19 +39,19 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
     // Cleanup listeners and idle timer on component unmount
     return () => {
-        cleanupListeners();
+      cleanupListeners();
     };
 
   }, [user_id]);
 
   return (
     <div>
-      
-        {user_id ? <SpecialNavbar /> : <RootNavbar />}
-        
-        <main>
-          {children}
-        </main>
+
+      {user_id ? <SpecialNavbar /> : <RootNavbar />}
+
+      <main>
+        {children}
+      </main>
 
     </div>
   );

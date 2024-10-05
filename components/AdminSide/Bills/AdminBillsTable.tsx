@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { billAction } from '@/utils/billAction'; // Assuming this is the path to billAction
+import { billAction } from '@/lib/actions/billAction';
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { formatAmount } from "@/lib/utils";

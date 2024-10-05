@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { scheduleAction } from '@/utils/scheduleAction';
-import { accountAction } from '@/utils/accountAction';
-import { useAppSelector } from '@/app/store/userSlice';
+
+import { accountAction } from '@/lib/actions/accountAction';
+import { scheduleAction } from '@/lib/actions/scheduleAction';
+import { useAppSelector } from '@/store/hooks';
 
 interface ScheduleTransferProps {
     user_id: string;

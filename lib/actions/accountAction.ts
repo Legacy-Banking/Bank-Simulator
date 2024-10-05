@@ -1,5 +1,5 @@
-import { createClient } from "./supabase/client";
-import { accbsbGenerator } from "./accbsbGenerator";
+import { createClient } from "../supabase/client";
+import { accbsbGenerator } from "../utils/accbsbGenerator";
 import { billAction } from "./billAction";
 import { billerAction } from './billerAction';
 import { cardAction } from "./cardAction";

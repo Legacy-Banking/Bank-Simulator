@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { useAppSelector } from '@/app/store/hooks'; // To get the user's ID
+import { useAppSelector } from '@/store/hooks';
 import HeaderBox from '@/components/HeaderBox';
 import TransferFundForm from '@/components/TransferFundsForm';
-import { accountAction } from '@/utils/accountAction'; // Import your account actions
+import { accountAction } from '@/lib/actions/accountAction';
 
 const TransferFunds = () => {
   const user_id = useAppSelector((state) => state.user.user_id); // Assuming user ID is stored in Redux
@@ -55,7 +55,7 @@ const TransferFunds = () => {
 
   return (
     <section className="no-scrollbar flex flex-col md:max-h-screen py-6 lg:py-12 xl:py-16 px-8 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen">
-      <HeaderBox 
+      <HeaderBox
         title="Transfer Funds"
         subtext="Please provide any specific details or notes related to the funds transfer"
       />

@@ -8,9 +8,9 @@ import React, { useEffect, useState } from 'react'; import {
 } from '@/components/ui/dialog';
 import SheetDetails from '@/components/SheetDetails'; // Import the existing SheetDetails component
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
-import { useAppSelector } from "@/app/store/hooks"; // Import for user data
+import { useAppSelector } from '@/store/hooks';
 import StatusLabel from '@/components/StatusLabel';
-import { billAction } from '@/utils/billAction'; // Assuming this is the path to billAction
+import { billAction } from '@/lib/actions/billAction';
 
 // Define the props for the component
 type AdminBillDetailProps = {

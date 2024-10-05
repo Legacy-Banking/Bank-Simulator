@@ -11,21 +11,21 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DatePicker } from "@/components/DatePicker";
-import { billerAction } from '@/utils/billerAction';
-import { billAction } from '@/utils/billAction';
+import { billAction } from "@/lib/actions/billAction";
+import { billerAction } from "@/lib/actions/billerAction";
 import { BillerDropdown } from '@/components/BillerDropDown';
 
 const formSchema = z.object({
-    biller: z.string().min(1, "Please select a valid biller"), 
-    amount: z.string().min(1, "Amount is required").regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"), 
-    dueDate: z.date().refine((date) => date >= new Date(), "Please select a valid due date"),
-    description: z.string().optional(),
-  });
+  biller: z.string().min(1, "Please select a valid biller"),
+  amount: z.string().min(1, "Amount is required").regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"),
+  dueDate: z.date().refine((date) => date >= new Date(), "Please select a valid due date"),
+  description: z.string().optional(),
+});
 
 
 interface CreateBillFormProps {
-    setIsCreatingBill: React.Dispatch<React.SetStateAction<boolean>>;
-  }
+  setIsCreatingBill: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
 const CreateBillForm: React.FC<CreateBillFormProps> = ({ setIsCreatingBill }) => {
   // Handle Back/Cancel button click
@@ -40,28 +40,28 @@ const CreateBillForm: React.FC<CreateBillFormProps> = ({ setIsCreatingBill }) =>
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      biller: "", 
+      biller: "",
       amount: "",
       dueDate: undefined,
       description: "",
     },
   });
 
-    // Fetch billers
-    useEffect(() => {
-        const fetchBillers = async () => {
-          try {
-            const data = await billerAction.fetchAllBillers();
-            setBillers(data || []);
-          } catch (error) {
-            console.error("Failed to fetch billers:", error);
-            setError("Failed to fetch billers");
-          }
-        };
-    
-        fetchBillers();
-      }, []);
-    
+  // Fetch billers
+  useEffect(() => {
+    const fetchBillers = async () => {
+      try {
+        const data = await billerAction.fetchAllBillers();
+        setBillers(data || []);
+      } catch (error) {
+        console.error("Failed to fetch billers:", error);
+        setError("Failed to fetch billers");
+      }
+    };
+
+    fetchBillers();
+  }, []);
+
 
   const submit = async (data: z.infer<typeof formSchema>) => {
     setError(null); // Clear previous error
@@ -74,18 +74,18 @@ const CreateBillForm: React.FC<CreateBillFormProps> = ({ setIsCreatingBill }) =>
         throw new Error("Invalid biller selected.");
       }
 
-        // Convert dueDate to UTC
-        const dueDateUTC = new Date(
-            Date.UTC(data.dueDate.getFullYear(), data.dueDate.getMonth(), data.dueDate.getDate())
-        );
+      // Convert dueDate to UTC
+      const dueDateUTC = new Date(
+        Date.UTC(data.dueDate.getFullYear(), data.dueDate.getMonth(), data.dueDate.getDate())
+      );
 
       await billAction.createAdminBill(
-        data.biller,     
-        parseFloat(data.amount),  
-        dueDateUTC,  
-        data.description || ""    
+        data.biller,
+        parseFloat(data.amount),
+        dueDateUTC,
+        data.description || ""
       );
-  
+
       console.log("Admin bill created successfully");
 
       form.reset();
@@ -180,8 +180,8 @@ const CreateBillForm: React.FC<CreateBillFormProps> = ({ setIsCreatingBill }) =>
               <div className="payment-transfer_form-item py-5">
                 <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700 mt-4">Due Date</FormLabel>
                 <div className="flex w-full flex-col">
-                    <DatePicker name="dueDate" />
-                    
+                  <DatePicker name="dueDate" />
+
                 </div>
               </div>
             </FormItem>

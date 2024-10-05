@@ -1,7 +1,7 @@
-import { createClient } from "./supabase/client";
+import { createClient } from "../supabase/client";
 import { billerAction } from "./billerAction";
 import { number } from "zod";
-import { referenceNumberGenerator, generateUniqueInvoiceNumber, calculateDueDate } from "./accbsbGenerator"
+import { referenceNumberGenerator, generateUniqueInvoiceNumber, calculateDueDate } from "../utils/accbsbGenerator"
 import { inboxAction } from "./inboxAction";
 
 export const billAction = {

@@ -1,6 +1,4 @@
-import { createClient } from "./supabase/client";
-import { randomNameGenerator } from "./randomNameGenerator";
-import { accountAction } from "./accountAction";
+import { createClient } from "../supabase/client";
 import { capitalizeFirstLetter } from "@/lib/utils";
 
 export const transactionAction = {

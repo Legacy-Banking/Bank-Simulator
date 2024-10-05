@@ -1,5 +1,5 @@
-import { createClient } from "./supabase/client"
-import { billerCodeGenerator, referenceNumberGenerator } from "./accbsbGenerator"
+import { createClient } from "../supabase/client"
+import { billerCodeGenerator, referenceNumberGenerator } from "../utils/accbsbGenerator"
 export const billerAction={
     createBiller:async (name:string):Promise<void>=>{
         const supabase = createClient();
