@@ -29,7 +29,7 @@ const formSchema = z.object({
   billerName: z.string().optional(),
   referenceNum: z.string().optional(),
   amount: z.string().min(1, "Amount is required").regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"),
-  description: z.string().optional(),
+  description: z.string().max(300, "Description must be 300 characters or less").optional(),
   saveBiller: z.number().optional(),
   paymentOption: z.enum(["payNow", "schedule", "recurring"]).default("payNow"),
   scheduleDate: z.date().optional(),
