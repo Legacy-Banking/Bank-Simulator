@@ -65,9 +65,6 @@ export default function SignUp({
           <label className="text-base font-medium" htmlFor="username">Username</label>
           <input className="rounded-md px-3 py-2 mt-2 border mb-5 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " name="username" placeholder="Enter username" required />
 
-          <label className="text-base font-medium" htmlFor="email">Email (Optional)</label>
-          <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " type="email" name="emailOption" placeholder="Enter your email" />
-
           <label className="text-base font-medium" htmlFor="password">Password</label>
           <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " type="password" name="password" placeholder="Enter your password" required />
 
