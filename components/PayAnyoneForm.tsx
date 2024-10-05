@@ -24,7 +24,7 @@ const formSchema = z.object({
     .string()
     .regex(/^\d{9}$/, "Account number must be a 9-digit number"), // Validates account number
   amount: z.string().min(1, "Amount is required").regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"), // Validates amount
-  description: z.string().optional(), // Optional description
+  description: z.string().max(300, "Description must be 300 characters or less").optional(), // Optional description
 });
 
 const PayAnyoneForm = ({ accounts }: { accounts: Account[] }) => {

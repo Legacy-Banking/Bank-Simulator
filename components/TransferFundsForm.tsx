@@ -18,7 +18,7 @@ const formSchema = z.object({
   fromBank: z.string().min(1, "Please select a valid bank account"),
   toBank: z.string().min(1, "Please select a valid bank account"),
   amount: z.string().min(1, "Amount is required").regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"),
-  description: z.string().optional(),
+  description: z.string().max(300, "Description must be 300 characters or less").optional(),
 });
 
 const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
