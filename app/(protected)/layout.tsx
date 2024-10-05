@@ -1,15 +1,15 @@
 'use client';
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-import { useAppDispatch, updateUserId, updateUserName, updateUserRole } from "../store/userSlice";
-import { useAppSelector } from '@/app/store/hooks';
+import { useAppDispatch, updateUserId, updateUserName, updateUserRole } from "../../store/userSlice";
+import { useAppSelector } from '@/store/hooks';
 import BankNavbar from "@/components/BankNavbar";
-import { accountAction } from "@/utils/accountAction";
-import { userAction } from "@/utils/userAction";
+import { accountAction } from "@/lib/actions/accountAction";
+import { userAction } from "@/lib/actions/userAction";
 import { Toaster } from "react-hot-toast";
-import { initializeAuthListeners, cleanupListeners } from "@/utils/hooks/useSignoutOnUnload";
+import { initializeAuthListeners, cleanupListeners } from "@/hooks/useSignoutOnUnload";
 
 const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const user = useAppSelector(state => state.user);

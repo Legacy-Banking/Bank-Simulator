@@ -12,17 +12,17 @@ import {
 } from "@/components/ui/table";
 import InboxDetailSheet from './InboxDetailSheet';
 import { formatDateTime } from '@/lib/utils';
-import { inboxAction } from '@/utils/inboxAction';
+import { inboxAction } from '@/lib/actions/inboxAction';
 
 export const InboxTable = ({ messages = [] }: InboxTableProps) => {
     const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
-  
+
     const openMessageDetails = (message: Message) => {
         setSelectedMessage(message);
         inboxAction.readMessage(message);
         message.read = true;
     };
-  
+
     const closeItemDetails = () => {
         setSelectedMessage(null);
     };
@@ -39,7 +39,7 @@ export const InboxTable = ({ messages = [] }: InboxTableProps) => {
                 return null;
         }
     };
-  
+
     return (
         <>
             <Table>
@@ -64,7 +64,7 @@ export const InboxTable = ({ messages = [] }: InboxTableProps) => {
                                 <TableCell className="w-10 pl-10 pr-0">
                                     {icon && <img src={icon} alt={message.type} className="w-4 h-4" />}
                                 </TableCell>
-                                
+
                                 <TableCell className="max-w-[250px] pl-8 pr-10">
                                     <div className="flex items-center gap-3">
                                         <h1 className={`text-14 truncate ${isRead ? 'font-normal text-gray-500' : 'font-semibold text-[#344054]'}`}>
@@ -72,11 +72,11 @@ export const InboxTable = ({ messages = [] }: InboxTableProps) => {
                                         </h1>
                                     </div>
                                 </TableCell>
-    
+
                                 <TableCell className={`pl-4 pr-10 ${isRead ? 'font-normal text-gray-500' : 'font-semibold text-[#344054]'}`}>
                                     {message.description}
                                 </TableCell>
-    
+
                                 <TableCell className={`min-w-32 pl-2 pr-10 ${isRead ? 'font-normal text-gray-500' : 'font-semibold text-[#344054]'}`}>
                                     {formatDateTime(message.date_received)}
                                 </TableCell>
@@ -85,7 +85,7 @@ export const InboxTable = ({ messages = [] }: InboxTableProps) => {
                     })}
                 </TableBody>
             </Table>
-  
+
             <InboxDetailSheet
                 message={selectedMessage}
                 onClose={closeItemDetails}

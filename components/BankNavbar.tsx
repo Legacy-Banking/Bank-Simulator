@@ -3,10 +3,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/utils/supabase/client'
-import { updateUserId } from '@/app/store/userSlice'
-import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
-import { inboxAction } from '@/utils/inboxAction'
+import { createClient } from '@/lib/supabase/client'
+import { updateUserId } from '@/store/userSlice'
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { inboxAction } from '@/lib/actions/inboxAction'
 
 const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) => {
     const user_id = useAppSelector((state) => state.user.user_id)?.toString();
@@ -21,48 +21,48 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
 
     const fetchUnreadMessages = async () => {
         if (user_id) {
-          try {
-            const count = await inboxAction.getUnreadMessageCount(user_id);
-            console.log(`Fetched unread message count: ${count}`);
-            setUnreadMessages(count);  // Update state
-            console.log(`Unread Messages: ${count}`);  // Log count to console
-          } catch (error) {
-            console.error('Error fetching unread messages:', error);
-          } finally {
-            setLoading(false);
-          }
+            try {
+                const count = await inboxAction.getUnreadMessageCount(user_id);
+                console.log(`Fetched unread message count: ${count}`);
+                setUnreadMessages(count);  // Update state
+                console.log(`Unread Messages: ${count}`);  // Log count to console
+            } catch (error) {
+                console.error('Error fetching unread messages:', error);
+            } finally {
+                setLoading(false);
+            }
         }
-      };
-    
-      useEffect(() => {
+    };
+
+    useEffect(() => {
         if (user_id) {
-          // Initial fetch
-          fetchUnreadMessages();
-    
-          // Set up the real-time subscription
-          const subscription = supabase
-            .channel('custom-messages-channel') // Unique channel name
-            .on(
-              'postgres_changes',
-              {
-                event: '*', // Listen for all changes (INSERT, UPDATE, DELETE)
-                schema: 'public',
-                table: 'messages',
-                filter: `to_user=eq.${user_id}`, // Filter by user ID
-              },
-              () => {
-                // Refetch unread messages count whenever there's a change
-                fetchUnreadMessages();
-              }
-            )
-            .subscribe();
-    
-          // Clean up the subscription when the component unmounts
-          return () => {
-            supabase.removeChannel(subscription);
-          };
+            // Initial fetch
+            fetchUnreadMessages();
+
+            // Set up the real-time subscription
+            const subscription = supabase
+                .channel('custom-messages-channel') // Unique channel name
+                .on(
+                    'postgres_changes',
+                    {
+                        event: '*', // Listen for all changes (INSERT, UPDATE, DELETE)
+                        schema: 'public',
+                        table: 'messages',
+                        filter: `to_user=eq.${user_id}`, // Filter by user ID
+                    },
+                    () => {
+                        // Refetch unread messages count whenever there's a change
+                        fetchUnreadMessages();
+                    }
+                )
+                .subscribe();
+
+            // Clean up the subscription when the component unmounts
+            return () => {
+                supabase.removeChannel(subscription);
+            };
         }
-      }, [user_id]);
+    }, [user_id]);
 
     const handleLinkClick = () => {
         setIsDropdownOpen(false);
@@ -187,7 +187,7 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
                             >
                                 Admin
                             </Link>
-                        ) }
+                        )}
 
                         <button
                             onClick={handleLogout}
@@ -256,7 +256,7 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
                                 )}
                             </div>
                         </li>
-                        
+
                         {userRole === 'admin' && (
                             <li className='font-inter text-left'>
                                 <Link

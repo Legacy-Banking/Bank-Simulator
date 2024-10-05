@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import DebitCard from '@/components/DebitCard';
 import CreditCardModel from '@/components/CreditCardModel';
-import { cardAction } from '@/utils/cardAction';
-import { accountAction } from '@/utils/accountAction';
+import { cardAction } from '@/lib/actions/cardAction';
+import { accountAction } from '@/lib/actions/accountAction';
 
 interface CardSidebarProps {
   owner: string; // The ownerId passed as a prop
@@ -46,14 +46,14 @@ const CardSidebar: React.FC<CardSidebarProps> = ({ owner }) => {
         </div>
       ) : (
         <div className="flex flex-col gap-6">
-            {/* Render Debit or Credit card */}
-            {cards.map((card) => {
+          {/* Render Debit or Credit card */}
+          {cards.map((card) => {
             const linkedAccount = accounts.find(account => account.id === card.linked_to);
-            
+
             if (!linkedAccount) return null; // Skip rendering if no linked account is found
 
             return card.card_type === 'debit' ? (
-                <DebitCard
+              <DebitCard
                 key={card.id}
                 type={card.card_type}
                 name={card.owner_username}
@@ -62,9 +62,9 @@ const CardSidebar: React.FC<CardSidebarProps> = ({ owner }) => {
                 maxSpending={linkedAccount.balance}
                 cvc={parseInt(card.cvv)}
                 linkedAccount={linkedAccount}
-                />
+              />
             ) : (
-                <CreditCardModel
+              <CreditCardModel
                 key={card.id}
                 type={card.card_type}
                 name={card.owner_username}
@@ -73,9 +73,9 @@ const CardSidebar: React.FC<CardSidebarProps> = ({ owner }) => {
                 maxSpending={card.credit}
                 cvc={parseInt(card.cvv)}
                 linkedAccount={linkedAccount}
-                />
+              />
             );
-            })}
+          })}
         </div>
       )}
     </div>

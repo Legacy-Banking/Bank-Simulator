@@ -1,6 +1,6 @@
 import React from "react";
 import { formatDateTime } from "@/lib/utils";
-import { useAppSelector } from "@/app/store/hooks";
+import { useAppSelector } from "@/store/hooks";
 import { Tooltip } from "react-tooltip";
 import { FaQuestionCircle } from "react-icons/fa";
 

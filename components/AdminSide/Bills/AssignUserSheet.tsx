@@ -24,8 +24,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { userAction } from "@/utils/userAction";
-import { billAction } from "@/utils/billAction";
+import { billAction } from "@/lib/actions/billAction";
+import { userAction } from "@/lib/actions/userAction";
 import SearchBar from "@/components/SearchBar";
 
 interface AssignUserSheetProps {

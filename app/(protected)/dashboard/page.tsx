@@ -3,8 +3,8 @@ import HeaderBox from '@/components/HeaderBox'
 import AnimatedCounter from '@/components/AnimatedCounter';
 import React, { useEffect, useState } from 'react'
 import AccountBox from '@/components/AccountBox';
-import { useAppSelector } from '@/app/store/hooks';
-import { accountAction } from '@/utils/accountAction';
+import { useAppSelector } from '@/store/hooks';
+import { accountAction } from '@/lib/actions/accountAction';
 
 const Dashboard = () => {
     const user = useAppSelector(state => state.user);

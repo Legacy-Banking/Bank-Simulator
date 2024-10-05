@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import SearchBar from '@/components/SearchBar';
 import AdminSideBar from '@/components/AdminSide/AdminSideBar';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 import { AccountsTable } from '../Accounts/AccountsTable';
 import { useSearchParams } from 'next/navigation';
 import { Pagination } from '@/components/Pagination';
@@ -118,7 +118,7 @@ const PresetsPage = () => {
       case 'Constant':
         setAddConstantWindow((prevState) => !prevState);
         break;
-      
+
     }
 
   }
@@ -216,7 +216,7 @@ const PresetsPage = () => {
             setShowUpdatePopUp={setShowUpdatePopUp}
             setShowDeletePopUp={setShowDeletePopUp}
             onEditStatus={fetchBillers}
-            
+
           />
         );
       case 'Constant':
@@ -236,7 +236,7 @@ const PresetsPage = () => {
   const renderPagination = () => {
     let finalTotalPages = 0;
     let currPage = 1;
-    let setPage = (page: number) => {};
+    let setPage = (page: number) => { };
 
     switch (activeTable) {
       case 'Accounts':
@@ -298,7 +298,7 @@ const PresetsPage = () => {
                 <PresetOption name="Billers" activeTable={activeTable} setActiveTable={setActiveTable} />
                 <PresetOption name="Constant" activeTable={activeTable} setActiveTable={setActiveTable} />
               </div>
-            <AddButton onClick={toggleAddItemDetailSheet}></AddButton>
+              <AddButton onClick={toggleAddItemDetailSheet}></AddButton>
             </div>
             <section className="flex w-full flex-col mt-6 bg-white-100 rounded-b-3xl">
               {renderActiveTable()}
@@ -322,14 +322,14 @@ const PresetsPage = () => {
         status={addBillerWindow}
         onClose={() => toggleAddItemDetailSheet()}
         onAddStatus={addedItemToTable}
-        
-        />
+
+      />
       <AddConstantDetailSheet
         status={addConstantWindow}
         onClose={() => toggleAddItemDetailSheet()}
         onAddStatus={addedItemToTable}
-        
-        />
+
+      />
 
       {showUpdatePopUp && (
         <PopUp message="Successfully Updated.." onClose={() => setShowUpdatePopUp(false)} />

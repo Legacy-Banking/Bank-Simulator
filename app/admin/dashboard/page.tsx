@@ -5,11 +5,11 @@ import AdditionalFundsPage from '@/components/AdminSide/AdditionalFundsPage';
 import AdminSideBar from '@/components/AdminSide/AdminSideBar'
 import CreateBillPage from '@/components/AdminSide/Bills/CreateBillPage';
 import PresetsPage from '@/components/AdminSide/Presets/PresetsPage';
-import { useAppSelector } from '@/app/store/userSlice';
+import { useAppSelector } from '@/store/hooks';
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation';
 import BankNavbar from '@/components/BankNavbar';
-import { accountAction } from "@/utils/accountAction";
+import { accountAction } from '@/lib/actions/accountAction';
 
 
 const AdminDashboard = () => {

@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import SearchBar from '@/components/SearchBar';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 import { AccountsTable } from './AccountsTable';
 import { Pagination } from '@/components/Pagination';
 import PopUp from './PopUp';
@@ -34,7 +34,7 @@ const AccountsPage = () => {
   const filteredAccounts = accounts.filter((account) =>
     (account.owner_username ?? '').toLowerCase().includes(inputValue.toLowerCase())
   );
-  
+
   const uniqueAccounts = filteredAccounts.filter((account, index, self) =>
     index === self.findIndex((t) => t.owner === account.owner)
   );

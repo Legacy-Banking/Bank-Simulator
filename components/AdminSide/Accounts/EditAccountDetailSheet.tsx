@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn, formatAmount, formatDateTime } from "@/lib/utils"
 
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 import { create } from 'domain';
 
 // Define the props type for the component
@@ -22,7 +22,7 @@ type AccountDetailSheetProps = {
   updateAccount: () => void;
 };
 
-const EditAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, status, onClose , updateAccount}) => {
+const EditAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, status, onClose, updateAccount }) => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
@@ -30,36 +30,36 @@ const EditAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, st
 
   const supabase = createClient();
   // Function to update password by user ID
-const updatePasswordById = async (userId: string | undefined, newPassword: string) => {
-  if (userId == undefined) {
-    return { success: false, message: "No user is selected" }
+  const updatePasswordById = async (userId: string | undefined, newPassword: string) => {
+    if (userId == undefined) {
+      return { success: false, message: "No user is selected" }
+    }
+    const { error } = await supabase.auth.admin.updateUserById(userId, {
+      password: newPassword,
+    })
+
+    if (error) {
+      setError(error.message);
+      console.error('Error updating password:', error.message)
+      return { success: false, message: error.message }
+    }
+
+    return { success: true, message: 'Password updated successfully' }
   }
-  const { error } = await supabase.auth.admin.updateUserById(userId, {
-    password: newPassword,
-  })
 
-  if (error) {
-    setError(error.message);
-    console.error('Error updating password:', error.message)
-    return { success: false, message: error.message }
-  }
+  const handlePasswordUpdate = async () => {
+    const userId = account?.owner; // Replace with the actual user ID from your app logic
 
-  return { success: true, message: 'Password updated successfully' }
-}
-    
-const handlePasswordUpdate = async () => {
-  const userId = account?.owner; // Replace with the actual user ID from your app logic
+    const result = await updatePasswordById(userId, newPassword);
 
-  const result = await updatePasswordById(userId, newPassword);
-
-  if (result.success) {
-    console.log(result.message);
-    // Show success notification
-  } else {
-    console.log(result.message);
-    // Show error notification
-  }
-};
+    if (result.success) {
+      console.log(result.message);
+      // Show success notification
+    } else {
+      console.log(result.message);
+      // Show error notification
+    }
+  };
 
 
   if (!status) return null;
@@ -68,7 +68,7 @@ const handlePasswordUpdate = async () => {
     <Dialog open={!!status} onOpenChange={onClose}>
       <DialogContent className="bg-white-100 p-6">
         <DialogHeader>
-          
+
           <DialogTitle className="text-2xl font-semibold font-inter mb-8">Edit Details</DialogTitle>
         </DialogHeader>
 
@@ -81,29 +81,29 @@ const handlePasswordUpdate = async () => {
           />
 
           <label className="">New Password</label>
-          <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " 
-                  name="password" 
-                  placeholder="Enter your password" 
-                  value={newPassword} 
-                  onChange={(e) => setNewPassword(e.target.value)} 
-                  required />
+          <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm "
+            name="password"
+            placeholder="Enter your password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            required />
 
           <label className="">Re-Type New Password</label>
-          <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm " 
-                  name="password" 
-                  placeholder="Enter your password" 
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required />
+          <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm "
+            name="password"
+            placeholder="Enter your password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required />
         </form>
 
-          {/* Error Message */}
-          {error && (
-            <div className="text-red-200">
-              *<Button className="delete" onClick={() => setError('')}></Button>
-              {error}
-            </div>
-          )}
+        {/* Error Message */}
+        {error && (
+          <div className="text-red-200">
+            *<Button className="delete" onClick={() => setError('')}></Button>
+            {error}
+          </div>
+        )}
         {/* Footer with Close button */}
         <DialogFooter className="mt-8 flex ">
           <Button onClick={handlePasswordUpdate} className="w-2/3 uppercase font-inter tracking-wider bg-blue-25 hover:bg-blue-200 text-white-100">Update</Button>
