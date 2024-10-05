@@ -87,6 +87,10 @@ export const transactionAction = {
     ): Promise<void> => {
         const supabase = createClient();
 
+        if (amount === 0) {
+            throw new Error('Transaction amount cannot be zero.');
+        }
+
         const fromNewBalance = fromAccount.balance - amount;
 
         if (fromNewBalance < 0) {
