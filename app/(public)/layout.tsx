@@ -6,7 +6,7 @@ import { updateUserId } from "@/store/userSlice";
 import RootNavbar from "@/components/RootNavbar";
 import SpecialNavbar from "@/components/SpecialNavbar";
 import { useRouter } from "next/navigation";
-import { initializeAuthListeners, cleanupListeners } from "@/utils/hooks/useSignoutOnUnload";
+import { initializeAuthListeners, cleanupListeners } from "@/hooks/useSignoutOnUnload";
 
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const user = useAppSelector((state) => state.user);

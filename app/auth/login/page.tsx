@@ -41,7 +41,7 @@ export default function Login({
 
 
         <div className="pb-4">
-          <img src="logo-full.png" alt="Logo" className="w-full " />
+          <img src="../logo-full.png" alt="Logo" className="w-full " />
         </div>
 
 
@@ -70,7 +70,7 @@ export default function Login({
         <div className="mt-5 text-base text-center font-normal text-[#475467]">
           Don't have an account?
           <Link className="text-[#3D87C3] rounded-md px-1 font-semibold"
-            href="/sign-up">Sign Up</Link>
+            href="/auth/sign-up">Sign Up</Link>
 
         </div>
       </div>

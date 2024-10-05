@@ -1,5 +1,5 @@
-import { createClient } from "../../lib/supabase/client";
-import { scheduleAction } from "../../lib/actions/scheduleAction";
+import { createClient } from "@/lib/supabase/client";
+import { scheduleAction } from "@/lib/actions/scheduleAction";
 
 // Helper function to calculate missed runs based on interval
 const calculateMissedRuns = (lastActivation: string, interval: number): number => {

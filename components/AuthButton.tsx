@@ -38,7 +38,7 @@ const AuthButton: React.FC = () => {
     try {
       await supabase.auth.signOut();
       dispatch(updateUserId(""));
-      router.push("/login");
+      router.push("/auth/login");
     } catch (error) {
       console.error("Error signing out:", error);
     }

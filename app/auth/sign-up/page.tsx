@@ -36,7 +36,7 @@ export default function SignUp({
 
 
     if (error) {
-      return redirect(`/sign-up?message=${error}`);
+      return redirect(`/auth/sign-up?message=${error}`);
     }
     const user_id = data.user?.id || '';
     await accountAction.signUpInitialization(user_id, username);
@@ -48,7 +48,7 @@ export default function SignUp({
     <div className="flex items-center justify-center min-h-screen bg-[#F6CA4D] w-full">
       <div className="flex flex-col w-full p-10 sm:max-w-md justify-center gap-2 bg-[#ffffff] rounded-2xl drop-shadow-2xl shadow-2xl shadow-stone-500">
         <div className="pb-4">
-          <img src="logo-full.png" alt="Logo" className="w-full " />
+          <img src="../logo-full.png" alt="Logo" className="w-full " />
         </div>
         <div className="py-6">
           <div className="text-5xl text-[#101828] font-semibold pb-4">Sign Up</div>

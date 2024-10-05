@@ -9,7 +9,7 @@ import BankNavbar from "@/components/BankNavbar";
 import { accountAction } from "@/lib/actions/accountAction";
 import { userAction } from "@/lib/actions/userAction";
 import { Toaster } from "react-hot-toast";
-import { initializeAuthListeners, cleanupListeners } from "@/utils/hooks/useSignoutOnUnload";
+import { initializeAuthListeners, cleanupListeners } from "@/hooks/useSignoutOnUnload";
 
 const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const user = useAppSelector(state => state.user);
