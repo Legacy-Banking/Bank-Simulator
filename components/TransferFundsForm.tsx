@@ -59,6 +59,18 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
       const amount = parseFloat(data.amount);
       const transactionType = "transfer funds";
 
+      // ** New validation for credit accounts **
+      if (toAccount.type === 'credit') {
+        const newCreditBalance = toAccount.balance + amount;
+
+        // Ensure the new balance doesn't exceed the opening balance (credit limit)
+        if (newCreditBalance > toAccount.opening_balance) {
+          setError("This transaction exceeds the credit limit.");
+          setIsLoading(false);
+          return;
+        }
+      }
+
       // Call the transactionAction to create the transaction
       await transactionAction.createTransaction(fromAccount, toAccount, amount, data.description || "", transactionType);
 
