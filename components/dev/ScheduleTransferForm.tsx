@@ -105,7 +105,6 @@ const ScheduleTransferForm: React.FC<ScheduleTransferProps> = ({ user_id }) => {
                         amount,
                         description,
                         schedule,
-                        [fromAcc.owner],
                     );
                     alert('BPAY scheduled successfully!');
                 } catch (error) {
@@ -217,7 +216,7 @@ const ScheduleTransferForm: React.FC<ScheduleTransferProps> = ({ user_id }) => {
                             <label>Recur End Date:</label>
                             <input
                                 type="date"
-                                value={recurEndDate}
+                                value={recurEndDate?.toISOString()}
                                 onChange={(e) => setRecurEndDate(new Date(e.target.value))}
                             />
                         </div>
@@ -342,7 +341,7 @@ const ScheduleTransferForm: React.FC<ScheduleTransferProps> = ({ user_id }) => {
                                 <label>Recur End Date:</label>
                                 <input
                                     type="date"
-                                    value={recurEndDate}
+                                    value={recurEndDate?.toISOString()}
                                     onChange={(e) => setRecurEndDate(new Date(e.target.value))}
                                 />
                             </div>
