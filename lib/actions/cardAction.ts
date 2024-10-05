@@ -113,6 +113,8 @@ export const cardAction = {
 
          const expiry = new Date(expiryYear, expiryMonth, 1); 
          const formattedExpiryDate = expiry.toISOString().split('T')[0];
+
+         console.log(formattedExpiryDate);
     
           // Query the database for the account linked to the provided card details
           const { data, error } = await supabase
@@ -147,6 +149,51 @@ export const cardAction = {
         }
       },
     
+      updateAllCardExpiryDates: async (): Promise<void> => {
+        try {
+          const supabase = createClient();
     
+          // Step 1: Fetch all card records
+          const { data: cards, error: fetchError } = await supabase
+            .from('cards')
+            .select('id, expiry_date');
+    
+          if (fetchError) {
+            throw new Error(`Error fetching cards: ${fetchError.message}`);
+          }
+    
+          if (!cards || cards.length === 0) {
+            console.log("No cards found.");
+            return;
+          }
+    
+          // Step 2: Loop through each card and update the expiry date
+          for (const card of cards) {
+            const expiryDate = new Date(card.expiry_date);
+    
+            // Set the day to the 1st of the respective month
+            const updatedExpiryDate = new Date(expiryDate.getFullYear(), expiryDate.getMonth(), 1);
+    
+            // Convert the updated expiry date to a format that matches your database schema (e.g., YYYY-MM-DD)
+            const formattedExpiryDate = updatedExpiryDate.toISOString().split('T')[0];
+    
+            // Step 3: Update the card expiry date in the database
+            const { error: updateError } = await supabase
+              .from('cards')
+              .update({ expiry_date: formattedExpiryDate })
+              .eq('id', card.id);
+    
+            if (updateError) {
+              console.error(`Error updating expiry date for card ID ${card.id}: ${updateError.message}`);
+            } else {
+              console.log(`Successfully updated expiry date for card ID ${card.id} to ${formattedExpiryDate}`);
+            }
+          }
+    
+        } catch (error) {
+          console.error("Error updating card expiry dates:", error);
+          throw error;
+        }
+      },
 
 }
