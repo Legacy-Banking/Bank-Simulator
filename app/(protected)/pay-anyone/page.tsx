@@ -23,8 +23,8 @@ const PayAnyone = () => {
 
         console.log("Fetched accounts data:", data); // Debug: Check fetched accounts
 
-        // Filter out accounts with type "savings" and "credit"
-        const filteredAccounts = data.filter((account) => account.type !== 'savings' && account.type !== 'credit');
+        // Filter out accounts with type "savings"
+        const filteredAccounts = data.filter((account) => account.type !== 'savings');
 
         console.log("Filtered accounts data (excluding savings and credit):", filteredAccounts); // Debug: Check filtered accounts
 
