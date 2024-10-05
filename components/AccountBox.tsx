@@ -43,6 +43,9 @@ const AccountBox: React.FC<AccountBoxProps> = ({ account }) => {
         router.push(`/transaction-history?accountid=${account.id}`);
     };
 
+    const availableCredit = account.balance || 0;  // Assuming balance field represents available credit for credit accounts
+    const creditUsed = (account.opening_balance || 0) - availableCredit; // opening_balance is assumed to be the total available credit limit
+
     return (
         <div className={`space-y-6 ${boxStyle} rounded-lg shadow-md`}>
             <div className='flex flex-col justify-between gap-4 rounded-lg border-y px-6 py-6 md:flex-row'>
@@ -75,9 +78,10 @@ const AccountBox: React.FC<AccountBoxProps> = ({ account }) => {
 
                 <div className='flex-center flex-col gap-2 rounded-md bg-white-100/20 px-8 py-2 text-blackText-100 border border-black'>
                     <div className="text-2xl text-center font-bold">
-                        <BalanceBox
-                            accounts={[]}
-                            currentBalance={account.balance || 0}
+                    <BalanceBox
+                            currentBalance={availableCredit}
+                            creditUsed={creditUsed}
+                            isCreditAccount={account.type === 'credit'}
                         />
                     </div>
                 </div>
