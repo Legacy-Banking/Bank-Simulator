@@ -116,27 +116,9 @@ export const accountAction = {
     signUpInitialization: async (user_id: string, owner_username: string): Promise<void> => {
         const { bsb: perbsb, acc: peracc } = accbsbGenerator();
         const { bsb: savbsb, acc: savacc } = accbsbGenerator();
-        const bills = [
-            {
-                biller: {
-                    id: '1',
-                    name: 'Melbourne Electricity',
-                    biller_code: '2513',
-                } as Biller,
-                amount: 100,
-                description: 'Electricity Bill'
-            },
-            {
-                biller: {
-                    id: '2',
-                    name: 'Daily News',
-                    biller_code: '8351'
 
-                } as Biller,
-                amount: 28.8,
-                description: 'Monthly Subscription'
-            }
-        ]
+        // Fetch preset bills using the new function in billerAction
+        const presetBills = await billAction.fetchPresetBills();
 
         const accounts: Partial<Account>[] = [
             {
@@ -175,8 +157,41 @@ export const accountAction = {
 
         await billerAction.createDefaultSavedBillers(user_id);
 
-        for (const bill of bills) {
-            await billAction.createBill(user_id, bill.biller, bill.amount, bill.description);
+        // Loop through fetched bills and create bills for the user
+        for (const bill of presetBills) {
+            await billAction.createBillForUsers(
+                [user_id], // The single user being assigned the bill
+                bill.biller, // Biller from the preset bill
+                bill.amount, // Amount from the preset bill
+                bill.description, // Description from the preset bill
+                new Date(bill.due_date), // Due date from the preset bill
+                bill.id // Linked bill from the preset bill
+            );
+    
+            // Now update the assigned_users in the Admin Bill
+            // Fetch the current assigned users for the linked bill
+            const { assigned_users: currentAssignedUsers } = await billAction.fetchAdminBillById(bill.id);
+    
+            // Create a string with the user details (username|id)
+            const newUserAssignment = `${owner_username}|${user_id}`;
+    
+            // If there are already assigned users, split them into an array, otherwise start with an empty array
+            const existingUserArray = currentAssignedUsers
+                ? currentAssignedUsers.split(",").map((user: string) => user.trim())
+                : [];
+    
+            // Add the new user to the list and remove duplicates
+            const updatedAssignedUsersArray = [...existingUserArray, newUserAssignment].filter(
+                (value, index, self) => self.indexOf(value) === index
+            );
+    
+            // Join the updated array into a string
+            const updatedAssignedUsers = updatedAssignedUsersArray.join(", ");
+    
+            // Update the admin bill with the new assigned users list
+            await billAction.updateAssignedUsers(bill.id, updatedAssignedUsers);
+    
+            console.log("Updated assigned users in Admin Bill:", updatedAssignedUsers);
         }
 
 
