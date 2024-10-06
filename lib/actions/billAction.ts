@@ -553,7 +553,43 @@ export const billAction = {
             console.error('Error fetching assigned users:', error);
             throw error;
         }
-    }
+    },
 
+    fetchPresetBills: async (): Promise<any[]> => {
+        const supabase = createClient();
+    
+        // Fetch bills where preset_status is true
+        const { data: adminBills, error: fetchError } = await supabase
+            .from('admin_bills')
+            .select('biller, description, amount, due_date, id')
+            .eq('preset_status', true); // Filter for preset bills
+    
+        if (fetchError) {
+            throw new Error(`Error fetching bills: ${fetchError.message}`);
+        }
+    
+        if (!adminBills || adminBills.length === 0) {
+            throw new Error("No preset bills found to insert.");
+        }
+    
+        // Fetch the corresponding biller details for each bill from the name
+        const billsWithBillerDetails = await Promise.all(
+            adminBills.map(async (bill) => {
+                const billerDetails = await billerAction.fetchBillerByName(bill.biller);
+                if (!billerDetails.length) {
+                    throw new Error(`Biller ${bill.biller} not found.`);
+                }
+                
+                return {
+                    ...bill, // Include the original bill details
+                    biller: billerDetails[0], // Replace the biller name with the full biller details
+                };
+            })
+        );
+    
+        // Return the bills with the full biller details
+        return billsWithBillerDetails;
+    },
+    
 
 };

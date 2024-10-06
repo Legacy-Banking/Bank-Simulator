@@ -57,12 +57,11 @@ export const billerAction={
     createDefaultSavedBillers: async (user_id: string): Promise<void> => {
     const supabase = createClient();
 
-    // Fetch the first 4 billers from the 'billers' table
+    // Fetch all billers where save_biller_status is true
     const { data: billers, error: fetchError } = await supabase
       .from('billers')
       .select('*')
-      .order('id', { ascending: true })
-      .limit(4);
+      .eq('save_biller_status', true); // Fetch billers where save_biller_status is true
 
       if (fetchError) {
         throw new Error(`Error fetching billers: ${fetchError.message}`);
@@ -281,6 +280,6 @@ export const billerAction={
     
       console.log('Biller reference updated successfully');
     },
-    
+  
 
 }
