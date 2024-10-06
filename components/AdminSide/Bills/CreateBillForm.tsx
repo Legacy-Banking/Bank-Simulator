@@ -19,7 +19,7 @@ const formSchema = z.object({
   biller: z.string().min(1, "Please select a valid biller"),
   amount: z.string().min(1, "Amount is required").regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"),
   dueDate: z.date().refine((date) => date >= new Date(), "Please select a valid due date"),
-  description: z.string().optional(),
+  description: z.string().max(300, "Description must be 300 characters or less").optional(),
 });
 
 
