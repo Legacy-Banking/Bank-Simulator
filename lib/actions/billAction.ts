@@ -19,6 +19,24 @@ export const billAction = {
 
         return sortedBills;
     },
+    fetchBillsByUserIdAndBillerName: async (user_id: string, biller_name: string): Promise<Bill[]> => {
+        const supabase = createClient();
+        
+        // Query to filter bills by both user_id and biller_name
+        const { data, error } = await supabase
+            .from('bills')
+            .select('*')
+            .eq('billed_user', user_id)
+            .eq('from', biller_name);
+        if (error) {
+            throw new Error(error.message);
+        }
+    
+        // Sort bills using the existing sortBill function
+        const sortedBills = billAction.sortBill(data);
+    
+        return sortedBills;
+    },
     sortBill: (bills: Bill[]): Bill[] => {
         const statusPriority: { [key: string]: number } = {
             unpaid: 1,
