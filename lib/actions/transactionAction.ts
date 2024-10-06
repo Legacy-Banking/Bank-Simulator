@@ -172,6 +172,39 @@ export const transactionAction = {
 
         });
     },
+
+    fetchTransactionPresets: async (accountId: string, accountUsername: string): Promise<Transaction[]> => {
+
+        const supabase = createClient();
+
+        const { data, error } = await supabase
+            .from('transaction_presets')
+            .select('*')
+            
+        if (error) {
+            console.error('Error fetching transaction presets:', error);
+            throw error;
+        }
+        const transactions = data as TransactionPresetType[];
+        // Assuming `fetchedTransactions` is the result of fetching from the database
+        const transformedData = transactions.map(transaction => {
+            const isPayingRecipient = transaction.amount < 0;
+            
+            return {
+            id: transaction.recipient + transaction.id,
+            description: "Some description", // Add logic to build the description
+            amount: transaction.amount,
+            paid_on: transaction.date_issued,
+            from_account: isPayingRecipient ? accountId : "default",
+            from_account_username: isPayingRecipient ? accountUsername : transaction.recipient,
+            to_account: isPayingRecipient ? "default" : accountId,
+            to_account_username: isPayingRecipient ? transaction.recipient: accountUsername,
+            transaction_type: 'pay anyone', // Adjust this based on your logic
+            };
+        });
+        
+        return transformedData as Transaction[];
+    }
 };
 
 

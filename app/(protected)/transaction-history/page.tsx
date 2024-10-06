@@ -39,7 +39,7 @@ const TransactionHistoryContent = () => {
   const [page, setPage] = useState(pageFromUrl);
   const [loading, setLoading] = useState(true);
   const rowsPerPage = 10;
-
+  const [transactionPresets, setTransactionsPresets] = useState<Transaction[]>([]);
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: addDays(new Date(), -20), // 20 days before today
     to: new Date(), // Today
@@ -81,10 +81,12 @@ const TransactionHistoryContent = () => {
           accountAction.fetchUsernamebyUserId(user_id)
             .then((fetchedUsername) => {
               var updatedDummyData: Transaction[] = [];
-
+              transactionAction.fetchTransactionPresets(accountId, fetchedUsername).then((presetData) => {
+                setTransactionsPresets(presetData);
+              
+              
               accountAction.fetchAccountTypebyId(accountId)
                 .then((fetchedType) => {
-                  console.log(fetchedType);
                   if (fetchedType == 'personal') {
                     updatedDummyData = [
                       {
@@ -191,8 +193,7 @@ const TransactionHistoryContent = () => {
 
                   // Combine fetched transactions with dummy data
 
-                  var combinedData = (data || []).concat(updatedDummyData);
-                  console.log(combinedData);
+                  var combinedData = (data || []).concat(updatedDummyData).concat(presetData);
                   // Filter combined data based on the selected date range
                   combinedData = combinedData.filter(
                     (transaction) =>
@@ -203,6 +204,7 @@ const TransactionHistoryContent = () => {
                   setLoading(false); // Set loading to false after fetching data
 
                 });
+              });
             })
 
             .catch((error) => {
@@ -313,7 +315,6 @@ const TransactionHistoryContent = () => {
                 </SelectContent>
               </Select>
             </div>
-
             <AccountBox account={account} />
 
             <div className="flex justify-between items-center flex-wrap">
