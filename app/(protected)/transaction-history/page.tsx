@@ -14,12 +14,11 @@ import { useAppSelector } from '@/store/hooks';
 import { capitalizeFirstLetter, formatAmount } from '@/lib/utils';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import { addDays, format } from "date-fns"
-import { Calendar as CalendarIcon } from "lucide-react"
-import { DateRange } from "react-day-picker"
+import { startOfMonth, format } from "date-fns"
+import { Calendar as CalendarIcon, X } from "lucide-react"
+import MonthPicker from '@/components/MonthPicker';
 
-import { cn } from "@/lib/utils"
-import { Calendar } from "@/components/ui/calendar"
+import { cn } from "@/lib/utils";
 import {
   Popover,
   PopoverContent,
@@ -40,10 +39,7 @@ const TransactionHistoryContent = () => {
   const [loading, setLoading] = useState(true);
   const rowsPerPage = 10;
 
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from: addDays(new Date(), -20), // 20 days before today
-    to: new Date(), // Today
-  })
+  const [selectedMonth, setSelectedMonth] = useState<Date | undefined>(undefined);
 
   // Inside the main component
   useEffect(() => {
@@ -193,12 +189,16 @@ const TransactionHistoryContent = () => {
 
                   var combinedData = (data || []).concat(updatedDummyData);
                   console.log(combinedData);
-                  // Filter combined data based on the selected date range
-                  combinedData = combinedData.filter(
-                    (transaction) =>
-                      new Date(transaction.paid_on) >= (date?.from || new Date(0)) &&
-                      new Date(transaction.paid_on) <= (date?.to || new Date())
-                  );
+                  // Filter transactions by the selected month
+                  if (selectedMonth) {
+                    combinedData = combinedData.filter((transaction) => {
+                      const transactionDate = new Date(transaction.paid_on);
+                      return (
+                        transactionDate.getMonth() === selectedMonth.getMonth() &&
+                        transactionDate.getFullYear() === selectedMonth.getFullYear()
+                      );
+                    });
+                  }                  
                   setTransactions(combinedData);
                   setLoading(false); // Set loading to false after fetching data
 
@@ -217,7 +217,7 @@ const TransactionHistoryContent = () => {
 
       setPage(pageFromUrl);
     }
-  }, [accountId, pageFromUrl, user_id, date]);
+  }, [accountId, pageFromUrl, user_id, selectedMonth]);
 
   const handleAccountChange = (value: string) => {
 
@@ -329,41 +329,32 @@ const TransactionHistoryContent = () => {
                         variant={"outline"}
                         className={cn(
                           "w-[270px] justify-start text-left font-normal bg-white border border-gray-300 font-poppins", // Ensuring proper button background and border
-                          !date && "text-gray-500" // Text contrast when no date is selected
+                          !selectedMonth  && "text-gray-500" // Text contrast when no date is selected
                         )}
                       >
-                        <CalendarIcon className="mr-2 h-4 w-4 text-gray-600" /> {/* Ensuring icon visibility */}
-                        {date?.from ? (
-                          date.to ? (
-                            <>
-                              {format(date.from, "LLL dd, y")} -{" "}
-                              {format(date.to, "LLL dd, y")}
-                            </>
-                          ) : (
-                            format(date.from, "LLL dd, y")
-                          )
-                        ) : (
-                          <span>Pick a date</span>
+                        <div className="flex items-center">
+                          <CalendarIcon className="mr-2 h-4 w-4 text-gray-600" /> {/* Ensuring icon visibility */}
+                          {selectedMonth ? format(selectedMonth, "LLLL yyyy") : <span>Select Month</span>}
+                        </div>
+
+                        {selectedMonth && ( // Conditionally render the "X" icon when a month is selected
+                          <div className="ml-auto mt-1"> {/* This ensures the "X" icon is all the way to the right */}
+                            <button
+                              onClick={() => setSelectedMonth(undefined)} // Clear the selected month
+                              className="text-gray-500 hover:text-black focus:outline-none"
+                              aria-label="Clear month filter"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
                         )}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0 bg-white-100 border border-gray-200 shadow-lg"> {/* Adding a solid background and shadow to make it non-transparent */}
-                      <Calendar
-                        initialFocus
-                        mode="range"
-                        defaultMonth={date?.from}
-                        selected={date}
-                        onSelect={setDate}
-                        numberOfMonths={2}
-                        className="p-4 text-gray-800" // Ensuring visible text inside the calendar
-
-                        modifiersClassNames={{
-                          range_start: "bg-blue-500 text-white", // Start of range
-                          range_end: "bg-blue-500 text-white", // End of range
-                          range_middle: "bg-blue-200 text-blue-700", // Middle of range
-                          hover: "bg-gray-200", // Hover effect for the dates
-                        }}
-                      />
+                      <MonthPicker
+                        currentMonth={selectedMonth || new Date()} // Default to current date if undefined
+                        onMonthChange={setSelectedMonth}
+                    />
                     </PopoverContent>
                   </Popover>
                 </div>
