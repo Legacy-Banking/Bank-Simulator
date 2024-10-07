@@ -13,7 +13,7 @@ import { cn, formatAmount, formatDateTime } from "@/lib/utils"
 import { createClient } from '@/lib/supabase/client';
 import { create } from 'domain';
 import Switch from '@mui/material/Switch';
-
+import { accbsbGenerator } from '@/lib/utils/accbsbGenerator';
 
 // Define the props type for the component
 type AccountPresetDetailSheetProps = {
@@ -33,7 +33,6 @@ const EditAccountPresetDetailSheet: React.FC<AccountPresetDetailSheetProps> = ({
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [enumOptions, setEnumOptions] = useState<string[]>([]);
-
 
   const fetchEnumValues = async () => {
     const data = [
@@ -139,6 +138,7 @@ const EditAccountPresetDetailSheet: React.FC<AccountPresetDetailSheetProps> = ({
             onChange={(e) => setStartingBalance(e.target.value)}
             required
           />
+          
         </form>
 
         {/* Error Message */}

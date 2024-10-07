@@ -172,6 +172,62 @@ export const transactionAction = {
 
         });
     },
+
+    fetchTransactionPresets: async (accountId: string, accountUsername: string): Promise<Transaction[]> => {
+
+        const supabase = createClient();
+
+        const { data, error } = await supabase
+            .from('transaction_presets')
+            .select('*')
+            
+        if (error) {
+            console.error('Error fetching transaction presets:', error);
+            throw error;
+        }
+        const transactions = data as TransactionPresetType[];
+        // Assuming `fetchedTransactions` is the result of fetching from the database
+        const transformedData = transactions.map(transaction => {
+            const isPayingRecipient = transaction.amount < 0;
+            
+            return {
+            id: transaction.recipient + transaction.id,
+            description: "Some description", // Add logic to build the description
+            amount: transaction.amount,
+            paid_on: transaction.date_issued,
+            from_account: isPayingRecipient ? accountId : "default",
+            from_account_username: isPayingRecipient ? accountUsername : transaction.recipient,
+            to_account: isPayingRecipient ? "default" : accountId,
+            to_account_username: isPayingRecipient ? transaction.recipient: accountUsername,
+            transaction_type: 'pay anyone', // Adjust this based on your logic
+            };
+        });
+        
+        return transformedData as Transaction[];
+    },
+
+    fetchTotalTransactionAmount : async (): Promise<number> => {
+        const supabase = createClient();
+    
+        // Execute the SQL query using select() and get the sum of all amounts
+        const { data, error } = await supabase
+            .from('transaction_presets')
+            .select('amount', { count: 'exact' });
+    
+        if (error) {
+            console.error('Error fetching total sum of transaction amounts:', error);
+            throw error;
+        }
+    
+        // Calculate the total sum of all transaction amounts in JavaScript
+        const totalSum = data?.reduce((acc: number, transaction: any) => acc + (transaction.amount || 0), 0);
+    
+        return totalSum || 0;
+    },
+    
+    
+    
+    
 };
 
 

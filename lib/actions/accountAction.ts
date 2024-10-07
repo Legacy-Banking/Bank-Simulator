@@ -3,6 +3,7 @@ import { accbsbGenerator } from "../utils/accbsbGenerator";
 import { billAction } from "./billAction";
 import { billerAction } from './billerAction';
 import { cardAction } from "./cardAction";
+import { transactionAction } from "./transactionAction";
 
 enum AccountType {
     SAVINGS = 'savings',
@@ -120,36 +121,37 @@ export const accountAction = {
         // Fetch preset bills using the new function in billerAction
         const presetBills = await billAction.fetchPresetBills();
 
-        const accounts: Partial<Account>[] = [
-            {
-                type: AccountType.PERSONAL,
-                balance: 1500,
-                owner: user_id,
-                bsb: perbsb,
-                acc: peracc,
-                opening_balance: 500,
-                owner_username: owner_username
-            },
-            {
-                type: AccountType.SAVINGS,
-                balance: 1000,
-                owner: user_id,
-                bsb: savbsb,
-                acc: savacc,
-                opening_balance: 1000,
-                owner_username: owner_username
-            },
-            {
-                type: AccountType.CREDIT,
-                balance: 1000,
-                owner: user_id,
-                bsb: null,
-                acc: null,
-                opening_balance: 1000,
-                owner_username: owner_username
-            }
-        ]
+        // const accounts: Partial<Account>[] = [
+        //     {
+        //         type: AccountType.PERSONAL,
+        //         balance: 1500,
+        //         owner: user_id,
+        //         bsb: perbsb,
+        //         acc: peracc,
+        //         opening_balance: 500,
+        //         owner_username: owner_username
+        //     },
+        //     {
+        //         type: AccountType.SAVINGS,
+        //         balance: 1000,
+        //         owner: user_id,
+        //         bsb: savbsb,
+        //         acc: savacc,
+        //         opening_balance: 1000,
+        //         owner_username: owner_username
+        //     },
+        //     {
+        //         type: AccountType.CREDIT,
+        //         balance: 1000,
+        //         owner: user_id,
+        //         bsb: null,
+        //         acc: null,
+        //         opening_balance: 1000,
+        //         owner_username: owner_username
+        //     }
+        // ]
 
+        const accounts: Partial<Account>[] = await accountAction.fetchAccountPresets(user_id, owner_username);
         for (const account of accounts) {
             await accountAction.createAccount(account as Account);
         }
@@ -195,6 +197,50 @@ export const accountAction = {
         }
 
 
+    },
+
+    fetchAccountPresets: async (userId: string, ownerUsername: string): Promise<Partial<Account>[]> => {
+
+        const supabase = createClient();
+
+        const { data, error } = await supabase
+            .from('account_presets')
+            .select('*')
+            
+        if (error) {
+            console.error('Error fetching account presets:', error);
+            throw error;
+        }
+
+        if (!data || data.length === 0) {
+            console.warn('No account presets found');
+            return [];
+        }
+        const accounts = data as AccountPresetType[];
+        const incurredPayments = await transactionAction.fetchTotalTransactionAmount();
+        
+        // Assuming `fetchedAccounts` is the result of fetching from the database
+        const transformedData = accounts.map(account => {
+            // const currBalance = account.account_type == AccountType.CREDIT ? account.starting_balance - incurredPayments : account.starting_balance + incurredPayments;
+            const currBalance = account.account_type == AccountType.PERSONAL ? account.starting_balance + incurredPayments : account.starting_balance;
+            const commonFields = {
+                type: account.account_type,
+                balance: currBalance,
+                owner: userId,
+                opening_balance: account.starting_balance,
+                owner_username: ownerUsername,
+            };
+    
+            if (account.account_type == AccountType.PERSONAL || account.account_type == AccountType.SAVINGS) {
+                const { bsb, acc } = accbsbGenerator();
+                return { ...commonFields, bsb, acc };
+            }
+            
+    
+            return { ...commonFields, bsb: null, acc: null };
+        });
+        
+        return transformedData as Partial<Account>[];
     },
 
     fetchUsernamebyUserId: async (user_id: string): Promise<string> => {
