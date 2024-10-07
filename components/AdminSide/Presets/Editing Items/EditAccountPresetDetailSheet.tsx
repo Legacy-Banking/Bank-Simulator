@@ -29,18 +29,11 @@ const EditAccountPresetDetailSheet: React.FC<AccountPresetDetailSheetProps> = ({
   if (!status) return null;
   const [accountPresetType, setAccountPresetType] = useState(accountPreset?.account_type);
   const [startingBalance, setStartingBalance] = useState(accountPreset?.starting_balance.toString());
-  const [bsb, setBsb] = useState('');
-  const [accountNumber, setAccountNumber] = useState('');
 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [enumOptions, setEnumOptions] = useState<string[]>([]);
 
-  const handleRandomBsb = () => {
-    const{ bsb : randomBsb, acc : randomAccountNumber } = accbsbGenerator();
-    setBsb(randomBsb);
-    setAccountNumber(randomAccountNumber);
-  }
   const fetchEnumValues = async () => {
     const data = [
       {
@@ -145,32 +138,7 @@ const EditAccountPresetDetailSheet: React.FC<AccountPresetDetailSheetProps> = ({
             onChange={(e) => setStartingBalance(e.target.value)}
             required
           />
-          {(accountPresetType=='personal' || accountPresetType=='savings') && (
-            <div>
-              <label className="">BSB </label>
-              <br />
-              <input
-                className="rounded-md px-3 py-2 mt-2 border mb-5 outline-1 outline-blue-25 text-base drop-shadow-"
-                placeholder="Enter BSB"
-                value={bsb}
-                onChange={(e) => setBsb(e.target.value)}
-                required
-              />
-              <Button className='ml-3 border-2 bg-blue-300' onClick={handleRandomBsb}> Generate random bsb </Button>
-              <br />
-              <label className="">Account Number </label>
-              <br />
-              <input
-                className="rounded-md px-3 py-2 mt-2 border mb-5 outline-1 outline-blue-25 text-base drop-shadow-"
-                placeholder="Enter Account Number"
-                value={accountNumber}
-                onChange={(e) => setAccountNumber(e.target.value)}
-                required
-              />
-              
-            </div>
-            
-          )}
+          
         </form>
 
         {/* Error Message */}

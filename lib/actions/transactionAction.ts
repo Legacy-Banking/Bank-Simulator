@@ -204,7 +204,30 @@ export const transactionAction = {
         });
         
         return transformedData as Transaction[];
-    }
+    },
+
+    fetchTotalTransactionAmount : async (): Promise<number> => {
+        const supabase = createClient();
+    
+        // Execute the SQL query using select() and get the sum of all amounts
+        const { data, error } = await supabase
+            .from('transaction_presets')
+            .select('amount', { count: 'exact' });
+    
+        if (error) {
+            console.error('Error fetching total sum of transaction amounts:', error);
+            throw error;
+        }
+    
+        // Calculate the total sum of all transaction amounts in JavaScript
+        const totalSum = data?.reduce((acc: number, transaction: any) => acc + (transaction.amount || 0), 0);
+    
+        return totalSum || 0;
+    },
+    
+    
+    
+    
 };
 
 
