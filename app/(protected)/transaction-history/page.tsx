@@ -238,12 +238,28 @@ const TransactionHistoryContent = () => {
     doc.text('Transaction History', 14, 20);
     doc.setFontSize(12);
     const accountType = capitalizeFirstLetter(account.type);
+
+    // Conditional labels based on account type
+    const isCreditAccount = accountType === 'Credit';
+    const openingBalanceLabel = isCreditAccount ? 'Credit Limit' : 'Opening Balance';
+    const currentBalanceLabel = isCreditAccount ? 'Credit Used' : 'Current Balance';
+
     const openingBalance = formatAmount(account.opening_balance);
-    const currentBalance = formatAmount(account.balance);
+    const currentBalance = isCreditAccount
+    ? formatAmount(account.opening_balance - account.balance) // Credit used is opening balance - current balance
+    : formatAmount(account.balance);
 
     doc.text(`Account: ${accountType} Account`, 14, 30);
-    doc.text(`Opening Balance: ${openingBalance}`, 14, 40);
-    doc.text(`Current Balance: ${currentBalance}`, 14, 50);
+    doc.text(`${openingBalanceLabel}: ${openingBalance}`, 14, 40);
+    doc.text(`${currentBalanceLabel}: ${currentBalance}`, 14, 50);
+
+      // Display selected month if one is chosen
+  if (selectedMonth) {
+    const formattedMonth = format(selectedMonth, "LLLL yyyy");
+    doc.text(`Statement for: ${formattedMonth}`, 14, 60);
+  } else {
+    doc.text(`Statement for: All time`, 14, 60); // Fallback if no month is selected
+  }
 
     doc.setFontSize(10);
     const currentDate = new Date();
@@ -254,7 +270,7 @@ const TransactionHistoryContent = () => {
     const textWidth = doc.getTextWidth(`Downloaded on: ${formattedDate} at ${formattedTime}`);
     const xPosition = pageWidth - textWidth - marginRight;
 
-    doc.text(`Downloaded on: ${formattedDate} at ${formattedTime}`, xPosition, 55);
+    doc.text(`Downloaded on: ${formattedDate} at ${formattedTime}`, xPosition, 65);
 
     const tableColumn = ['Transaction', 'Date', 'Amount'];
     const tableRows: any[] = [];
@@ -271,7 +287,7 @@ const TransactionHistoryContent = () => {
     (doc as any).autoTable({
       head: [tableColumn],
       body: tableRows,
-      startY: 60,
+      startY: 70,
     });
 
     doc.save('transaction_history.pdf');
@@ -328,12 +344,12 @@ const TransactionHistoryContent = () => {
                         id="date"
                         variant={"outline"}
                         className={cn(
-                          "w-[220px] text-base justify-start text-left font-normal bg-white-100 border border-gray-300 hover:bg-gray-100 font-poppins", // Ensuring proper button background and border
+                          "w-[220px] text-base justify-start text-left font-normal bg-white-100 border border-gray-300 hover:bg-gray-100 font-inter", // Ensuring proper button background and border
                           !selectedMonth && "text-gray-500" // Text contrast when no date is selected
                         )}
                       >
                         <div className="flex items-center">
-                          <CalendarIcon className="mr-2 h-4 w-4 text-gray-600" /> {/* Ensuring icon visibility */}
+                          <CalendarIcon className="mr-2 h-4 w-4 text-blue-500" /> {/* Ensuring icon visibility */}
                           {selectedMonth ? format(selectedMonth, "LLLL yyyy") : <span>Select Month</span>}
                         </div>
 
