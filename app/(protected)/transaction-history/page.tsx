@@ -87,8 +87,8 @@ const TransactionHistoryContent = () => {
                 if (fetchedType == 'personal') {
 
                     setTransactionsPresets(presetData);
-
                     combinedData = combinedData.concat(presetData);
+                    
 
 
                     // updatedDummyData = [
@@ -198,7 +198,7 @@ const TransactionHistoryContent = () => {
 
                   // Combine fetched transactions with dummy data
 
-                  var combinedData = (data || []).concat(updatedDummyData);
+                  combinedData = combinedData.concat(updatedDummyData);
                   console.log(combinedData);
                   // Filter transactions by the selected month
                   if (selectedMonth) {
