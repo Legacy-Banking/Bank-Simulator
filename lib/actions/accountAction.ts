@@ -234,6 +234,9 @@ export const accountAction = {
             if (account.account_type == AccountType.PERSONAL || account.account_type == AccountType.SAVINGS) {
                 const { bsb, acc } = accbsbGenerator();
                 return { ...commonFields, bsb, acc };
+            } else if (account.account_type === AccountType.CREDIT) {
+                const { acc } = accbsbGenerator();
+                return { ...commonFields, bsb: null, acc };
             }
             
     
