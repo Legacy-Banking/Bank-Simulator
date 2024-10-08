@@ -68,12 +68,17 @@ const AccountBox: React.FC<AccountBoxProps> = ({ account }) => {
                         </p>
                     </div>
 
-                    {account.type !== 'credit' && (
-                        <p className="text-lg font-medium tracking-[1.1px] text-blackText-100"
-                            data-tooltip-id='bsb-acc-tip'>
-                            BSB: {account?.bsb ? formatBSB(account.bsb.toString()) : ''} <span className="mx-4"> </span> Account Number: {account?.acc ? formatAccountNumber(account.acc.toString()) : ''}
-                        </p>
-                    )}
+                    <p className="text-lg font-medium tracking-[1.1px] text-blackText-100"
+                        data-tooltip-id='bsb-acc-tip'>
+                        {account.type !== 'credit' && (
+                            <>
+                                BSB: {account?.bsb ? formatBSB(account.bsb.toString()) : ''} 
+                                <span className="mx-4"> </span>
+                            </>
+                        )}
+                        Account Number: {account?.acc ? formatAccountNumber(account.acc.toString()) : ''}
+                    </p>
+
                 </div>
 
                 <div className='flex-center flex-col gap-2 rounded-md bg-white-100/20 px-8 py-2 text-blackText-100 border border-black'>
