@@ -198,7 +198,7 @@ const TransactionHistoryContent = () => {
                         transactionDate.getFullYear() === selectedMonth.getFullYear()
                       );
                     });
-                  }                  
+                  }
                   setTransactions(combinedData);
                   setLoading(false); // Set loading to false after fetching data
 
@@ -328,8 +328,8 @@ const TransactionHistoryContent = () => {
                         id="date"
                         variant={"outline"}
                         className={cn(
-                          "w-[270px] justify-start text-left font-normal bg-white border border-gray-300 font-poppins", // Ensuring proper button background and border
-                          !selectedMonth  && "text-gray-500" // Text contrast when no date is selected
+                          "w-[220px] text-base justify-start text-left font-normal bg-white-100 border border-gray-300 hover:bg-gray-100 font-poppins", // Ensuring proper button background and border
+                          !selectedMonth && "text-gray-500" // Text contrast when no date is selected
                         )}
                       >
                         <div className="flex items-center">
@@ -354,7 +354,7 @@ const TransactionHistoryContent = () => {
                       <MonthPicker
                         currentMonth={selectedMonth || new Date()} // Default to current date if undefined
                         onMonthChange={setSelectedMonth}
-                    />
+                      />
                     </PopoverContent>
                   </Popover>
                 </div>
