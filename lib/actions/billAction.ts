@@ -15,12 +15,66 @@ export const billAction = {
         if (error) {
             throw new Error(error.message);
         }
+        const updatedBills = await billAction.updateOverdueBills(data);
+        const sortedBills = billAction.sortBill(updatedBills);
+        // const sortedBills = billAction.sortBill(data);
+
+        return sortedBills;
+    },
+
+    updateOverdueBills: async (bills: Bill[]): Promise<Bill[]> => {
+        const supabase = createClient();
+        const currentDate = new Date();
+
+        // Loop through each bill and check if it's overdue
+        const overdueBills = bills.filter(bill => {
+            const dueDate = new Date(bill.due_date);
+            return (bill.status === 'unpaid' || bill.status === 'partial') && dueDate < currentDate;
+        });
+
+        // Update the status of overdue bills
+        if (overdueBills.length > 0) {
+            const invoiceNumbers = overdueBills.map(bill => bill.invoice_number);
+
+            const { error } = await supabase
+                .from('bills')
+                .update({ status: 'overdue' })
+                .in('invoice_number', invoiceNumbers);
+
+            if (error) {
+                throw new Error(`Failed to update overdue bills: ${error.message}`);
+            }
+
+            // Update the local list of bills
+            overdueBills.forEach(bill => {
+                bill.status = 'overdue';
+            });
+        }
+
+        return bills;
+    },
+
+    fetchBillsByUserIdAndBillerName: async (user_id: string, biller_name: string): Promise<Bill[]> => {
+        const supabase = createClient();
+
+        // Query to filter bills by both user_id and biller_name
+        const { data, error } = await supabase
+            .from('bills')
+            .select('*')
+            .eq('billed_user', user_id)
+            .eq('from', biller_name);
+        if (error) {
+            throw new Error(error.message);
+        }
+
+        // Sort bills using the existing sortBill function
         const sortedBills = billAction.sortBill(data);
 
         return sortedBills;
     },
     sortBill: (bills: Bill[]): Bill[] => {
         const statusPriority: { [key: string]: number } = {
+            overdue: 0,
             unpaid: 1,
             partial: 2,
             pending: 3,
@@ -557,21 +611,21 @@ export const billAction = {
 
     fetchPresetBills: async (): Promise<any[]> => {
         const supabase = createClient();
-    
+
         // Fetch bills where preset_status is true
         const { data: adminBills, error: fetchError } = await supabase
             .from('admin_bills')
             .select('biller, description, amount, due_date, id')
             .eq('preset_status', true); // Filter for preset bills
-    
+
         if (fetchError) {
             throw new Error(`Error fetching bills: ${fetchError.message}`);
         }
-    
+
         if (!adminBills || adminBills.length === 0) {
             throw new Error("No preset bills found to insert.");
         }
-    
+
         // Fetch the corresponding biller details for each bill from the name
         const billsWithBillerDetails = await Promise.all(
             adminBills.map(async (bill) => {
@@ -579,17 +633,17 @@ export const billAction = {
                 if (!billerDetails.length) {
                     throw new Error(`Biller ${bill.biller} not found.`);
                 }
-                
+
                 return {
                     ...bill, // Include the original bill details
                     biller: billerDetails[0], // Replace the biller name with the full biller details
                 };
             })
         );
-    
+
         // Return the bills with the full biller details
         return billsWithBillerDetails;
     },
-    
+
 
 };

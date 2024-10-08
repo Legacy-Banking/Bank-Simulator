@@ -14,7 +14,7 @@ export const bpayAction = {
 
     ): Promise<void> => {
         const account = await accountAction.fetchAccountById(from_account.id);
-        const bills = await billAction.fetchBillsbyUserId(user_id);
+        const bills = await billAction.fetchBillsByUserIdAndBillerName(user_id, biller_name);
         console.log('account_balance', account.balance);
         console.log('amount', amount);
 
