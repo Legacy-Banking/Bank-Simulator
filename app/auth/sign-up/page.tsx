@@ -75,7 +75,7 @@ export default function SignUp({
         <div className="mt-5 text-base text-center font-normal text-[#475467]">
           Already have an account?
           <Link className="text-[#3D87C3] rounded-md px-1 font-semibold"
-            href="/login">Login</Link>
+            href="/auth/login">Login</Link>
         </div>
       </div>
     </div>
