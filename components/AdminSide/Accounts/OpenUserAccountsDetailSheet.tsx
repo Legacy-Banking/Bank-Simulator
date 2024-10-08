@@ -44,7 +44,9 @@ const OpenUserAccountsDetailSheet: React.FC<AccountDetailSheetProps> = ({ accoun
       <DialogContent className="bg-white-100 p-6 min-h-[78vh] max-w-[700px] rounded-lg shadow-lg">
         <DialogHeader>
           <DialogTitle className="font-inter text-2xl font-semibold mb-1">
-            <span className='text-blackText-50'>{accounts.at(0)?.owner_username}'s Accounts</span>
+            <span className='text-blackText-50'>
+              <span className="text-blue-25">{accounts.at(0)?.owner_username}'s</span> Accounts
+            </span>
           </DialogTitle>
         </DialogHeader>
 

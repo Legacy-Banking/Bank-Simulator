@@ -63,7 +63,7 @@ const AddFundsSheet: React.FC<AddFundsSheetProps> = ({ toBank }) => {
 
       // Add funds logic
       await transactionAction.adminAddFunds(toBank, amount, data.description || "");
-      
+
       // Reset the form after submission
       form.reset();
       setIsOpen(false); // Close the sheet after successful submission
@@ -78,14 +78,14 @@ const AddFundsSheet: React.FC<AddFundsSheetProps> = ({ toBank }) => {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-            <Button className="bg-gray-100 p-2.5 rounded-md shadow-md m-0">
-                    <Plus className="w-5 h-5 text-black" />
-            </Button>
+        <Button className="bg-gray-100 p-2.5 rounded-md shadow-md m-0">
+          <Plus className="w-5 h-5 text-black" />
+        </Button>
       </SheetTrigger>
 
-      <SheetContent className="w-[400px]">
+      <SheetContent className="w-[400px] bg-white-100">
         <SheetHeader>
-          <SheetTitle className="text-black">Add Funds</SheetTitle>
+          <SheetTitle className="text-black text-3xl">Add Funds</SheetTitle>
           <SheetDescription>{`Account: ${toBank.type.charAt(0).toUpperCase() + toBank.type.slice(1)} - ${toBank.owner_username}`}</SheetDescription>
           <SheetDescription>{`Current Balance: ${toBank.balance}`}</SheetDescription>
         </SheetHeader>

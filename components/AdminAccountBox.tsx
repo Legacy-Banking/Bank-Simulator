@@ -31,13 +31,13 @@ const AdminAccountBox: React.FC<AdminAccountBoxProps> = ({ account }) => {
                     {(variant ? variant.charAt(0).toUpperCase() + variant.slice(1) : "Unknown")}
                 </h2>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-8">
                 <span className="text-xl font-semibold">
                     ${account.balance?.toFixed(2)}
                 </span>
-                
-                <AddFundsSheet toBank={account}/>
-                
+
+                <AddFundsSheet toBank={account} />
+
             </div>
         </div>
     );
