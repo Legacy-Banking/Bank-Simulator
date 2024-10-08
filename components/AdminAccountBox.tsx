@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react'; // Import the Plus icon
 
 // Define props for the component
 type AdminAccountBoxProps = {
@@ -34,8 +35,8 @@ const AdminAccountBox: React.FC<AdminAccountBoxProps> = ({ account }) => {
                 <span className="text-xl font-semibold">
                     ${account.balance?.toFixed(2)}
                 </span>
-                <Button className="bg-gray-100 p-3 rounded-md shadow-sm">
-                    <span className="text-black font-bold">+</span>
+                <Button className="bg-gray-100 p-2.5 rounded-md shadow-md m-0">
+                    <Plus className="w-5 h-5 text-black" />
                 </Button>
             </div>
         </div>
