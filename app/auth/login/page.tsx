@@ -29,7 +29,7 @@ export default function Login({
     });
 
     if (error) {
-      return redirect("/login?message=Could not authenticate user");
+      return redirect("/auth/login?message=Could not authenticate user");
     }
 
     return redirect("/dashboard");
