@@ -15,9 +15,6 @@ import { cn, formatAmount, formatDateTime } from "@/lib/utils";
 import { Button } from '@/components/ui/button';
 import TrashAccountDetailSheet from '../Accounts/TrashAccountDetailSheet';
 import { boolean } from 'zod';
-import EditAccountDetailSheet from '../Accounts/EditAccountDetailSheet';
-import PopUp from '../Accounts/PopUp';
-import SavedStatus from './SavedStatus';
 import EditAccountPresetDetailSheet from './Editing Items/EditAccountPresetDetailSheet';
 import TrashAccountPresetDetailSheet from './Deleting Items/TrashAccountPresetDetailSheet';
 
