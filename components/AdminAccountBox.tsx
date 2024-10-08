@@ -1,11 +1,11 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react'; // Import the Plus icon
+import AddFundsSheet from './AdminSide/Accounts/AddFundsSheet';
 
 // Define props for the component
 type AdminAccountBoxProps = {
-    account: Partial<Account>;
+    account: Account;
 };
 
 const AdminAccountBox: React.FC<AdminAccountBoxProps> = ({ account }) => {
@@ -35,9 +35,9 @@ const AdminAccountBox: React.FC<AdminAccountBoxProps> = ({ account }) => {
                 <span className="text-xl font-semibold">
                     ${account.balance?.toFixed(2)}
                 </span>
-                <Button className="bg-gray-100 p-2.5 rounded-md shadow-md m-0">
-                    <Plus className="w-5 h-5 text-black" />
-                </Button>
+                
+                <AddFundsSheet toBank={account}/>
+                
             </div>
         </div>
     );

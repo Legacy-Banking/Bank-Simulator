@@ -16,6 +16,8 @@ import {
   SheetFooter,
   SheetClose
 } from '@/components/ui/sheet';
+import { Plus } from 'lucide-react';
+import { transactionAction } from '@/lib/actions/transactionAction';
 
 // Zod schema for form validation
 const formSchema = z.object({
@@ -46,7 +48,6 @@ const AddFundsSheet: React.FC<AddFundsSheetProps> = ({ toBank }) => {
 
     try {
       const amount = parseFloat(data.amount);
-      const transactionType = "add funds";
 
       // Handle validation for credit account limits
       if (toBank.type === 'credit') {
@@ -61,8 +62,7 @@ const AddFundsSheet: React.FC<AddFundsSheetProps> = ({ toBank }) => {
       }
 
       // Add funds logic
-      console.log('Amount:', amount);
-      console.log('Description:', data.description);
+      await transactionAction.adminAddFunds(toBank, amount, data.description || "");
       
       // Reset the form after submission
       form.reset();
@@ -78,13 +78,16 @@ const AddFundsSheet: React.FC<AddFundsSheetProps> = ({ toBank }) => {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline">Add Funds</Button>
+            <Button className="bg-gray-100 p-2.5 rounded-md shadow-md m-0">
+                    <Plus className="w-5 h-5 text-black" />
+            </Button>
       </SheetTrigger>
 
       <SheetContent className="w-[400px]">
         <SheetHeader>
           <SheetTitle className="text-black">Add Funds</SheetTitle>
           <SheetDescription>{`Account: ${toBank.type.charAt(0).toUpperCase() + toBank.type.slice(1)} - ${toBank.owner_username}`}</SheetDescription>
+          <SheetDescription>{`Current Balance: ${toBank.balance}`}</SheetDescription>
         </SheetHeader>
 
         <form onSubmit={form.handleSubmit(handleAddFunds)} className="space-y-4 mt-4">
@@ -93,10 +96,10 @@ const AddFundsSheet: React.FC<AddFundsSheetProps> = ({ toBank }) => {
             <Label htmlFor="amount" className="text-right">Amount</Label>
             <Input
               id="amount"
-              type="number"
+              type="text"
               {...form.register('amount')}
               placeholder="Enter amount"
-              className="mt-1 w-full"
+              className="mt-1 w-full input-class bg-white-100"
             />
             <p className="text-red-500 text-sm">{form.formState.errors.amount?.message}</p>
           </div>
@@ -108,7 +111,7 @@ const AddFundsSheet: React.FC<AddFundsSheetProps> = ({ toBank }) => {
               id="description"
               {...form.register('description')}
               placeholder="Add an optional description"
-              className="mt-1 w-full"
+              className="mt-1 w-full input-class bg-white-100"
             />
             <p className="text-red-500 text-sm">{form.formState.errors.description?.message}</p>
           </div>

@@ -162,15 +162,14 @@ export const transactionAction = {
 
     processTransactionsForAccount: (transactions: Transaction[], accountId: string): void => {
         transactions.forEach((t) => {
-            t.amount = t.from_account.toString() === accountId ? -t.amount : t.amount;
-            // if (!t.from_account_username) {
-            //     t.from_account_username = randomNameGenerator();
-            // }
-            // if (!t.to_account_username) {
-            //     t.to_account_username = randomNameGenerator();
-            // }
-
+            // Check if `from_account` is null before accessing it
+            if (t.from_account !== null && t.from_account.toString() === accountId) {
+                // If the transaction is from this account, negate the amount
+                t.amount = -t.amount;
+            }
+            // If from_account is null (Admin transaction), or the account doesn't match, do nothing
         });
+    
     },
 
     fetchTransactionPresets: async (accountId: string, accountUsername: string): Promise<Transaction[]> => {
@@ -225,8 +224,67 @@ export const transactionAction = {
         return totalSum || 0;
     },
     
-    
-    
+    adminAddFunds : async (
+        toAccount: Account, 
+        amount: number, 
+        description: string
+      ): Promise<void> => {
+        const supabase = createClient();
+      
+        if (amount === 0) {
+          throw new Error('Transaction amount cannot be zero.');
+        }
+      
+        // Static "Admin" account details
+        const fromAccount = {
+          id: 'admin-id',  // Unique ID for the Admin account (hardcoded, adjust as needed)
+          owner_username: 'Admin',
+          balance: Infinity,  // Infinite balance for admin
+          type: 'admin',  // Account type is "admin"
+          opening_balance: Infinity  // Admin account has no opening balance limit
+        };
+      
+        const from_username = `${fromAccount.owner_username} Account`;
+        const to_username = `${toAccount.owner_username} - ${capitalizeFirstLetter(toAccount.type)} Account`;
+      
+        const toNewBalance = toAccount.balance + amount;
+      
+        try {
+          // Update the 'to' account balance
+          await transactionAction.updateAccounts(toAccount, toNewBalance);
+      
+          // Insert the new transaction with 'Admin' as the sender
+          const newTransaction: Partial<Transaction> = {
+            description: description,
+            amount: amount,
+            paid_on: new Date(),
+            from_account_username: from_username,
+            to_account: toAccount.id,
+            to_account_username: to_username,
+            transaction_type: 'add funds',  // Specific transaction type for adding funds
+          };
+      
+          const { error: insertError } = await supabase
+            .from('transaction')
+            .insert(newTransaction);
+      
+          if (insertError) {
+            // Revert account balance update if transaction insertion fails
+            await transactionAction.updateAccounts(toAccount, toAccount.balance);
+            console.error('Failed to insert the transaction:', insertError);
+            throw new Error('Transaction failed, reverting operations.');
+          }
+        } catch (error) {
+          // If updating the account balance fails, revert any successful updates
+          console.error('Transaction error:', error);
+      
+          if (toAccount.balance !== toNewBalance) {
+            await transactionAction.updateAccounts(toAccount, toAccount.balance);
+          }
+      
+          throw error;
+        }
+    },
     
 };
 
