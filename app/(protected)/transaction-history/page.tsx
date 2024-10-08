@@ -40,6 +40,7 @@ const TransactionHistoryContent = () => {
   const rowsPerPage = 10;
 
   const [selectedMonth, setSelectedMonth] = useState<Date | undefined>(undefined);
+  const [transactionPresets, setTransactionsPresets] = useState<Transaction[]>([]);
 
   // Inside the main component
   useEffect(() => {
