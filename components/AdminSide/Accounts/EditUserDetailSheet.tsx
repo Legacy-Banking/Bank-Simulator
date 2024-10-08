@@ -19,10 +19,10 @@ type AccountDetailSheetProps = {
   account: Account | null,
   status: boolean;
   onClose: () => void;
-  updateAccount: () => void;
+  updateUser: () => void;
 };
 
-const EditAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, status, onClose, updateAccount }) => {
+const EditAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, status, onClose, updateUser }) => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');

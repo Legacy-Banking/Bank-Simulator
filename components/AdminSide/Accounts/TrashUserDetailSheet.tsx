@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { cn, formatAmount, formatDateTime } from "@/lib/utils"
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 
 // Define the props type for the component
 type UserDetailSheetProps = {

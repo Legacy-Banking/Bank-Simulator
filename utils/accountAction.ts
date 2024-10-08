@@ -1,8 +1,8 @@
-import { createClient } from "./supabase/client";
-import { accbsbGenerator } from "./accbsbGenerator";
-import { billAction } from "./billAction";
-import { billerAction } from './billerAction';
-import { cardAction } from "./cardAction";
+import { createClient } from "@/lib/supabase/client";
+import { accbsbGenerator } from "@/lib/utils/accbsbGenerator";
+import { cardAction } from "@/lib/actions/cardAction";
+import { billerAction } from "@/lib/actions/billerAction";
+import { billAction } from "@/lib/actions/billAction";
 
 enum AccountType {
     SAVINGS = 'savings',

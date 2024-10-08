@@ -15,7 +15,7 @@ import { cn, formatAmount, formatDateTime } from "@/lib/utils";
 import { Button } from '@/components/ui/button';
 import { boolean } from 'zod';
 import PopUp from './PopUp';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 import { accountAction } from '@/utils/accountAction';
 import OpenUserAccountsDetailSheet from './OpenUserAccountsDetailSheet';
 import TrashUserDetailSheet from './TrashUserDetailSheet';
