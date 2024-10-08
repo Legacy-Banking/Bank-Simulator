@@ -3,8 +3,8 @@ import HeaderBox from '@/components/HeaderBox'
 import AnimatedCounter from '@/components/AnimatedCounter';
 import React, { useEffect, useState } from 'react'
 import AccountBox from '@/components/AccountBox';
-import { useAppSelector } from '@/app/store/hooks';
-import { accountAction } from '@/utils/accountAction';
+import { useAppSelector } from '@/store/hooks';
+import { accountAction } from '@/lib/actions/accountAction';
 
 const Dashboard = () => {
     const user = useAppSelector(state => state.user);
@@ -38,7 +38,17 @@ const Dashboard = () => {
 
     }, [user_id]);
 
-    const totalBalance = accounts.reduce((acc, account) => acc + (account.balance || 0), 0);
+    // Calculate the total balance by summing the balances of all non-credit accounts
+    // and subtracting the amount of credit used (balance of the credit account, which should be negative)
+    const totalBalance = accounts.reduce((acc, account) => {
+        if (account.type === 'credit') {
+            // For credit accounts, subtract the used credit (balance is negative for credit used)
+            return acc - (account.opening_balance - account.balance || 0);
+        } else {
+            // For other accounts, add the balance
+            return acc + (account.balance || 0);
+        }
+    }, 0);
 
     return (
         <section className="flex w-full flex-row max-xl:max-h-screen font-inter">

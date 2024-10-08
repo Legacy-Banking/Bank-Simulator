@@ -5,9 +5,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/utils/supabase/client'
-import { updateUserId } from '@/app/store/userSlice'
-import { useAppDispatch } from "@/app/store/hooks";
+import { createClient } from '@/lib/supabase/client'
+import { updateUserId } from '@/store/userSlice'
+import { useAppDispatch } from "@/store/hooks";
 import { homeNavLinks } from '@/constants'
 const SpecialNavbar = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);

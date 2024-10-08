@@ -1,8 +1,8 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import RootLayout from './(root)/layout';
-import { contentAction } from '@/utils/contentAction';
+import RootLayout from './(public)/layout';
+import { contentAction } from '@/lib/actions/contentAction';
 import HomeAuthLinks from '@/components/HomeAuthLinks';
 export const revalidate = 60
 

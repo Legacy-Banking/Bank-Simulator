@@ -1,8 +1,8 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import SearchBar from '@/components/SearchBar';
-import { createClient } from '@/utils/supabase/client';
-import { UsersTable } from './UsersTable';
+import { createClient } from '@/lib/supabase/client';
+import { AccountsTable } from './AccountsTable';
 import { Pagination } from '@/components/Pagination';
 import PopUp from './PopUp';
 
@@ -34,7 +34,7 @@ const AccountsPage = () => {
   const filteredAccounts = accounts.filter((account) =>
     (account.owner_username ?? '').toLowerCase().includes(inputValue.toLowerCase())
   );
-  
+
   const uniqueAccounts = filteredAccounts.filter((account, index, self) =>
     index === self.findIndex((t) => t.owner === account.owner)
   );
@@ -45,17 +45,17 @@ const AccountsPage = () => {
 
   // Fetching data from Supabase
   const supabase = createClient();
-  const fetchUsers = async () => {
-    const { data, error } = await supabase.from('account').select('*');
-
-    if (error) {
-      setError(error.message);
-    } else {
-      setAccounts(data || []);
-    }
-    setLoading(false);
-  };
   useEffect(() => {
+    const fetchUsers = async () => {
+      const { data, error } = await supabase.from('account').select('*');
+
+      if (error) {
+        setError(error.message);
+      } else {
+        setAccounts(data || []);
+      }
+      setLoading(false);
+    };
 
     fetchUsers();
   }, []); // Run once when the component mounts
@@ -82,14 +82,13 @@ const AccountsPage = () => {
             <div className='flex flex-1'>
               <h1 className="text-xl text-black font-semibold">Accounts</h1>
             </div>
-            <SearchBar inputValue={inputValue} setInputValue={setInputValue} setPage={setPage}/>
+            <SearchBar inputValue={inputValue} setInputValue={setInputValue} />
           </div>
           <section className="flex w-full flex-col mt-6 bg-white-100 rounded-b-3xl">
-            <UsersTable
+            <AccountsTable
               accounts={currentAccounts}
               setShowUpdatePopUp={setShowUpdatePopUp}
               setShowDeletePopUp={setShowDeletePopUp}
-              onEditStatus={fetchUsers}
             />
 
             {totalPages > 1 && (
