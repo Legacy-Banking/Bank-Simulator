@@ -21,7 +21,7 @@ const AdminAccountBox: React.FC<AdminAccountBoxProps> = ({ account }) => {
     return (
         <div
             className={cn(
-                'flex items-center justify-between p-6 rounded-lg shadow-md',
+                'flex items-center justify-between p-6 rounded-lg shadow-lg',
                 boxStyle
             )}
         >
@@ -31,7 +31,7 @@ const AdminAccountBox: React.FC<AdminAccountBoxProps> = ({ account }) => {
                 </h2>
             </div>
             <div className="flex items-center gap-4">
-                <span className="text-lg font-bold">
+                <span className="text-xl font-semibold">
                     ${account.balance?.toFixed(2)}
                 </span>
                 <Button className="bg-gray-100 p-3 rounded-md shadow-sm">

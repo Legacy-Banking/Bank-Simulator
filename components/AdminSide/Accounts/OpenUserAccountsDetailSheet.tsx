@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dialog';
 import AdminAccountBox from '@/components/AdminAccountBox'; // Import the new AdminAccountBox component
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/Spinner';
 
 // Define the props type for the component
 type AccountDetailSheetProps = {
@@ -17,6 +18,19 @@ type AccountDetailSheetProps = {
 };
 
 const OpenUserAccountsDetailSheet: React.FC<AccountDetailSheetProps> = ({ accounts, status, onClose }) => {
+  // State for loading
+  const [loading, setLoading] = useState(true);
+
+  // Set loading state to false after accounts are loaded
+  useEffect(() => {
+    if (status) {
+      setLoading(true); // Set loading to true when dialog opens
+      setTimeout(() => {
+        setLoading(false); // Simulate data loading (replace with actual fetching logic if needed)
+      }, 200); // Adjust the delay as per the real loading time
+    }
+  }, [status]);
+
   // Check if status is false, render nothing
   if (!status) return null;
 
@@ -27,7 +41,7 @@ const OpenUserAccountsDetailSheet: React.FC<AccountDetailSheetProps> = ({ accoun
 
   return (
     <Dialog open={!!status} onOpenChange={onClose}>
-      <DialogContent className="bg-white-100 p-6 max-w-[700px] rounded-lg shadow-lg">
+      <DialogContent className="bg-white-100 p-6 min-h-[78vh] max-w-[700px] rounded-lg shadow-lg">
         <DialogHeader>
           <DialogTitle className="font-inter text-2xl font-semibold mb-1">
             <span className='text-blackText-50'>{accounts.at(0)?.owner_username}'s Accounts</span>
@@ -37,11 +51,18 @@ const OpenUserAccountsDetailSheet: React.FC<AccountDetailSheetProps> = ({ accoun
         <div className="h-0.5 bg-blue-200 my-4"></div>
 
         {/* Display Account Boxes */}
-        <div className="flex flex-col gap-8">
-          {personalAccount && <AdminAccountBox account={personalAccount} />}
-          {savingsAccount && <AdminAccountBox account={savingsAccount} />}
-          {creditAccount && <AdminAccountBox account={creditAccount} />}
-        </div>
+        {loading ? (
+          <div className="flex justify-center items-center py-8">
+            <Spinner size="large" show={true} />
+          </div>
+        ) : (
+          // Display Account Boxes when data is loaded
+          <div className="flex flex-col gap-8">
+            {personalAccount && <AdminAccountBox account={personalAccount} />}
+            {savingsAccount && <AdminAccountBox account={savingsAccount} />}
+            {creditAccount && <AdminAccountBox account={creditAccount} />}
+          </div>
+        )}
 
         <div className="h-0.5 bg-blue-200 my-4"></div>
 
