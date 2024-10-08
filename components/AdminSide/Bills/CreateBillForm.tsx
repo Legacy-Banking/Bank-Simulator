@@ -108,17 +108,31 @@ const CreateBillForm: React.FC<CreateBillFormProps> = ({ setIsCreatingBill }) =>
     <Form {...form}>
       <form onSubmit={form.handleSubmit(submit)} className="flex flex-col">
         {/* Back Button */}
-        <Button
+        {/* <Button
           onClick={handleBackClick}
           className="mb-6 w-fit bg-gray-100 hover:bg-gray-300 text-gray-700 text-base flex items-center"
         >
           <ArrowLeft className="mr-2" /> Back
-        </Button>
+        </Button> */}
+        <div className="flex max-w-[850px] w-full">
+          <div className="flex flex-row pb-5 justify-between w-full">
+            <div className="flex flex-col gap-1 pb-5">
 
-        <div className="flex flex-col gap-1 pb-5">
-          <h2 className="text-18 font-semibold text-gray-900">Step 1 - Biller Details</h2>
-          <p className="text-14 font-normal text-gray-600">Enter the details of the biller</p>
+              <h2 className="text-18 font-semibold text-gray-900">Step 1 - Biller Details</h2>
+              <p className="text-14 font-normal text-gray-600">Enter the details of the biller</p>
+
+            </div>
+
+            <Button
+              onClick={handleBackClick}
+              className="w-fit bg-gray-100 hover:bg-gray-300 text-gray-700 text-base flex items-center"
+            >
+              <ArrowLeft className="mr-2" /> Back
+            </Button>
+
+          </div>
         </div>
+
 
         {/* Biller Dropdown */}
         <FormField
