@@ -17,10 +17,10 @@ import { boolean } from 'zod';
 import PopUp from './PopUp';
 import { createClient } from '@/lib/supabase/client';
 import { accountAction } from '@/utils/accountAction';
-import OpenUserAccountsDetailSheet from './OpenUserAccountsDetailSheet';
 import TrashUserDetailSheet from './TrashUserDetailSheet';
 import EditUserDetailSheet from './EditUserDetailSheet';
 import { userAction } from '@/lib/actions/userAction';
+import OpenUserAccountsDetailSheet from './OpenUserAccountsDetailSheet';
 
 // UsersTable component
 export const UsersTable = ({ accounts = [], setShowUpdatePopUp, setShowDeletePopUp, onEditStatus }: UsersTableProps) => {
@@ -168,10 +168,9 @@ export const UsersTable = ({ accounts = [], setShowUpdatePopUp, setShowDeletePop
         updateUser={updateUser}
         />
       <OpenUserAccountsDetailSheet
-      accounts={selectedUserAccounts}
-      status={openUserAccountsWindow}
-      onClose={() => toggleOpenUserAccountsWindow(null)}
-      />
+        accounts={selectedUserAccounts}
+        status={openUserAccountsWindow}
+        onClose={() => toggleOpenUserAccountsWindow(null)} loading={false}      />
     </>
   );
 };
