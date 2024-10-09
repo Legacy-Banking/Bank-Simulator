@@ -15,9 +15,6 @@ import { cn, formatAmount, formatDateTime } from "@/lib/utils";
 import { Button } from '@/components/ui/button';
 import TrashAccountDetailSheet from '../Accounts/TrashAccountDetailSheet';
 import { boolean } from 'zod';
-// import EditAccountDetailSheet from '../Accounts/EditAccountDetailSheet';
-import PopUp from '../Accounts/PopUp';
-import SavedStatus from './SavedStatus';
 import EditAccountPresetDetailSheet from './Editing Items/EditAccountPresetDetailSheet';
 import TrashAccountPresetDetailSheet from './Deleting Items/TrashAccountPresetDetailSheet';
 
@@ -27,16 +24,16 @@ export const AccountPresetTable = ({ accountTypes = [], setShowUpdatePopUp, setS
   const [deleteAccountPresetWindow, setDeleteAccountPresetWindow] = useState(false);
   const [editAccountPresetWindow, setEditAccountPresetWindow] = useState(false);
 
-  const toggleDeleteAccountPresetWindow = (acc: AccountPresetType | null) => {
+  const toggleDeleteAccountPresetWindow = (acc : AccountPresetType | null) => {
     setDeleteAccountPresetWindow((prevState) => !prevState);
     setSelectedAccountPreset(acc);
   };
 
-  const toggleEditAccountPresetWindow = (acc: AccountPresetType | null) => {
-
+  const toggleEditAccountPresetWindow = (acc : AccountPresetType | null) => {
+      
     setEditAccountPresetWindow((prevState) => !prevState);
     setSelectedAccountPreset(acc);
-
+    
   };
 
   const deleteAccountPreset = () => {
@@ -54,16 +51,16 @@ export const AccountPresetTable = ({ accountTypes = [], setShowUpdatePopUp, setS
 
   function formatToCurrency(amount: number | undefined): string {
     if (!amount) {
-      return '$0.00';
+        return '$0.00';
     }
     const formattedAmount = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
     }).format(amount);
 
     return formattedAmount;
-  }
+}
   return (
     <>
       <Table>
@@ -96,10 +93,10 @@ export const AccountPresetTable = ({ accountTypes = [], setShowUpdatePopUp, setS
                 <TableCell className="font-inter text-lg ">
                   {formatToCurrency(startingBalance)}
                 </TableCell>
-
+                
                 <TableCell >
-                  <Button onClick={() => toggleEditAccountPresetWindow(accountType)} className="p-0 ml-4"> <img src="../Edit.png" alt="Edit button" /></Button>
-                  <Button onClick={() => toggleDeleteAccountPresetWindow(accountType)} className="p-0 ml-4"> <img src="../Delete.png" alt="Delete button" /></Button>
+                    <Button onClick={() => toggleEditAccountPresetWindow(accountType)} className="p-0 ml-4"> <img src="../Edit.png" alt="Edit button" /></Button>
+                    <Button onClick={() => toggleDeleteAccountPresetWindow(accountType)} className="p-0 ml-4"> <img src="../Delete.png" alt="Delete button" /></Button>
                 </TableCell>
               </TableRow>
             );
@@ -118,10 +115,10 @@ export const AccountPresetTable = ({ accountTypes = [], setShowUpdatePopUp, setS
         status={editAccountPresetWindow}
         onClose={() => toggleEditAccountPresetWindow(selectedAccountPreset)}
         updateAccountPreset={updateAccountPreset}
-      />
+        />
 
     </>
-
+    
   );
 };
 export default AccountPresetTable;
