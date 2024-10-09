@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -36,6 +36,8 @@ const OpenUserAccountsDetailSheet: React.FC<AccountDetailSheetProps> = ({ accoun
   // const [updatedAccounts, setUpdatedAccounts] = useState<Account[]>(accounts); // Use initial accounts as fallback
   const [updatedAccounts, setUpdatedAccounts] = useState<Account[]>([]);
 
+  // useRef to ensure effect runs only once when `status` becomes true
+  const hasFetchedAccounts = useRef(false);
 
   // Fetch updated accounts
   const refreshAccounts = async () => {
@@ -53,13 +55,31 @@ const OpenUserAccountsDetailSheet: React.FC<AccountDetailSheetProps> = ({ accoun
   };
 
   // Fetch accounts when the dialog opens
+  // useEffect(() => {
+  //   if (status) {
+  //     // Reset accounts to avoid showing stale data
+  //     setUpdatedAccounts([]);
+  //     refreshAccounts();
+  //   }
+  // }, [status, accounts]);
+
+  // if (!status) return null;
+
+  // Only fetch accounts when the dialog is opened
   useEffect(() => {
-    if (status) {
-      // Reset accounts to avoid showing stale data
-      setUpdatedAccounts([]);
+    if (status && !hasFetchedAccounts.current) {
+      hasFetchedAccounts.current = true; // Set the ref to true to prevent further fetches
+      setUpdatedAccounts([]); // Clear previous account data
       refreshAccounts();
     }
-  }, [status, accounts]);
+  }, [status]); // Depend only on status to avoid unnecessary re-renders
+
+  // Reset the ref when dialog is closed to allow future fetches
+  useEffect(() => {
+    if (!status) {
+      hasFetchedAccounts.current = false;
+    }
+  }, [status]);
 
   if (!status) return null;
 
@@ -77,7 +97,7 @@ const OpenUserAccountsDetailSheet: React.FC<AccountDetailSheetProps> = ({ accoun
         <DialogHeader>
           <DialogTitle className="font-inter text-2xl font-semibold mb-1 mt-4">
             <span className='text-blackText-50'>
-              <span className="text-blue-25">{accounts.at(0)?.owner_username}'s</span> Accounts
+              <span className="text-blue-25">{accounts[0]?.owner_username}'s</span> Accounts
             </span>
           </DialogTitle>
         </DialogHeader>
