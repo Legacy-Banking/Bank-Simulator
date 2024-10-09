@@ -10,6 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn, formatAmount, formatDateTime } from "@/lib/utils"
 import { createClient } from '@/lib/supabase/client';
+import { serviceRoleClient } from '@/lib/supabase/serviceRoleClient';
 
 // Define the props type for the component
 type UserDetailSheetProps = {
@@ -28,7 +29,7 @@ const TrashUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status,
 
   const supabase = createClient();
 
-  async function deleteAccountsByOwnerUsername(ownerUsername: string | undefined) {
+  async function deleteAccountsByOwnerUsername(ownerUsername: string | undefined, ownerId: string | undefined) {
     if (!ownerUsername) {
       return;
     }
@@ -45,7 +46,67 @@ const TrashUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status,
       } else {
         console.log('Cards deleted:', cardData);
       }
-  
+      // alter the transactions this account has affected other accounts
+      const { data: fromAccountData, error: fromAccountError } = await supabase
+      .from('transaction')
+      .update({
+        from_account: null,
+        from_account_username: '(Deleted User)'
+      })
+      .eq('from_account_username', ownerUsername)
+      .eq('transaction_type', 'pay anyone'); // Only update for 'pay anyone' transactions
+
+    if (fromAccountError) {
+      throw new Error(`Error updating transactions (payer): ${fromAccountError.message}`);
+    } else {
+      console.log('Updated transactions for payer:', fromAccountData);
+    }
+
+    // Update transactions where the deleted user is the recipient (to_account) for 'pay anyone' type only
+    const { data: toAccountData, error: toAccountError } = await supabase
+      .from('transaction')
+      .update({
+        to_account: null,
+        to_account_username: '(Deleted User)'
+      })
+      .eq('to_account_username', ownerUsername)
+      .eq('transaction_type', 'pay anyone'); // Only update for 'pay anyone' transactions
+
+    if (toAccountError) {
+      throw new Error(`Error updating transactions (recipient): ${toAccountError.message}`);
+    } else {
+      console.log('Updated transactions for recipient:', toAccountData);
+    }
+
+    // Delete transactions for other transaction types (not 'pay anyone')
+    const { data: otherTransactions, error: otherTransactionsError } = await supabase
+        .from('transaction')
+        .select('from_account_username');
+
+        if (otherTransactionsError) {
+          throw new Error(`Error fetching Other Transactions: ${otherTransactionsError.message}`);
+        }
+
+        // Iterate over the otherTransactions and extract the ownerUsername part
+        const filteredTransactions = otherTransactions.filter(transaction => {
+          const usernamePart = transaction.from_account_username.split(' - ')[0]; // Split by ' - ' and take the first part (e.g., 'fred8')
+          return usernamePart === ownerUsername;
+        });
+
+        // If there are any filtered otherTransactions, proceed to delete
+        if (filteredTransactions.length > 0) {
+          const { data: deleteData, error: deleteError } = await supabase
+            .from('transaction')
+            .delete()
+            .in('from_account_username', filteredTransactions.map(t => t.from_account_username)); // Deleting all matching otherTransactions
+
+          if (deleteError) {
+            throw new Error(`Error deleting Other Transactions: ${deleteError.message}`);
+          }
+
+          console.log('Deleted Other Transactions for owner:', deleteData);
+        }
+      
       // Now delete accounts based on owner_username
       const { data: accountData, error: accountError } = await supabase
         .from('account') // Replace with your accounts table name
@@ -55,9 +116,66 @@ const TrashUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status,
       if (accountError) {
         throw new Error(`Error deleting accounts: ${accountError.message}`);
       } else {
-        console.log('Users deleted:', accountData);
+        console.log('Accounts deleted:', accountData);
       }
   
+      // Delete messages
+      const { data: messagesData, error: messagesError } = await supabase
+        .from('messages') // Replace with your messagess table name
+        .delete()
+        .eq('to_user', ownerId); // Match by ownerId
+
+      if (messagesError) {
+        throw new Error(`Error deleting messagess: ${messagesError.message}`);
+      } else {
+        console.log('Messages deleted:', messagesData);
+      }
+
+      // User Billers
+      const { data: userBillerData, error: userBillerError } = await supabase
+        .from('user_billers') // Replace with your userBillers table name
+        .delete()
+        .eq('owner', ownerId); // Match by ownerId
+
+      if (userBillerError) {
+        throw new Error(`Error deleting User Biller: ${userBillerError.message}`);
+      } else {
+        console.log('User Biller deleted:', userBillerData);
+      }
+
+      // Bills 
+      const { data: billsData, error: billsError } = await supabase
+        .from('bills') // Replace with your billss table name
+        .delete()
+        .eq('billed_user', ownerId); // Match by ownerId
+
+      if (billsError) {
+        throw new Error(`Error deleting Bill: ${billsError.message}`);
+      } else {
+        console.log('Bill deleted:', billsData);
+      }
+
+      // Admin bills
+      updateAdminBills(ownerUsername, ownerId);
+
+
+      // Delete from supabase [hard delete]
+      const supabaseAdmin = serviceRoleClient();
+      const { data, error } = await supabaseAdmin.auth.admin.deleteUser(ownerId!);
+
+      if (error) {
+        setError(error.message);
+        console.error('Error deleting user:', error.message);
+      } else {
+        setError('');
+        console.log('User deleted:', data);
+      }
+
+      // Schedule payments
+        // #############################
+        // #############################
+        // #############################
+        // #############################
       // Call parent function or refresh data after deletion
       deleteUser(); // Assuming you have a function to refresh the data
     } catch (error: unknown) {
@@ -70,6 +188,52 @@ const TrashUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status,
     }
   }
   
+  async function updateAdminBills(ownerUsername: string | undefined, ownerId: string | undefined) {
+    try {
+      // Fetch admin_bills data
+      const { data: adminBills, error: adminBillsError } = await supabase
+        .from('admin_bills')
+        .select('*');
+  
+      if (adminBillsError) {
+        throw new Error(`Error fetching admin bills: ${adminBillsError.message}`);
+      }
+  
+      // Build the exact string to be removed (e.g., "fred15|12345")
+    const userToDelete = `${ownerUsername}|${ownerId}`;
+
+    // Iterate through each bill and remove the specific user
+    const updatedBills = adminBills.map(bill => {
+      // Check if assigned_users is a string or array and split only if it's a string
+      let assignedUsers = Array.isArray(bill.assigned_users)
+        ? bill.assigned_users
+        : bill.assigned_users.split(', ');
+
+      return {
+        ...bill,
+        assigned_users: assignedUsers
+          .filter((user: string) => user !== userToDelete) // Filter out the user
+          .join(', ') // Join the array back into a string
+      };
+    });
+
+      for (const bill of updatedBills) {
+        const { error: updateError } = await supabase
+          .from('admin_bills')
+          .update({ assigned_users: bill.assigned_users })  // Update the 'assigned_users' field
+          .eq('id', bill.id);  // Use 'id' to target the specific row for update
+
+        if (updateError) {
+          throw new Error(`Error updating bill ${bill.id}: ${updateError.message}`);
+        }
+      }
+      console.log('All bills updated successfully');
+    } catch (error) {
+      console.error('Error processing admin bills:', error);
+    }
+
+ 
+  }
   
   
   
@@ -86,7 +250,6 @@ const TrashUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status,
           You can’t undo this action.
           </DialogDescription>
         </DialogHeader>
-
         {/* Error Message */}
         {error && (
             <div className="text-red-200">
@@ -94,11 +257,10 @@ const TrashUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status,
               {error}
             </div>
           )}
-
         {/* Footer with Close button */}
         <DialogFooter className="mt-8 flex ">
             <Button onClick={onClose} className="grow uppercase font-inter border-2 hover:bg-slate-200 tracking-wider">Cancel</Button>
-          <Button onClick={(e) => deleteAccountsByOwnerUsername(account?.owner_username)} className="grow uppercase font-inter tracking-wider bg-blue-25 hover:bg-blue-200 text-white-100">Delete</Button>
+          <Button onClick={(e) => deleteAccountsByOwnerUsername(account?.owner_username, account?.owner)} className="grow uppercase font-inter tracking-wider bg-blue-25 hover:bg-blue-200 text-white-100">Delete</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
