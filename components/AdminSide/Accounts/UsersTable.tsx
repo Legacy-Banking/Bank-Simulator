@@ -20,6 +20,7 @@ import { accountAction } from '@/utils/accountAction';
 import OpenUserAccountsDetailSheet from './OpenUserAccountsDetailSheet';
 import TrashUserDetailSheet from './TrashUserDetailSheet';
 import EditUserDetailSheet from './EditUserDetailSheet';
+import { userAction } from '@/lib/actions/userAction';
 
 // UsersTable component
 export const UsersTable = ({ accounts = [], setShowUpdatePopUp, setShowDeletePopUp, onEditStatus }: UsersTableProps) => {
@@ -29,6 +30,7 @@ export const UsersTable = ({ accounts = [], setShowUpdatePopUp, setShowDeletePop
   const [openUserAccountsWindow, setOpenUserAccountsWindow] = useState(false);
   const [selectedUserAccounts, setSelectedUserAccounts] = useState<Account []>([]);
   const [userBalances, setUserBalances] = useState<{ [key: string]: number }>({}); // State to store balances by user ID
+  const [lastLogins, setLastLogins] = useState<{ [key: string]: string | null }>({});
 
   const toggleDeleteUserWindow = (acc : Account | null) => {
     setDeleteUserWindow((prevState) => !prevState);
@@ -79,7 +81,23 @@ export const UsersTable = ({ accounts = [], setShowUpdatePopUp, setShowDeletePop
       }
     });
   }, [accounts]); // Re-run effect when accounts change
+  const fetchLastLogins = async () => {
+    try {
+      const usersWithLogins = await userAction.listMostRecentUsers(); // Fetch the user logins
+      const logins = usersWithLogins.reduce((acc: { [key: string]: string | null }, user: { id: string, last_sign_in_at: string | null }) => {
+        acc[user.id] = user.last_sign_in_at;
+        return acc;
+      }, {});
+      setLastLogins(logins); // Update state with last logins
+    } catch (error) {
+      console.error("Error fetching last logins:", error);
+    }
+  };
+  
 
+  useEffect(() => {
+    fetchLastLogins(); // Fetch last login times when the component mounts
+  }, []);
   return (
     <>
       <Table>
@@ -95,7 +113,7 @@ export const UsersTable = ({ accounts = [], setShowUpdatePopUp, setShowDeletePop
         <TableBody>
           {accounts.map((acc: Account) => {
             const accountName = acc.owner_username;
-            const lastLogin = new Date();
+            const lastLogin = lastLogins[acc.owner] ? lastLogins[acc.owner] : null;
 
             return (
               <TableRow
@@ -124,7 +142,7 @@ export const UsersTable = ({ accounts = [], setShowUpdatePopUp, setShowDeletePop
                 </TableCell>
 
                 <TableCell className="font-inter min-w-32 pl-2 pr-10 text-[#475467] ">
-                    {lastLogin.toDateString()}
+                  {lastLogin ? new Date(lastLogin).toDateString() : "No login data"}
                 </TableCell>
                 
                 <TableCell >
