@@ -56,7 +56,7 @@ const OpenUserAccountsDetailSheet: React.FC<AccountDetailSheetProps> = ({ accoun
     <Dialog open={!!status} onOpenChange={onClose}>
       <DialogContent className="bg-white-100 p-6 min-h-[78vh] max-w-[700px] rounded-lg shadow-lg">
         <DialogHeader>
-          <DialogTitle className="font-inter text-2xl font-semibold mb-1">
+          <DialogTitle className="font-inter text-2xl font-semibold mb-1 mt-4">
             <span className='text-blackText-50'>
               <span className="text-blue-25">{accounts.at(0)?.owner_username}'s</span> Accounts
             </span>
@@ -82,8 +82,8 @@ const OpenUserAccountsDetailSheet: React.FC<AccountDetailSheetProps> = ({ accoun
         <div className="h-0.5 bg-blue-200 my-4"></div>
 
         {/* Footer with Close button */}
-        <DialogFooter className="mt-4 flex justify-end">
-          <Button onClick={onClose} className="bg-gray-200">
+        <DialogFooter className="flex justify-end">
+          <Button onClick={onClose} className="text-base px-6 bg-white-100 font-semibold border border-gray-300 shadow-form hover:bg-slate-200">
             Close
           </Button>
         </DialogFooter>

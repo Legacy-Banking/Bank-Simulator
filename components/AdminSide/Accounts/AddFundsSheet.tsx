@@ -89,16 +89,22 @@ const AddFundsSheet: React.FC<AddFundsSheetProps> = ({ toBank, refreshAccounts }
       </SheetTrigger>
 
       <SheetContent className="w-[400px] bg-white-100">
-        <SheetHeader>
-          <SheetTitle className="text-black text-3xl">Add Funds</SheetTitle>
-          <SheetDescription>{`Account: ${toBank.type.charAt(0).toUpperCase() + toBank.type.slice(1)} - ${toBank.owner_username}`}</SheetDescription>
-          <SheetDescription>{`Current Balance: ${toBank.balance}`}</SheetDescription>
+        <SheetHeader className="pb-6 border-b border-blue-25 mt-4">
+          <SheetTitle className="text-black text-2xl">Add Funds</SheetTitle>
+            <SheetDescription className="text-blackText-300 ">
+              Transfer additional funds to this user's account
+            </SheetDescription>
         </SheetHeader>
 
-        <form onSubmit={form.handleSubmit(handleAddFunds)} className="space-y-4 mt-4">
+        <div className="text-black mt-8 font-semibold">
+          <p className="text-base">{`Account: ${toBank.type.charAt(0).toUpperCase() + toBank.type.slice(1)} - ${toBank.owner_username}`}</p>
+          <p className="text-base mt-8">{`Current Balance: ${toBank.balance}`}</p>
+        </div>
+
+        <form onSubmit={form.handleSubmit(handleAddFunds)} className="space-y-8 mt-8">
           {/* Input for Amount */}
           <div>
-            <Label htmlFor="amount" className="text-right">Amount</Label>
+            <Label htmlFor="amount" className="text-right text-base">Amount</Label>
             <Input
               id="amount"
               type="text"
@@ -111,7 +117,7 @@ const AddFundsSheet: React.FC<AddFundsSheetProps> = ({ toBank, refreshAccounts }
 
           {/* Input for Optional Description */}
           <div>
-            <Label htmlFor="description" className="text-right">Optional Description</Label>
+            <Label htmlFor="description" className="text-right text-base">Optional Description</Label>
             <Textarea
               id="description"
               {...form.register('description')}
@@ -126,11 +132,11 @@ const AddFundsSheet: React.FC<AddFundsSheetProps> = ({ toBank, refreshAccounts }
           {/* Footer with Cancel and Add buttons */}
           <SheetFooter className="flex justify-between mt-6">
             <SheetClose asChild>
-              <Button variant="ghost" onClick={() => form.reset()}>
+              <Button variant="ghost" className="text-base px-6 bg-white-100 font-semibold border border-gray-300 shadow-form hover:bg-slate-200" onClick={() => form.reset()}>
                 Cancel
               </Button>
             </SheetClose>
-            <Button type="submit" variant="default">
+            <Button type="submit" variant="default" className="text-base px-6 bg-blue-gradient font-semibold text-white-100 shadow-form hover:bg-blue-gradient" >
               {isLoading ? "Processing..." : "Add Funds"}
             </Button>
           </SheetFooter>
