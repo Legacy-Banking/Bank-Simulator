@@ -32,8 +32,10 @@ type AccountDetailSheetProps = {
 
 const OpenUserAccountsDetailSheet: React.FC<AccountDetailSheetProps> = ({ accounts, status, onClose }) => {
   // State for loading
-  const [loading, setLoading] = useState(false);
-  const [updatedAccounts, setUpdatedAccounts] = useState<Account[]>(accounts); // Use initial accounts as fallback
+  const [loading, setLoading] = useState(true);
+  // const [updatedAccounts, setUpdatedAccounts] = useState<Account[]>(accounts); // Use initial accounts as fallback
+  const [updatedAccounts, setUpdatedAccounts] = useState<Account[]>([]);
+
 
   // Fetch updated accounts
   const refreshAccounts = async () => {
@@ -53,9 +55,11 @@ const OpenUserAccountsDetailSheet: React.FC<AccountDetailSheetProps> = ({ accoun
   // Fetch accounts when the dialog opens
   useEffect(() => {
     if (status) {
+      // Reset accounts to avoid showing stale data
+      setUpdatedAccounts([]);
       refreshAccounts();
     }
-  }, [status]);
+  }, [status, accounts]);
 
   if (!status) return null;
 
