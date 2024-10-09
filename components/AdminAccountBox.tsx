@@ -6,6 +6,7 @@ import AddFundsSheet from './AdminSide/Accounts/AddFundsSheet';
 // Define props for the component
 type AdminAccountBoxProps = {
     account: Account;
+    balance: string | React.JSX.Element;  // Accept balance as string or JSX element (like Skeleton)
     refreshAccounts: () => Promise<void>; // Accept the refresh callback as a prop
 };
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -10,86 +10,46 @@ import AdminAccountBox from '@/components/AdminAccountBox'; // Import the new Ad
 import { Button } from '@/components/ui/button';
 import { accountAction } from '@/lib/actions/accountAction';
 
-// Skeleton Loader for Account Boxes
-const SkeletonAccountBox: React.FC = () => {
-  return (
-    <div className="animate-pulse flex items-center justify-between p-6 rounded-lg shadow-lg bg-gray-200">
-      <div className="flex flex-col gap-2">
-        <div className="h-6 w-32 bg-gray-300 rounded"></div>
-        <div className="h-6 w-24 bg-gray-300 rounded"></div>
-      </div>
-      <div className="h-8 w-8 bg-gray-300 rounded-md"></div>
-    </div>
-  );
-};
+// Skeleton Loader for Account Balances
+const SkeletonBalance: React.FC = () => (
+  <div className="animate-pulse h-6 w-24 bg-gray-300 rounded"></div>
+);
 
 // Define the props type for the component
 type AccountDetailSheetProps = {
   accounts: Account[],
   status: boolean;
+  loading: boolean;
   onClose: () => void;
 };
 
-const OpenUserAccountsDetailSheet: React.FC<AccountDetailSheetProps> = ({ accounts, status, onClose }) => {
-  // State for loading
-  const [loading, setLoading] = useState(true);
-  // const [updatedAccounts, setUpdatedAccounts] = useState<Account[]>(accounts); // Use initial accounts as fallback
-  const [updatedAccounts, setUpdatedAccounts] = useState<Account[]>([]);
+const OpenUserAccountsDetailSheet: React.FC<AccountDetailSheetProps> = ({ accounts, status, loading, onClose }) => {
+  const [updatedAccounts, setUpdatedAccounts] = useState<Account[]>(accounts); // Initialize with fallback accounts
 
-  // useRef to ensure effect runs only once when `status` becomes true
-  const hasFetchedAccounts = useRef(false);
-
-  // Fetch updated accounts
+  // Fetch updated accounts when the dialog opens
   const refreshAccounts = async () => {
-    setLoading(true); // Ensure loading is set to true
     try {
       if (accounts.length > 0) {
         const fetchedAccounts = await accountAction.fetchAccountsbyUserId(accounts[0].owner);
-        setUpdatedAccounts(fetchedAccounts);
+        setUpdatedAccounts(fetchedAccounts); // Set the updated accounts
       }
     } catch (error) {
       console.error("Error fetching updated accounts:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
-  // Fetch accounts when the dialog opens
-  // useEffect(() => {
-  //   if (status) {
-  //     // Reset accounts to avoid showing stale data
-  //     setUpdatedAccounts([]);
-  //     refreshAccounts();
-  //   }
-  // }, [status, accounts]);
-
-  // if (!status) return null;
-
-  // Only fetch accounts when the dialog is opened
   useEffect(() => {
-    if (status && !hasFetchedAccounts.current) {
-      hasFetchedAccounts.current = true; // Set the ref to true to prevent further fetches
-      setUpdatedAccounts([]); // Clear previous account data
-      refreshAccounts();
+    if (status) {
+      refreshAccounts(); // Trigger fetch when the dialog opens
     }
-  }, [status]); // Depend only on status to avoid unnecessary re-renders
+  }, [status, accounts]);
 
-  // Reset the ref when dialog is closed to allow future fetches
-  useEffect(() => {
-    if (!status) {
-      hasFetchedAccounts.current = false;
-    }
-  }, [status]);
+  // Filter accounts by type for rendering
+  const personalAccount = updatedAccounts.find(acc => acc.type === 'personal');
+  const savingsAccount = updatedAccounts.find(acc => acc.type === 'savings');
+  const creditAccount = updatedAccounts.find(acc => acc.type === 'credit');
 
   if (!status) return null;
-
-  // Use either the updated accounts or fallback to the initial accounts
-  const activeAccounts = updatedAccounts.length > 0 ? updatedAccounts : accounts;
-
-  // Filter accounts by type to ensure ordering in the UI
-  const personalAccount = activeAccounts.find(acc => acc.type === 'personal');
-  const savingsAccount = activeAccounts.find(acc => acc.type === 'savings');
-  const creditAccount = activeAccounts.find(acc => acc.type === 'credit');
 
   return (
     <Dialog open={!!status} onOpenChange={onClose}>
@@ -104,26 +64,33 @@ const OpenUserAccountsDetailSheet: React.FC<AccountDetailSheetProps> = ({ accoun
 
         <div className="h-0.5 bg-blue-200 my-4"></div>
 
-        {/* Display Account Boxes or Skeleton Loaders */}
-        {loading ? (
-          // Show skeleton loaders for account boxes when loading
-          <div className="flex flex-col gap-8">
-            <SkeletonAccountBox />
-            <SkeletonAccountBox />
-            <SkeletonAccountBox />
-          </div>
-        ) : (
-          // Display Account Boxes when data is loaded
-          <div className="flex flex-col gap-8">
-            {personalAccount && <AdminAccountBox account={personalAccount} refreshAccounts={refreshAccounts} />}
-            {savingsAccount && <AdminAccountBox account={savingsAccount} refreshAccounts={refreshAccounts} />}
-            {creditAccount && <AdminAccountBox account={creditAccount} refreshAccounts={refreshAccounts} />}
-          </div>
-        )}
+        {/* Show the AdminAccountBox immediately, but display a skeleton for balance while loading */}
+        <div className="flex flex-col gap-8">
+          {personalAccount && (
+            <AdminAccountBox
+              account={personalAccount}
+              balance={loading ? <SkeletonBalance /> : `$${personalAccount.balance?.toFixed(2)}`}
+              refreshAccounts={refreshAccounts}
+            />
+          )}
+          {savingsAccount && (
+            <AdminAccountBox
+              account={savingsAccount}
+              balance={loading ? <SkeletonBalance /> : `$${savingsAccount.balance?.toFixed(2)}`}
+              refreshAccounts={refreshAccounts}
+            />
+          )}
+          {creditAccount && (
+            <AdminAccountBox
+              account={creditAccount}
+              balance={loading ? <SkeletonBalance /> : `$${creditAccount.balance?.toFixed(2)}`}
+              refreshAccounts={refreshAccounts}
+            />
+          )}
+        </div>
 
         <div className="h-0.5 bg-blue-200 my-4"></div>
 
-        {/* Footer with Close button */}
         <DialogFooter className="flex justify-end">
           <Button onClick={onClose} className="text-base px-6 bg-white-100 font-semibold border border-gray-300 shadow-form hover:bg-slate-200">
             Close

@@ -27,19 +27,20 @@ export const UsersTable = ({ accounts = [], setShowUpdatePopUp, setShowDeletePop
   const [deleteUserWindow, setDeleteUserWindow] = useState(false);
   const [editUserWindow, setEditUserWindow] = useState(false);
   const [openUserAccountsWindow, setOpenUserAccountsWindow] = useState(false);
-  const [selectedUserAccounts, setSelectedUserAccounts] = useState<Account []>([]);
+  const [selectedUserAccounts, setSelectedUserAccounts] = useState<Account[]>([]);
   const [userBalances, setUserBalances] = useState<{ [key: string]: number }>({}); // State to store balances by user ID
+  const [loadingAccounts, setLoadingAccounts] = useState(false); // Track loading state for user accounts
 
-  const toggleDeleteUserWindow = (acc : Account | null) => {
+  const toggleDeleteUserWindow = (acc: Account | null) => {
     setDeleteUserWindow((prevState) => !prevState);
     setSelectedUser(acc);
   };
 
-  const toggleEditUserWindow = (acc : Account | null) => {
-      
+  const toggleEditUserWindow = (acc: Account | null) => {
+
     setEditUserWindow((prevState) => !prevState);
     setSelectedUser(acc);
-    
+
   };
 
   const deleteUser = () => {
@@ -52,14 +53,17 @@ export const UsersTable = ({ accounts = [], setShowUpdatePopUp, setShowDeletePop
     setShowUpdatePopUp(true);
     onEditStatus();
   }
-  const toggleOpenUserAccountsWindow = async (userId : string | null) => {
+  const toggleOpenUserAccountsWindow = async (userId: string | null) => {
     setOpenUserAccountsWindow((prevState) => !prevState)
     if (userId) {
-      setSelectedUserAccounts(await accountAction.fetchAccountsbyUserId(userId));
+      setLoadingAccounts(true);
+      const fetchedAccounts = await accountAction.fetchAccountsbyUserId(userId);
+      setSelectedUserAccounts(fetchedAccounts);
+      setLoadingAccounts(false);
     }
   }
-   // Fetch and set the total balance for a user
-   const fetchTotalBalance = async (userId: string) => {
+  // Fetch and set the total balance for a user
+  const fetchTotalBalance = async (userId: string) => {
     try {
       const balance = await accountAction.fetchAccountsTotalBalance(userId);
       setUserBalances((prevBalances) => ({
@@ -101,9 +105,9 @@ export const UsersTable = ({ accounts = [], setShowUpdatePopUp, setShowDeletePop
               <TableRow
                 key={acc.id}
               >
-                <TableCell className="max-w-[200px] pl-8 pr-10" 
-                onClick={() => toggleOpenUserAccountsWindow(acc.owner)}
-                
+                <TableCell className="max-w-[200px] pl-8 pr-10"
+                  onClick={() => toggleOpenUserAccountsWindow(acc.owner)}
+
                 >
                   <div className="flex items-center gap-3">
                     <h1 className="font-inter text-16 truncate font-semibold text-[#344054] cursor-pointer">
@@ -115,8 +119,8 @@ export const UsersTable = ({ accounts = [], setShowUpdatePopUp, setShowDeletePop
 
 
                 <TableCell className="font-inter font-bold"
-                onClick={() => toggleOpenUserAccountsWindow(acc.owner)}
-                
+                  onClick={() => toggleOpenUserAccountsWindow(acc.owner)}
+
                 >
                   <span className='cursor-pointer'>
                     {formatAmount(userBalances[acc.owner])}
@@ -124,12 +128,12 @@ export const UsersTable = ({ accounts = [], setShowUpdatePopUp, setShowDeletePop
                 </TableCell>
 
                 <TableCell className="font-inter min-w-32 pl-2 pr-10 text-[#475467] ">
-                    {lastLogin.toDateString()}
+                  {lastLogin.toDateString()}
                 </TableCell>
-                
+
                 <TableCell >
-                    <Button onClick={() => toggleEditUserWindow(acc)} className="p-0 ml-4"> <img src="../Edit.png" alt="Edit button" /></Button>
-                    <Button onClick={() => toggleDeleteUserWindow(acc)} className="p-0 ml-4"> <img src="../Delete.png" alt="Delete button" /></Button>
+                  <Button onClick={() => toggleEditUserWindow(acc)} className="p-0 ml-4"> <img src="../Edit.png" alt="Edit button" /></Button>
+                  <Button onClick={() => toggleDeleteUserWindow(acc)} className="p-0 ml-4"> <img src="../Delete.png" alt="Delete button" /></Button>
                 </TableCell>
               </TableRow>
             );
@@ -148,11 +152,12 @@ export const UsersTable = ({ accounts = [], setShowUpdatePopUp, setShowDeletePop
         status={editUserWindow}
         onClose={() => toggleEditUserWindow(selectedUser)}
         updateUser={updateUser}
-        />
+      />
       <OpenUserAccountsDetailSheet
-      accounts={selectedUserAccounts}
-      status={openUserAccountsWindow}
-      onClose={() => toggleOpenUserAccountsWindow(null)}
+        accounts={selectedUserAccounts}
+        status={openUserAccountsWindow && !loadingAccounts}  // Only open the sheet when accounts are loaded
+        loading={loadingAccounts} // Pass the loading state down
+        onClose={() => toggleOpenUserAccountsWindow(null)}
       />
     </>
   );
