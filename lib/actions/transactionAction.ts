@@ -245,7 +245,7 @@ export const transactionAction = {
         };
       
         const from_username = `${fromAccount.owner_username} Account`;
-        const to_username = `${toAccount.owner_username} - ${capitalizeFirstLetter(toAccount.type)} Account`;
+        const to_username = toAccount.owner_username;
       
         const toNewBalance = toAccount.balance + amount;
       
