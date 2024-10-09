@@ -9,6 +9,7 @@ import {
 import AdminAccountBox from '@/components/AdminAccountBox'; // Import the new AdminAccountBox component
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/Spinner';
+import { accountAction } from '@/lib/actions/accountAction';
 
 // Define the props type for the component
 type AccountDetailSheetProps = {
@@ -20,11 +21,23 @@ type AccountDetailSheetProps = {
 const OpenUserAccountsDetailSheet: React.FC<AccountDetailSheetProps> = ({ accounts, status, onClose }) => {
   // State for loading
   const [loading, setLoading] = useState(true);
+  const [updatedAccounts, setUpdatedAccounts] = useState<Account[]>(accounts);
+
+  // Fetch updated accounts
+  const refreshAccounts = async () => {
+    try {
+      const fetchedAccounts = await accountAction.fetchAccountsbyUserId(accounts[0].owner);
+      setUpdatedAccounts(fetchedAccounts); // Update the state with the new account data
+    } catch (error) {
+      console.error("Error fetching updated accounts:", error);
+    }
+  };
 
   // Set loading state to false after accounts are loaded
   useEffect(() => {
     if (status) {
       setLoading(true); // Set loading to true when dialog opens
+      refreshAccounts();
       setTimeout(() => {
         setLoading(false); // Simulate data loading (replace with actual fetching logic if needed)
       }, 200); // Adjust the delay as per the real loading time
@@ -35,9 +48,9 @@ const OpenUserAccountsDetailSheet: React.FC<AccountDetailSheetProps> = ({ accoun
   if (!status) return null;
 
   // Filter accounts by type to ensure ordering in the UI
-  const personalAccount = accounts.find(acc => acc.type === 'personal');
-  const savingsAccount = accounts.find(acc => acc.type === 'savings');
-  const creditAccount = accounts.find(acc => acc.type === 'credit');
+  const personalAccount = updatedAccounts.find(acc => acc.type === 'personal');
+  const savingsAccount = updatedAccounts.find(acc => acc.type === 'savings');
+  const creditAccount = updatedAccounts.find(acc => acc.type === 'credit');
 
   return (
     <Dialog open={!!status} onOpenChange={onClose}>
@@ -60,9 +73,9 @@ const OpenUserAccountsDetailSheet: React.FC<AccountDetailSheetProps> = ({ accoun
         ) : (
           // Display Account Boxes when data is loaded
           <div className="flex flex-col gap-8">
-            {personalAccount && <AdminAccountBox account={personalAccount} />}
-            {savingsAccount && <AdminAccountBox account={savingsAccount} />}
-            {creditAccount && <AdminAccountBox account={creditAccount} />}
+            {personalAccount && <AdminAccountBox account={personalAccount} refreshAccounts={refreshAccounts} />}
+            {savingsAccount && <AdminAccountBox account={savingsAccount} refreshAccounts={refreshAccounts} />}
+            {creditAccount && <AdminAccountBox account={creditAccount} refreshAccounts={refreshAccounts} />}
           </div>
         )}
 

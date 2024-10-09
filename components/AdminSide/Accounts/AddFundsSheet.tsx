@@ -27,9 +27,10 @@ const formSchema = z.object({
 
 type AddFundsSheetProps = {
   toBank: Account; // Assuming the account type is passed here
+  refreshAccounts: () => Promise<void>; // Pass a callback to refresh the accounts
 };
 
-const AddFundsSheet: React.FC<AddFundsSheetProps> = ({ toBank }) => {
+const AddFundsSheet: React.FC<AddFundsSheetProps> = ({ toBank, refreshAccounts }) => {
   const [isOpen, setIsOpen] = useState(false); // Manage sheet open/close state
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,6 +68,10 @@ const AddFundsSheet: React.FC<AddFundsSheetProps> = ({ toBank }) => {
       // Reset the form after submission
       form.reset();
       setIsOpen(false); // Close the sheet after successful submission
+
+      // Call the refreshAccounts callback to refetch the updated account details
+      await refreshAccounts();
+      
     } catch (error) {
       console.error("Adding funds failed: ", error);
       setError("An error occurred while adding the funds.");

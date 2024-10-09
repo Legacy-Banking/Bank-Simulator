@@ -6,9 +6,10 @@ import AddFundsSheet from './AdminSide/Accounts/AddFundsSheet';
 // Define props for the component
 type AdminAccountBoxProps = {
     account: Account;
+    refreshAccounts: () => Promise<void>; // Accept the refresh callback as a prop
 };
 
-const AdminAccountBox: React.FC<AdminAccountBoxProps> = ({ account }) => {
+const AdminAccountBox: React.FC<AdminAccountBoxProps> = ({ account, refreshAccounts }) => {
     const variant = account.type;
 
     // Define box style based on the account type
@@ -36,7 +37,7 @@ const AdminAccountBox: React.FC<AdminAccountBoxProps> = ({ account }) => {
                     ${account.balance?.toFixed(2)}
                 </span>
 
-                <AddFundsSheet toBank={account} />
+                <AddFundsSheet toBank={account} refreshAccounts={refreshAccounts} />
 
             </div>
         </div>
