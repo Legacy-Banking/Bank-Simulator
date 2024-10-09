@@ -1,6 +1,8 @@
 "use client"
 import React, { useState, useRef } from 'react';
 import { Search } from "lucide-react"; // Import the Search icon from Lucide
+import { Input } from '@/components/ui/input'; // Shadcn Input component
+import { Button } from '@/components/ui/button'; // Shadcn Button component
 
 interface SearchBarProps {
     inputValue: string;
@@ -24,27 +26,29 @@ function SearchBar({ inputValue, setInputValue }: SearchBarProps) {
     };
 
     return (
-        <div className='w-64 h-10 border-[#D7D7D7] border-2 rounded-lg py-2 px-4 flex bg-[#FFFF] text-[#667085] font-semibold items-center'>
-            {!inputValue && (
-                <Search
-                    className='mr-2 scale-92 transition-opacity duration-300 cursor-text opacity-100'
-                    onClick={handleMagnifierClick}
-                />
-            )}
-            <input
+        <div className="relative flex items-center w-64">
+            {/* Search Icon */}
+            <div className="absolute left-3 text-gray-500 cursor-pointer" onClick={handleMagnifierClick}>
+                <Search className="h-5 w-5" />
+            </div>
+
+            {/* Shadcn Input component */}
+            <Input
                 ref={inputRef}
                 placeholder="Search Users"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                className="w-full outline-none focus:ring-0"
+                className="pl-10 pr-10 bg-white-100 text-base" // Add padding to leave space for icons
             />
+
+            {/* Clear Button */}
             {inputValue && (
-                <button
+                <Button
                     onClick={handleClearInput}
-                    className="ml-2 text-[#667085] scale-125 transition-opacity duration-300 cursor-pointer focus:outline-none"
+                    className="absolute right-0 text-gray-500 cursor-pointer focus:outline-none"
                 >
                     &#x2715;
-                </button>
+                </Button>
             )}
         </div>
     );

@@ -2,12 +2,12 @@
 import React, { useEffect, useState } from 'react';
 import SearchBar from '@/components/SearchBar';
 import { createClient } from '@/lib/supabase/client';
-import { AccountsTable } from './AccountsTable';
+import { UsersTable } from './UsersTable';
 import { Pagination } from '@/components/Pagination';
 import PopUp from './PopUp';
 
-const AccountsPage = () => {
-  const [accounts, setAccounts] = useState<Account[]>([]);
+const UsersPage = () => {
+  const [accounts, setUsers] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,31 +31,31 @@ const AccountsPage = () => {
   const rowsPerPage = 10;
 
   // Filter the accounts based on the input value
-  const filteredAccounts = accounts.filter((account) =>
+  const filteredUsers = accounts.filter((account) =>
     (account.owner_username ?? '').toLowerCase().includes(inputValue.toLowerCase())
   );
 
-  const uniqueAccounts = filteredAccounts.filter((account, index, self) =>
+  const uniqueUsers = filteredUsers.filter((account, index, self) =>
     index === self.findIndex((t) => t.owner === account.owner)
   );
-  const totalPages = Math.ceil(uniqueAccounts.length / rowsPerPage);
+  const totalPages = Math.ceil(uniqueUsers.length / rowsPerPage);
   const indexOfLastTransaction = page * rowsPerPage;
   const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
-  const currentAccounts = uniqueAccounts.slice(indexOfFirstTransaction, indexOfLastTransaction);
+  const currentUsers = uniqueUsers.slice(indexOfFirstTransaction, indexOfLastTransaction);
 
   // Fetching data from Supabase
   const supabase = createClient();
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const { data, error } = await supabase.from('account').select('*');
+  const fetchUsers = async () => {
+    const { data, error } = await supabase.from('account').select('*');
 
-      if (error) {
-        setError(error.message);
-      } else {
-        setAccounts(data || []);
-      }
-      setLoading(false);
-    };
+    if (error) {
+      setError(error.message);
+    } else {
+      setUsers(data || []);
+    }
+    setLoading(false);
+  };
+  useEffect(() => {
 
     fetchUsers();
   }, []); // Run once when the component mounts
@@ -80,15 +80,16 @@ const AccountsPage = () => {
         <div className='px-8 py-2'>
           <div className='flex'>
             <div className='flex flex-1'>
-              <h1 className="text-xl text-black font-semibold">Accounts</h1>
+              <h1 className="text-xl text-black font-semibold">Users</h1>
             </div>
             <SearchBar inputValue={inputValue} setInputValue={setInputValue} />
           </div>
           <section className="flex w-full flex-col mt-6 bg-white-100 rounded-b-3xl">
-            <AccountsTable
-              accounts={currentAccounts}
+            <UsersTable
+              accounts={currentUsers}
               setShowUpdatePopUp={setShowUpdatePopUp}
               setShowDeletePopUp={setShowDeletePopUp}
+              onEditStatus={fetchUsers}
             />
 
             {totalPages > 1 && (
@@ -115,4 +116,4 @@ const AccountsPage = () => {
   );
 };
 
-export default AccountsPage;
+export default UsersPage;

@@ -207,10 +207,11 @@ declare interface BillerAccount {
 //   receiverBankId: string;
 // };
 
-type AccountsTableProps = {
+type UsersTableProps = {
   accounts: Account[];
   setShowUpdatePopUp: React.Dispatch<React.SetStateAction<boolean>>;
   setShowDeletePopUp: React.Dispatch<React.SetStateAction<boolean>>;
+  onEditStatus: () => void;
 }
 type AccountPresetTableProps = {
   accountTypes: AccountPresetType[];
