@@ -8,8 +8,20 @@ import {
 } from '@/components/ui/dialog';
 import AdminAccountBox from '@/components/AdminAccountBox'; // Import the new AdminAccountBox component
 import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/Spinner';
 import { accountAction } from '@/lib/actions/accountAction';
+
+// Skeleton Loader for Account Boxes
+const SkeletonAccountBox: React.FC = () => {
+  return (
+    <div className="animate-pulse flex items-center justify-between p-6 rounded-lg shadow-lg bg-gray-200">
+      <div className="flex flex-col gap-2">
+        <div className="h-6 w-32 bg-gray-300 rounded"></div>
+        <div className="h-6 w-24 bg-gray-300 rounded"></div>
+      </div>
+      <div className="h-8 w-8 bg-gray-300 rounded-md"></div>
+    </div>
+  );
+};
 
 // Define the props type for the component
 type AccountDetailSheetProps = {
@@ -20,37 +32,40 @@ type AccountDetailSheetProps = {
 
 const OpenUserAccountsDetailSheet: React.FC<AccountDetailSheetProps> = ({ accounts, status, onClose }) => {
   // State for loading
-  const [loading, setLoading] = useState(true);
-  const [updatedAccounts, setUpdatedAccounts] = useState<Account[]>(accounts);
+  const [loading, setLoading] = useState(false);
+  const [updatedAccounts, setUpdatedAccounts] = useState<Account[]>(accounts); // Use initial accounts as fallback
 
   // Fetch updated accounts
   const refreshAccounts = async () => {
+    setLoading(true); // Ensure loading is set to true
     try {
-      const fetchedAccounts = await accountAction.fetchAccountsbyUserId(accounts[0].owner);
-      setUpdatedAccounts(fetchedAccounts); // Update the state with the new account data
+      if (accounts.length > 0) {
+        const fetchedAccounts = await accountAction.fetchAccountsbyUserId(accounts[0].owner);
+        setUpdatedAccounts(fetchedAccounts);
+      }
     } catch (error) {
       console.error("Error fetching updated accounts:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Set loading state to false after accounts are loaded
+  // Fetch accounts when the dialog opens
   useEffect(() => {
     if (status) {
-      setLoading(true); // Set loading to true when dialog opens
       refreshAccounts();
-      setTimeout(() => {
-        setLoading(false); // Simulate data loading (replace with actual fetching logic if needed)
-      }, 200); // Adjust the delay as per the real loading time
     }
   }, [status]);
 
-  // Check if status is false, render nothing
   if (!status) return null;
 
+  // Use either the updated accounts or fallback to the initial accounts
+  const activeAccounts = updatedAccounts.length > 0 ? updatedAccounts : accounts;
+
   // Filter accounts by type to ensure ordering in the UI
-  const personalAccount = updatedAccounts.find(acc => acc.type === 'personal');
-  const savingsAccount = updatedAccounts.find(acc => acc.type === 'savings');
-  const creditAccount = updatedAccounts.find(acc => acc.type === 'credit');
+  const personalAccount = activeAccounts.find(acc => acc.type === 'personal');
+  const savingsAccount = activeAccounts.find(acc => acc.type === 'savings');
+  const creditAccount = activeAccounts.find(acc => acc.type === 'credit');
 
   return (
     <Dialog open={!!status} onOpenChange={onClose}>
@@ -65,10 +80,13 @@ const OpenUserAccountsDetailSheet: React.FC<AccountDetailSheetProps> = ({ accoun
 
         <div className="h-0.5 bg-blue-200 my-4"></div>
 
-        {/* Display Account Boxes */}
+        {/* Display Account Boxes or Skeleton Loaders */}
         {loading ? (
-          <div className="flex justify-center items-center py-8">
-            <Spinner size="large" show={true} />
+          // Show skeleton loaders for account boxes when loading
+          <div className="flex flex-col gap-8">
+            <SkeletonAccountBox />
+            <SkeletonAccountBox />
+            <SkeletonAccountBox />
           </div>
         ) : (
           // Display Account Boxes when data is loaded
