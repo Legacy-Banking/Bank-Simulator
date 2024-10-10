@@ -20,7 +20,7 @@ function card_detailGenerator(): { card_num: string, expiry: Date, cvv: string }
     const expiryYear = currentYear + 5;
 
     // Create the expiry date as the first day of the selected month 5 years from now
-    const expiry = new Date(expiryYear, randomMonth, 1);
+    const expiry = new Date(Date.UTC(expiryYear, randomMonth, 1));
 
     // Generate a 3-digit CVV as a string
     const cvv = Math.floor(Math.random() * 900 + 100).toString(); // Random 3-digit number between 100 and 999

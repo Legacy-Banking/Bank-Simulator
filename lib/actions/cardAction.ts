@@ -109,9 +109,9 @@ export const cardAction = {
 
           const [month, year] = expiryDate.split('/');
           const expiryYear = parseInt('20' + year); 
-          const expiryMonth = parseInt(month);
+          const expiryMonth = parseInt(month)-1;
 
-         const expiry = new Date(expiryYear, expiryMonth, 1); 
+         const expiry = new Date(Date.UTC(expiryYear, expiryMonth, 1)); 
          const formattedExpiryDate = expiry.toISOString().split('T')[0];
 
          console.log(formattedExpiryDate);
@@ -172,7 +172,7 @@ export const cardAction = {
             const expiryDate = new Date(card.expiry_date);
     
             // Set the day to the 1st of the respective month
-            const updatedExpiryDate = new Date(expiryDate.getFullYear(), expiryDate.getMonth(), 1);
+            const updatedExpiryDate = new Date(Date.UTC(expiryDate.getFullYear(), expiryDate.getMonth(), 1));
     
             // Convert the updated expiry date to a format that matches your database schema (e.g., YYYY-MM-DD)
             const formattedExpiryDate = updatedExpiryDate.toISOString().split('T')[0];
