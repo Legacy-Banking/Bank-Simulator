@@ -33,20 +33,18 @@ export default function SignUp({
         emailRedirectTo: `${origin}/auth/callback`,
       },
     });
-    console.log(error?.code);
-    switch (error?.code) {
-      case "user_already_exists":
-        return redirect(`/auth/sign-up?message=Username already exists. Please try another username.`);
-      case "invalid_email":
-        return redirect(`/auth/sign-up?message=Invalid username. Please try again.`);
-      case "invalid_password":
-        return redirect(`/auth/sign-up?message=Invalid password. Please try again.`);
-      default:
-        return redirect('/auth/sign-up?message=An error occured with our website.')
 
-    }
     if (error) {
-      return redirect(`/auth/sign-up?message=${error}`);
+      switch (error?.code) {
+        case "user_already_exists":
+          return redirect(`/auth/sign-up?message=Username already exists. Please try another username.`);
+        case "invalid_email":
+          return redirect(`/auth/sign-up?message=Invalid username. Please try again.`);
+        case "invalid_password":
+          return redirect(`/auth/sign-up?message=Invalid password. Please try again.`);
+        default:
+          return redirect('/auth/sign-up?message=An error occured with our website.')
+      }
     }
     const user_id = data.user?.id || '';
     await accountAction.signUpInitialization(user_id, username);
