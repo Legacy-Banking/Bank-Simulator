@@ -28,11 +28,12 @@ export default function Login({
       password,
     });
 
-    console.log(error?.code);
-    if (error?.code === "invalid_credentials") {
-      return redirect(`/auth/login?message=Invalid credentials. Please check your username and password and try again!`);
-    } else {
-      return redirect('/auth/login?message=An error occured with our website.')
+    if (error) {
+      if (error?.code === "invalid_credentials") {
+        return redirect(`/auth/login?message=Invalid credentials. Please check your username and password and try again!`);
+      } else {
+        return redirect('/auth/login?message=An error occured with our website.')
+      }
     }
 
 
