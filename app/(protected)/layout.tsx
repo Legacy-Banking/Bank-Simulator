@@ -1,13 +1,15 @@
 'use client';
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-import { useAppDispatch, updateUserId, updateUserName } from "../store/userSlice";
-import { useAppSelector } from '@/app/store/hooks';
+import { useAppDispatch, updateUserId, updateUserName, updateUserRole } from "../../store/userSlice";
+import { useAppSelector } from '@/store/hooks';
 import BankNavbar from "@/components/BankNavbar";
-import { accountAction } from "@/utils/accountAction";
+import { accountAction } from "@/lib/actions/accountAction";
+import { userAction } from "@/lib/actions/userAction";
 import { Toaster } from "react-hot-toast";
+import { initializeAuthListeners, cleanupListeners } from "@/hooks/useSignoutOnUnload";
 
 const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const user = useAppSelector(state => state.user);
@@ -40,15 +42,32 @@ const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children
             }
         }
     };
+    const userRoleUpdate = async () => {
+        if (user_id) {
+            const userRole = await userAction.fetchUserRole(user_id);
+            dispatch(updateUserRole(userRole));
+        }
+    }
 
     useEffect(() => {
         const fetchUserData = async () => {
             await userStateUpdate();
+            await userRoleUpdate();
             if (user_id) {
                 await fetchUserPersonalAccount(); // Fetch personal account after user ID is set
             }
         };
         fetchUserData();
+
+
+        // Initialize auth-related listeners (idle detection, tab close)
+        initializeAuthListeners(router, dispatch);
+
+        // Cleanup listeners and idle timer on component unmount
+        return () => {
+            cleanupListeners();
+        };
+
     }, [user_id]); // Watch for changes in user_id
 
     return (

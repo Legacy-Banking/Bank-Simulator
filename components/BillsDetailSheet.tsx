@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import SheetDetails from './SheetDetails';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import { useAppSelector } from "@/app/store/hooks";
+import { useAppSelector } from "@/store/hooks";
 import { formatDateTime } from "@/lib/utils";
 import { Bold } from 'lucide-react';
 
@@ -118,7 +118,7 @@ const BillSheet: React.FC<BillSheetProps> = ({ bills, onClose }) => {
     <Dialog open={!!bills} onOpenChange={onClose}>
       <DialogContent className="bg-white-100 p-4 max-w-md w-full max-h-[88vh] overflow-auto">
         <DialogHeader>
-          <DialogTitle className="hidden sm:block text-lg font-semibold">Bill Details</DialogTitle>
+          <DialogTitle className="hidden sm:block text-xl font-semibold">Bill Details</DialogTitle>
           <DialogDescription className="hidden sm:block text-sm text-gray-500">
             Detailed information about the selected bill.
           </DialogDescription>

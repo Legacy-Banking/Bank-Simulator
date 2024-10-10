@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { useAppSelector } from '@/app/store/hooks'; // To get the user's ID
+import { useAppSelector } from '@/store/hooks';
 import HeaderBox from '@/components/HeaderBox';
-import { accountAction } from '@/utils/accountAction'; // Import your account actions
+import { accountAction } from '@/lib/actions/accountAction';
 import PayAnyoneForm from '@/components/PayAnyoneForm';
 
 
@@ -23,7 +23,12 @@ const PayAnyone = () => {
 
         console.log("Fetched accounts data:", data); // Debug: Check fetched accounts
 
-        setAccountsData(data); // Store fetched accounts
+        // Filter out accounts with type "savings"
+        const filteredAccounts = data.filter((account) => account.type !== 'savings');
+
+        console.log("Filtered accounts data (excluding savings and credit):", filteredAccounts); // Debug: Check filtered accounts
+
+        setAccountsData(filteredAccounts); // Store only filtered accounts
       } catch (err) {
         console.error("Error fetching accounts:", err);
         setError("Unable to fetch accounts");
@@ -52,11 +57,11 @@ const PayAnyone = () => {
 
   return (
     <section className="no-scrollbar flex flex-col md:max-h-screen py-6 lg:py-12 xl:py-16 px-8 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen">
-            <HeaderBox 
-              type="title"
-              title="Payment Transfer"
-              subtext="Please provide any specific details or notes related to the payment transfer"
-            />
+      <HeaderBox
+        type="title"
+        title="Payment Transfer"
+        subtext="Please provide any specific details or notes related to the payment transfer"
+      />
 
       <section className="size-full pt-5 pb-8">
         {/* Pass the fetched accounts to the TransferFundForm component */}

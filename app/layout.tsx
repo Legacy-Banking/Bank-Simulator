@@ -1,6 +1,6 @@
 import { Inter, Poppins, Manrope } from "next/font/google";
 import "./globals.css";
-import StoreProvider from './store/StoreProvider'; // Import your StoreProvider component
+import StoreProvider from '../store/StoreProvider'; // Import your StoreProvider component
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const poppins = Poppins({

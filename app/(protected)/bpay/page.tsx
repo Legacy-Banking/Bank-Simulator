@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { useAppSelector } from '@/app/store/hooks'; // To get the user's ID
+import { useAppSelector } from '@/store/hooks'; // To get the user's ID
 import HeaderBox from '@/components/HeaderBox';
-import { accountAction } from '@/utils/accountAction'; // Import your account actions
-import { billerAction } from '@/utils/billerAction'; // Import your biller actions
+import { accountAction } from '@/lib/actions/accountAction'; // Import your account actions
+import { billerAction } from '@/lib/actions/billerAction'; // Import your biller actions
 import BPAYForm from '@/components/BPAYForm';
 
 const BPAY = () => {
@@ -22,7 +22,9 @@ const BPAY = () => {
         console.log("Fetching accounts for user ID:", user_id); // Debug: Check user ID
         const accounts = await accountAction.fetchAccountsbyUserId(user_id);
         console.log("Fetched accounts data:", accounts); // Debug: Check fetched accounts
-        setAccountsData(accounts);
+        // Filter out accounts with type "savings" and "credit"
+        const filteredAccounts = accounts.filter((account) => account.type !== 'savings' && account.type !== 'credit');
+        setAccountsData(filteredAccounts); // Store filtered accounts
 
         // Fetch billers
         console.log("Fetching billers"); // Debug: Check biller fetch
@@ -62,15 +64,15 @@ const BPAY = () => {
 
   return (
     <section className="flex flex-col bg-gray-25 md:max-h-screen py-6 lg:py-12 xl:py-16 px-8 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen">
-            <HeaderBox 
-              type="title"
-              title="Bill Payment"
-              subtext="Please provide any specific details or notes related to the bill payment"
-            />
+      <HeaderBox
+        type="title"
+        title="Bill Payment"
+        subtext="Please provide any specific details or notes related to the bill payment"
+      />
 
       <section className="size-full pt-5">
         {/* Pass the fetched accounts to the TransferFundForm component */}
-        <BPAYForm accounts={accountsData} billers={billersData}/>
+        <BPAYForm accounts={accountsData} billers={billersData} />
       </section>
 
     </section>

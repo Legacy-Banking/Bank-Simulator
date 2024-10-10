@@ -7,16 +7,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import * as z from "zod";
 import { BankDropdown } from "./BankDropDown";
+import CardSidebar from './CardSidebar';
 import { Button } from "./ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { Checkbox } from "@/components/ui/checkbox"; // Import Checkbox from shadcn
 import { PaymentWhenOptions } from "./PaymentWhenOptions";
 import { BillerDropdown } from './BillerDropDown';
-import { useAppSelector } from '@/app/store/hooks';
-import { billerAction } from '@/utils/billerAction';
-import { bpayAction } from '@/utils/bpayAction';
-import { billAction } from '@/utils/billAction';
+import { useAppSelector } from '@/store/hooks';
+import { bpayAction } from '@/lib/actions/bpayAction';
+import { billerAction } from '@/lib/actions/billerAction';
+import { scheduleAction } from '@/lib/actions/scheduleAction';
+import { cardAction } from '@/lib/actions/cardAction';
+import { billAction } from '@/lib/actions/billAction';
+
 
 const formSchema = z.object({
   toBiller: z.string().optional(),
@@ -25,7 +29,7 @@ const formSchema = z.object({
   billerName: z.string().optional(),
   referenceNum: z.string().optional(),
   amount: z.string().min(1, "Amount is required").regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"),
-  description: z.string().optional(),
+  description: z.string().max(300, "Description must be 300 characters or less").optional(),
   saveBiller: z.number().optional(),
   paymentOption: z.enum(["payNow", "schedule", "recurring"]).default("payNow"),
   scheduleDate: z.date().optional(),
@@ -129,7 +133,9 @@ const formSchema = z.object({
 
       // Number of Payments is required if "numberOfPayments" is selected
       if (data.endCondition === "numberOfPayments") {
-        if (isNaN(Number(data.numberOfPayments)) || Number(data.numberOfPayments) <= 0) {
+        const numPayments = Number(data.numberOfPayments);
+        // Check if the value is a number, positive, and an integer
+        if (isNaN(numPayments) || numPayments <= 0 || !Number.isInteger(numPayments)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["numberOfPayments"],
@@ -176,8 +182,8 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      toBiller: "", // Set default value as 0 for numeric IDs
-      fromBank: "", // Set default value as 0 for numeric IDs
+      toBiller: "",
+      fromBank: "",
       billerCode: "",
       billerName: "",
       referenceNum: "",
@@ -205,16 +211,14 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
 
   const fromBank = useWatch({ control: form.control, name: "fromBank" });
   // Show card details if "Use Card" is selected
+
   useEffect(() => {
+    console.log("Check if card", fromBank);
+    // If "Use Card" is selected, show the card details
     if (fromBank === "-1") {
-      // If "Use Card" is selected, show the card details
       setShowCardDetails(true);
     } else {
-      // Otherwise, only show card details if the selected account type is "debit"
       setShowCardDetails(false);
-      const selectedAccount = accounts.find(account => String(account.id) === fromBank);
-      //could check if its either a credit or debit card
-      setShowCardDetails(selectedAccount?.type === 'debit');
     }
   }, [fromBank, accounts, form]);
 
@@ -240,29 +244,60 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
     setIsLoading(true);
 
     try {
-      const fromAccount = accounts.find(account => String(account.id) === data.fromBank);
+      let fromAccount = accounts.find(account => String(account.id) === data.fromBank);
 
-      if (!fromAccount) {
-        throw new Error("Invalid bank account selected.");
+      // If no bank account is selected, check for card details and fetch the corresponding account
+      if (!fromAccount && showCardDetails) {
+        const { cardNumber, expiryDate, cvv } = data;
+
+        // Ensure that card details are not undefined
+        if (!cardNumber || !expiryDate || !cvv) {
+          throw new Error("Please provide valid card details.");
+        }
+
+        // Create a sanitized card number by removing all spaces
+        const sanitizedCardNumber = cardNumber.replace(/\s+/g, "");
+
+        // Fetch the account linked to the card
+        fromAccount = await cardAction.fetchCardAccountId({
+          cardNumber: sanitizedCardNumber,
+          expiryDate,
+          cvv,
+        });
+
+        if (!fromAccount) {
+          throw new Error("Invalid card details or card not linked to an account.");
+        }
       }
 
+      if (!fromAccount) {
+        throw new Error("Please select a bank account or provide valid card details.");
+      }
+
+
       const amountF = parseFloat(data.amount);
+      let totalAmount = amountF;
+
+      // If "numberOfPayments" is selected, calculate total amount
+      if (data.endCondition === "numberOfPayments") {
+        const numPayments = parseInt(data.numberOfPayments!, 10);
+
+        if (!isNaN(numPayments) && numPayments > 0) {
+          totalAmount = amountF * numPayments;
+          console.log("Total Amount with numberOfPayments:", totalAmount);
+        } else {
+          setError("Invalid number of payments entered.");
+          setIsLoading(false);
+          return;
+        }
+      }
 
       // Check for insufficient funds
-      if (fromAccount.balance < amountF) {
+      if (fromAccount.balance < totalAmount) {
         setError("Insufficient funds in selected account.");
         setIsLoading(false);
         return;
       }
-
-      // Prepare card details if required
-      const cardDetails = showCardDetails
-        ? {
-          cardNumber: data.cardNumber,
-          expiryDate: data.expiryDate,
-          cvv: data.cvv,
-        }
-        : null;
 
       // Variables to hold final biller details
       let finalBillerName: string = '';
@@ -316,17 +351,70 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
         return;
       }
 
-      // Call the createBPAYTransaction action
-      await bpayAction.payBills(
-        user_id,
-        fromAccount,
-        finalBillerName,
-        finalBillerCode,
-        finalReferenceNum,
-        amountF,
-        data.description || '',
-        bills,
-      );
+      // Check if the user selected "schedule" or "recurring" payment
+      if (data.paymentOption === "schedule" || data.paymentOption === "recurring") {
+
+        const scheduleDate = data.paymentOption === "schedule" ? data.scheduleDate! : data.recurringStartDate!;
+        const scheduleType = data.paymentOption === "schedule" ? 'bpay_schedule' : 'bpay_recur';
+
+        console.log("Payment Option Selected:", data.paymentOption);
+        console.log("Schedule Date:", scheduleDate);
+        console.log("Schedule Type:", scheduleType);
+
+
+        if (data.paymentOption === "recurring") {
+          scheduleAction.setScheduleType(scheduleType);
+          scheduleAction.setPayInterval(data.frequency || 'weekly');
+
+          console.log("Recurring Payment Selected");
+          console.log("Payment Interval:", data.frequency || 'weekly');
+
+          // Handle different end conditions
+          switch (data.endCondition) {
+            case "untilFurtherNotice":
+              scheduleAction.setRecurRule('untilFurtherNotice');
+              break;
+            case "setEndDate":
+              scheduleAction.setRecurRule('endDate');
+              scheduleAction.setEndDate(data.endDate!);
+              console.log("End Date:", data.endDate!);
+              break;
+            case "numberOfPayments":
+              scheduleAction.setRecurRule('numberOfPayments');
+              scheduleAction.setRecurCount(parseInt(data.numberOfPayments!, 10));
+              console.log("Parsed Number of Payments:", (parseInt(data.numberOfPayments!, 10)));
+              break;
+          }
+        }
+
+        // Create a scheduled BPAY entry
+        try {
+          const scheduleRef = await scheduleAction.createScheduleEntry(
+            fromAccount,
+            null,
+            finalBillerName,
+            finalBillerCode,
+            finalReferenceNum,
+            amountF,
+            data.description || '',
+            scheduleDate,
+          );
+          console.log("Scheduled BPAY Entry Created:", scheduleRef);
+        } catch (error) {
+          console.error("Error Creating Schedule Entry:", error);
+        }
+      } else {
+        // Call the createBPAYTransaction action
+        await bpayAction.payBills(
+          fromAccount,
+          finalBillerName,
+          finalBillerCode,
+          finalReferenceNum,
+          amountF,
+          data.description || '',
+          user_id,
+        );
+      }
 
       if (data.saveBiller) {
         // Check if billerName, billerCode, and referenceNum are filled
@@ -360,185 +448,42 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
   //const selectedPaymentOption = form.watch("paymentOption");
 
   return (
+    <div className="flex">
+      {/* Main Form Section */}
+      <div className="w-4/5 p-4">
 
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(submit)} className="flex flex-col">
-        <div className="payment-transfer_form-details">
-          <h2 className="text-18 font-semibold text-gray-900">Biller Details</h2>
-          <p className="text-14 font-normal text-gray-600">Enter the details of the biller</p>
-        </div>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(submit)} className="flex flex-col">
+            <div className="payment-transfer_form-details">
+              <h2 className="text-18 font-semibold text-gray-900">Biller Details</h2>
+              <p className="text-14 font-normal text-gray-600">Enter the details of the biller</p>
+            </div>
 
-        <FormField
-          control={form.control}
-          name="toBiller"
-          render={({ field }) => (
-            <FormItem className="border-t border-gray-200">
-              <div className="payment-transfer_form-item pb-6 pt-5">
-                <div className="payment-transfer_form-content">
-                  <FormLabel className="text-14 font-medium text-gray-700">Select Biller</FormLabel>
-                  <FormDescription className="text-12 font-normal text-gray-600">
-                    Select the biller you want to pay to
-                  </FormDescription>
-                </div>
-                <div className="flex w-full flex-col">
-                  <FormControl>
-                    <BillerDropdown
-                      billerAccounts={billers} // Pass billers array here
-                      onChange={(id) => {
-                        if (id) {
-                          form.setValue("toBiller", id);  // Ensure the ID is treated as a number
-                        }
-                      }}
-                      initialSelected={(form.getValues("toBiller")) || ''}
-                      label="Select Biller"
-                      otherStyles="!w-full"
-                    />
-                  </FormControl>
-                  <FormMessage className="text-12 text-red-500" />
-                </div>
-              </div>
-            </FormItem>
-          )}
-        />
-
-        <div className="payment-transfer_form-details">
-          <h2 className="text-18 font-semibold text-gray-900">OR</h2>
-        </div>
-
-        <FormField
-          control={form.control}
-          name="billerCode"
-          render={({ field }) => (
-            <FormItem className="border-t border-gray-200">
-              <div className="payment-transfer_form-item pb-5 pt-6 ">
-                <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Biller Code</FormLabel>
-                <div className="flex w-full flex-col ">
-                  <FormControl>
-                    <Input placeholder="Enter 4-digit Biller Code" className="input-class bg-white-100" {...field} />
-                  </FormControl>
-                  <FormMessage className="text-12 text-red-500" />
-                </div>
-              </div>
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="billerName"
-          render={({ field }) => (
-            <FormItem className="border-t border-gray-200">
-              <div className="payment-transfer_form-item pb-5 pt-6">
-                <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Biller Name</FormLabel>
-                <div className="flex w-full flex-col">
-                  <FormControl>
-                    <Input placeholder="Enter Biller Name" className="input-class bg-white-100" {...field} />
-                  </FormControl>
-                  <FormMessage className="text-12 text-red-500" />
-                </div>
-              </div>
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="referenceNum"
-          render={({ field }) => (
-            <FormItem className="border-t border-gray-200">
-              <div className="payment-transfer_form-item pb-5 pt-6">
-                <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Reference Number</FormLabel>
-                <div className="flex w-full flex-col">
-                  <FormControl>
-                    <Input placeholder="Enter 12-digit Reference Number" className="input-class bg-white-100" {...field} />
-                  </FormControl>
-                  <FormMessage className="text-12 text-red-500" />
-                </div>
-              </div>
-            </FormItem>
-          )}
-        />
-
-        {/* Save Biller Checkbox */}
-        <FormField
-          control={form.control}
-          name="saveBiller"
-          render={({ field }) => (
-            <FormItem className="border-t border-gray-200">
-              <div className="payment-transfer_form-item pb-5 pt-6">
-                <div className="payment-transfer_form-content">
-                  <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">
-                    Save to my Billers
-                  </FormLabel>
-                  <FormDescription className="text-14 font-normal text-gray-600">
-                    Save this biller's details for future transactions
-                  </FormDescription>
-                </div>
-                <FormControl>
-                  <Checkbox
-                    className="custom-checkbox"
-                    checked={field.value === 1} // Check if the value is 1 for checked state
-                    onCheckedChange={(checked) => field.onChange(checked ? 1 : 0)} // Toggle between 1 and 0
-                  />
-                </FormControl>
-              </div>
-            </FormItem>
-          )}
-        />
-
-        <div className="payment-transfer_form-details">
-          <h2 className="text-18 font-semibold text-gray-900">Step 2 - Payment Details</h2>
-          <p className="text-14 font-normal text-gray-600">Select the bank account you want to pay then enter the amount and date of payment</p>
-        </div>
-
-        <FormField
-          control={form.control}
-          name="fromBank"
-          render={({ field }) => (
-            <FormItem className="border-t border-gray-200">
-              <div className="payment-transfer_form-item pb-6 pt-5">
-                <div className="payment-transfer_form-content">
-                  <FormLabel className="text-14 font-medium text-gray-700">From Bank Account</FormLabel>
-                  <FormDescription className="text-12 font-normal text-gray-600">
-                    Select the bank account you want to transfer funds from
-                  </FormDescription>
-                </div>
-                <div className="flex w-full flex-col">
-                  <FormControl>
-                    <BankDropdown
-                      accounts={accounts}
-                      onChange={(id) => {
-                        if (id) {
-                          form.setValue("fromBank", id);
-                        }
-                      }}
-                      additionalOption={{ id: "-1", label: "Use Card" }}  // Add "Use Card" option
-                      label="From Bank Account"
-                      otherStyles="!w-full"
-                    />
-
-                  </FormControl>
-                  <FormMessage className="text-12 text-red-500" />
-                </div>
-              </div>
-            </FormItem>
-          )}
-        />
-
-        {/* Card Details Section - Render only if the selected account is debit */}
-        {showCardDetails && (
-          <div>
-            {/* Card Number */}
             <FormField
               control={form.control}
-              name="cardNumber"
+              name="toBiller"
               render={({ field }) => (
                 <FormItem className="border-t border-gray-200">
-                  <div className="payment-transfer_form-item py-5">
-                    <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Card Number</FormLabel>
+                  <div className="payment-transfer_form-item pb-6 pt-5">
+                    <div className="payment-transfer_form-content">
+                      <FormLabel className="text-14 font-medium text-gray-700">Select Biller</FormLabel>
+                      <FormDescription className="text-12 font-normal text-gray-600">
+                        Select the biller you want to pay to
+                      </FormDescription>
+                    </div>
                     <div className="flex w-full flex-col">
                       <FormControl>
-                        <Input placeholder="ex: 1234 1234 1234 1234" className="input-class bg-white-100" {...field} />
+                        <BillerDropdown
+                          billerAccounts={billers} // Pass billers array here
+                          onChange={(id) => {
+                            if (id) {
+                              form.setValue("toBiller", id);  // Ensure the ID is treated as a number
+                            }
+                          }}
+                          initialSelected={(form.getValues("toBiller")) || ''}
+                          label="Select Biller"
+                          otherStyles="!w-full"
+                        />
                       </FormControl>
                       <FormMessage className="text-12 text-red-500" />
                     </div>
@@ -547,17 +492,20 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
               )}
             />
 
-            {/* Expiry Date */}
+            <div className="payment-transfer_form-details">
+              <h2 className="text-18 font-semibold text-gray-900">OR</h2>
+            </div>
+
             <FormField
               control={form.control}
-              name="expiryDate"
+              name="billerCode"
               render={({ field }) => (
-                <FormItem>
-                  <div className="payment-transfer_form-item py-5">
-                    <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Expiry Date</FormLabel>
-                    <div className="flex w-full flex-col">
+                <FormItem className="border-t border-gray-200">
+                  <div className="payment-transfer_form-item pb-5 pt-6 ">
+                    <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Biller Code</FormLabel>
+                    <div className="flex w-full flex-col ">
                       <FormControl>
-                        <Input placeholder="MM/YY" className="input-class bg-white-100" {...field} />
+                        <Input placeholder="Enter 4-digit Biller Code" className="input-class bg-white-100" {...field} />
                       </FormControl>
                       <FormMessage className="text-12 text-red-500" />
                     </div>
@@ -566,17 +514,16 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
               )}
             />
 
-            {/* CVV */}
             <FormField
               control={form.control}
-              name="cvv"
+              name="billerName"
               render={({ field }) => (
-                <FormItem>
-                  <div className="payment-transfer_form-item py-5">
-                    <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">CVV</FormLabel>
+                <FormItem className="border-t border-gray-200">
+                  <div className="payment-transfer_form-item pb-5 pt-6">
+                    <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Biller Name</FormLabel>
                     <div className="flex w-full flex-col">
                       <FormControl>
-                        <Input placeholder="ex: 987" className="input-class bg-white-100" {...field} />
+                        <Input placeholder="Enter Biller Name" className="input-class bg-white-100" {...field} />
                       </FormControl>
                       <FormMessage className="text-12 text-red-500" />
                     </div>
@@ -584,45 +531,203 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
                 </FormItem>
               )}
             />
-          </div>
-        )}
 
-        <FormField
-          control={form.control}
-          name="amount"
-          render={({ field }) => (
-            <FormItem className="border-y border-gray-200">
-              <div className="payment-transfer_form-item py-5">
-                <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Amount</FormLabel>
-                <div className="flex w-full flex-col">
-                  <FormControl>
-                    <Input placeholder="ex: 100.00" className="input-class bg-white-100" {...field} />
-                  </FormControl>
-                  <FormMessage className="text-12 text-red-500" />
-                </div>
+            <FormField
+              control={form.control}
+              name="referenceNum"
+              render={({ field }) => (
+                <FormItem className="border-t border-gray-200">
+                  <div className="payment-transfer_form-item pb-5 pt-6">
+                    <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Reference Number</FormLabel>
+                    <div className="flex w-full flex-col">
+                      <FormControl>
+                        <Input placeholder="Enter 12-digit Reference Number" className="input-class bg-white-100" {...field} />
+                      </FormControl>
+                      <FormMessage className="text-12 text-red-500" />
+                    </div>
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            {/* Save Biller Checkbox */}
+            <FormField
+              control={form.control}
+              name="saveBiller"
+              render={({ field }) => (
+                <FormItem className="border-t border-gray-200">
+                  <div className="payment-transfer_form-item pb-5 pt-6">
+                    <div className="payment-transfer_form-content">
+                      <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">
+                        Save to my Billers
+                      </FormLabel>
+                      <FormDescription className="text-14 font-normal text-gray-600">
+                        Save this biller's details for future transactions
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Checkbox
+                        className="custom-checkbox"
+                        checked={field.value === 1} // Check if the value is 1 for checked state
+                        onCheckedChange={(checked) => field.onChange(checked ? 1 : 0)} // Toggle between 1 and 0
+                      />
+                    </FormControl>
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            <div className="payment-transfer_form-details">
+              <h2 className="text-18 font-semibold text-gray-900">Step 2 - Payment Details</h2>
+              <p className="text-14 font-normal text-gray-600">Select the bank account you want to pay then enter the amount and date of payment</p>
+            </div>
+
+            <FormField
+              control={form.control}
+              name="fromBank"
+              render={({ field }) => (
+                <FormItem className="border-t border-gray-200">
+                  <div className="payment-transfer_form-item pb-6 pt-5">
+                    <div className="payment-transfer_form-content">
+                      <FormLabel className="text-14 font-medium text-gray-700">From Bank Account</FormLabel>
+                      <FormDescription className="text-12 font-normal text-gray-600">
+                        Select the bank account you want to transfer funds from
+                      </FormDescription>
+                    </div>
+                    <div className="flex w-full flex-col">
+                      <FormControl>
+                        <BankDropdown
+                          accounts={accounts}
+                          onChange={(id) => {
+                            if (id) {
+                              form.setValue("fromBank", id);
+                            }
+                          }}
+                          additionalOption={{ id: "-1", label: "Use Card" }}  // Add "Use Card" option
+                          label="From Bank Account"
+                          otherStyles="!w-full"
+                        />
+
+                      </FormControl>
+                      <FormMessage className="text-12 text-red-500" />
+                    </div>
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            {/* Card Details Section - Render only if the selected account is debit */}
+            {showCardDetails && (
+              <div>
+                {/* Card Number */}
+                <FormField
+                  control={form.control}
+                  name="cardNumber"
+                  render={({ field }) => (
+                    <FormItem className="border-t border-gray-200">
+                      <div className="payment-transfer_form-item py-5">
+                        <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Card Number</FormLabel>
+                        <div className="flex w-full flex-col">
+                          <FormControl>
+                            <Input placeholder="ex: 1234 1234 1234 1234" className="input-class bg-white-100" {...field} />
+                          </FormControl>
+                          <FormMessage className="text-12 text-red-500" />
+                        </div>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
+                {/* Expiry Date */}
+                <FormField
+                  control={form.control}
+                  name="expiryDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="payment-transfer_form-item py-5">
+                        <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Expiry Date</FormLabel>
+                        <div className="flex w-full flex-col">
+                          <FormControl>
+                            <Input placeholder="MM/YY" className="input-class bg-white-100" {...field} />
+                          </FormControl>
+                          <FormMessage className="text-12 text-red-500" />
+                        </div>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
+                {/* CVV */}
+                <FormField
+                  control={form.control}
+                  name="cvv"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="payment-transfer_form-item py-5">
+                        <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">CVV</FormLabel>
+                        <div className="flex w-full flex-col">
+                          <FormControl>
+                            <Input placeholder="ex: 987" className="input-class bg-white-100" {...field} />
+                          </FormControl>
+                          <FormMessage className="text-12 text-red-500" />
+                        </div>
+                      </div>
+                    </FormItem>
+                  )}
+                />
               </div>
-            </FormItem>
-          )}
-        />
-
-        {/* Payment Options (Pay Now, Schedule Payment, Recurring Payment) */}
-        <PaymentWhenOptions />
-
-        {error && <p className="text-red-500 mt-4">{error}</p>} {/* Display error message if any */}
-
-        <div className="payment-transfer_btn-box mt-6">
-          <Button type="submit" className="text-14 w-full bg-blue-gradient font-semibold text-white-100 shadow-form">
-            {isLoading ? (
-              <>
-                <Loader2 size={20} className="animate-spin" /> &nbsp; Sending...
-              </>
-            ) : (
-              "Pay Bill"
             )}
-          </Button>
-        </div>
-      </form>
-    </Form>
+
+            <FormField
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <FormItem className="border-y border-gray-200">
+                  <div className="payment-transfer_form-item py-5">
+                    <FormLabel className="text-14 w-full max-w-[280px] font-medium text-gray-700">Amount</FormLabel>
+                    <div className="flex w-full flex-col">
+                      <FormControl>
+                        <Input placeholder="ex: 100.00" className="input-class bg-white-100" {...field} />
+                      </FormControl>
+                      <FormMessage className="text-12 text-red-500" />
+                    </div>
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            {/* Payment Options (Pay Now, Schedule Payment, Recurring Payment) */}
+            <PaymentWhenOptions />
+
+            {error && <p className="text-red-500 mt-4">{error}</p>} {/* Display error message if any */}
+
+            <div className="payment-transfer_btn-box mt-6">
+              <Button type="submit" className="text-14 w-full bg-blue-gradient font-semibold text-white-100 shadow-form">
+                {isLoading ? (
+                  <>
+                    <Loader2 size={20} className="animate-spin" /> &nbsp; Sending...
+                  </>
+                ) : (
+                  "Pay Bill"
+                )}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </div>
+
+      {/* Right Sidebar/Panel - Only show when "Use Card" is selected */}
+      <div
+        className={`hidden xl:bottom-0 3xl:top-48 fixed bg-transparent xl:flex w-[380px] h-full transform transition-transform duration-500 ${showCardDetails ? 'translate-x-0 xl:right-0 2xl:right-10 3xl:right-24' : 'translate-x-full xl:right-0'
+          }  xl:overflow-y-scroll 3xl:overflow-hidden overflow-x-hidden`}
+        style={{ transitionTimingFunction: 'ease-in-out' }}
+      >
+        {<CardSidebar owner={accounts[0].owner} />}
+      </div>
+
+
+    </div>
+
   );
 };
 

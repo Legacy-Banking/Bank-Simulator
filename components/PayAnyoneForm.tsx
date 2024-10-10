@@ -11,8 +11,8 @@ import { Button } from "./ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
-import { transactionAction } from '@/utils/transactionAction'; // Import the transaction action
-import { accountAction } from '@/utils/accountAction'; // Import the transaction action
+import { transactionAction } from '@/lib/actions/transactionAction'; // Import the transaction action
+import { accountAction } from '@/lib/actions/accountAction'; // Import the transaction action
 
 // Zod schema for form validation with BSB and account number
 const formSchema = z.object({
@@ -24,7 +24,7 @@ const formSchema = z.object({
     .string()
     .regex(/^\d{9}$/, "Account number must be a 9-digit number"), // Validates account number
   amount: z.string().min(1, "Amount is required").regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"), // Validates amount
-  description: z.string().optional(), // Optional description
+  description: z.string().max(300, "Description must be 300 characters or less").optional(), // Optional description
 });
 
 const PayAnyoneForm = ({ accounts }: { accounts: Account[] }) => {
@@ -62,7 +62,7 @@ const PayAnyoneForm = ({ accounts }: { accounts: Account[] }) => {
         setIsLoading(false);
         return;
       }
-      
+
       // Fetch the recipient's account using the BSB and Account Number
       const toAccount = await accountAction.fetchAccountByBSBAndAccountNumber(data.bsb, data.accountNum);
 
@@ -72,9 +72,9 @@ const PayAnyoneForm = ({ accounts }: { accounts: Account[] }) => {
         return;
       }
 
-      // Check if the same account is selected for both from and to
-      if (fromAccount.id === toAccount.id) {
-        setError("You cannot transfer funds between the same account.");
+      // Check if the user is trying to pay themselves
+      if (toAccount.owner_username === fromAccount.owner_username) {
+        setError("You cannot pay to your own account. Do this in the Transfer Funds page.");
         setIsLoading(false);
         return;
       }

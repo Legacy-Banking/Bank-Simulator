@@ -2,8 +2,8 @@ import { link } from 'fs';
 import { useState } from 'react';
 
 const DebitCard = (
-    {type, name, cardNumber, expirationDate, maxSpending, spending, cvc, linkedAccount}: 
-    {type : string, name : string, cardNumber : number, expirationDate : Date, maxSpending : number, spending : number, cvc : number, linkedAccount : Account | undefined}
+    {type, name, cardNumber, expirationDate, maxSpending, cvc, linkedAccount}: 
+    {type : string, name : string, cardNumber : string, expirationDate : Date, maxSpending : number, cvc : number, linkedAccount : Account | undefined}
 )  => {
     // State to track the spending amount (you can replace this with real data)
 
@@ -28,6 +28,30 @@ const DebitCard = (
     const formatCardNumber = (number: string) => {
         return number.replace(/\d{4}(?=\d)/g, "$& ");
     };
+
+    function abbreviateName(fullName : string) {
+        // Split the full name into an array of words
+        const nameParts = fullName.split(' ');
+      
+        // Handle case where there's only one name part (no first name, middle name)
+        if (nameParts.length === 1) {
+          return fullName; // Return the name as is
+        }
+      
+        // Initialize an array to hold the abbreviated name
+        const abbreviatedParts = nameParts.map((part, index) => {
+          if (index === nameParts.length - 1) {
+            // Return the last name as is
+            return part;
+          } else {
+            // Return the first letter of the first and middle names with a dot
+            return part.charAt(0).toUpperCase() + '.';
+          }
+        });
+      
+        // Join the parts back together into a string
+        return abbreviatedParts.join(' ');
+      }
     return (
         <div className="max-w-200 flex gap-10 flex-wrap">
 
@@ -46,7 +70,7 @@ const DebitCard = (
                 
                     {/* Cardholder Name */}
                     <div className="relative -bottom-24 left-4 text-white-200 text-sm font-manrope tracking-widest">
-                        {name}
+                        {abbreviateName(name)}
                     </div>
 
                     {/* Expiration Date */}

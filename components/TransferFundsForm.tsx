@@ -11,14 +11,14 @@ import { Button } from "./ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
-import { transactionAction } from '@/utils/transactionAction'; // Import the transaction action
+import { transactionAction } from '@/lib/actions/transactionAction'; // Import the transaction action
 
 // Zod schema for form validation, now using number for IDs
 const formSchema = z.object({
   fromBank: z.string().min(1, "Please select a valid bank account"),
   toBank: z.string().min(1, "Please select a valid bank account"),
   amount: z.string().min(1, "Amount is required").regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"),
-  description: z.string().optional(),
+  description: z.string().max(300, "Description must be 300 characters or less").optional(),
 });
 
 const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
@@ -59,6 +59,18 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
       const amount = parseFloat(data.amount);
       const transactionType = "transfer funds";
 
+      // ** New validation for credit accounts **
+      if (toAccount.type === 'credit') {
+        const newCreditBalance = toAccount.balance + amount;
+
+        // Ensure the new balance doesn't exceed the opening balance (credit limit)
+        if (newCreditBalance > toAccount.opening_balance) {
+          setError("This transaction exceeds the credit limit.");
+          setIsLoading(false);
+          return;
+        }
+      }
+
       // Call the transactionAction to create the transaction
       await transactionAction.createTransaction(fromAccount, toAccount, amount, data.description || "", transactionType);
 
@@ -66,7 +78,7 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
       router.push("/dashboard");
     } catch (error) {
       console.error("Submitting create transfer request failed: ", error);
-    
+
       // Check if the error is an instance of Error and has a message property
       if (error instanceof Error) {
         setError(error.message || "An error occurred during the transfer.");
@@ -74,7 +86,7 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
         setError("An unexpected error occurred during the transfer.");
       }
     }
-    
+
 
     setIsLoading(false);
   };
@@ -100,7 +112,7 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
                       accounts={accounts}
                       onChange={(id) => {
                         if (id) {
-                          form.setValue("fromBank", id);  
+                          form.setValue("fromBank", id);
                           console.log("From Bank Changed: ", id);
                         }
                       }}
@@ -133,7 +145,7 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
                       accounts={accounts}
                       onChange={(id) => {
                         if (id) {
-                          form.setValue("toBank", id);  
+                          form.setValue("toBank", id);
                           console.log("To Bank Changed: ", id);
                         }
                       }}
