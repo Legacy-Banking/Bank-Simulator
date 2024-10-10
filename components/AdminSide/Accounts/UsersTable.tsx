@@ -146,7 +146,7 @@ export const UsersTable = ({ accounts = [], setShowUpdatePopUp, setShowDeletePop
                 </TableCell>
                 
                 <TableCell >
-                    <Button onClick={() => toggleEditUserWindow(acc)} className="p-0 ml-4"> <img src="../Edit.png" alt="Edit button" /></Button>
+                    {/* <Button onClick={() => toggleEditUserWindow(acc)} className="p-0 ml-4"> <img src="../Edit.png" alt="Edit button" /></Button> */}
                     <Button onClick={() => toggleDeleteUserWindow(acc)} className="p-0 ml-4"> <img src="../Delete.png" alt="Delete button" /></Button>
                 </TableCell>
               </TableRow>

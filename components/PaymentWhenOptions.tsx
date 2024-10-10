@@ -24,7 +24,7 @@ export const PaymentWhenOptions = () => {
             className="custom-checkbox"
           />
         </label>
-        <label className="flex justify-between items-center space-x-6">
+        {/* <label className="flex justify-between items-center space-x-6">
           <span className="text-14 w-full max-w-[280px] font-medium text-gray-700">Schedule Payment</span>
           <Checkbox
             checked={selectedPaymentOption === "schedule"}
@@ -39,7 +39,7 @@ export const PaymentWhenOptions = () => {
             onCheckedChange={() => form.setValue("paymentOption", "recurring")} // Set the value to "recurring"
             className="custom-checkbox" 
           />
-        </label>
+        </label> */}
       </div>
 
       {/* Conditionally render date picker for scheduled payment */}
