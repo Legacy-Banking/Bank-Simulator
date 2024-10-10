@@ -1,7 +1,6 @@
 "use client";
 
 import AccountsPage from '@/components/AdminSide/Accounts/AccountsPage';
-import AdditionalFundsPage from '@/components/AdminSide/AdditionalFundsPage';
 import AdminSideBar from '@/components/AdminSide/AdminSideBar'
 import CreateBillPage from '@/components/AdminSide/Bills/CreateBillPage';
 import PresetsPage from '@/components/AdminSide/Presets/PresetsPage';
@@ -52,8 +51,6 @@ const AdminDashboard = () => {
         return <PresetsPage />;
       case 'create-bill':
         return <CreateBillPage />;
-      case 'additional-funds':
-        return <AdditionalFundsPage />;
       default:
         return <AccountsPage />;
     }
