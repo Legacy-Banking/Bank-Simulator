@@ -49,7 +49,7 @@ export const handleVisibilityChange = () => {
         idleTime = 1000; // 1 seconds
     } else {
         // If the tab is visible, reset the idle timeout to 3 minutes
-        idleTime = 3 * 60 * 1000; // 3 minutes
+        idleTime = 5 * 60 * 1000; // 5 minutes
     }
 };
 
