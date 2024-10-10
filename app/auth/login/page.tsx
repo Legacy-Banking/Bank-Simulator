@@ -28,9 +28,13 @@ export default function Login({
       password,
     });
 
-    if (error) {
-      return redirect("/auth/login?message=Could not authenticate user");
+    console.log(error?.code);
+    if (error?.code === "invalid_credentials") {
+      return redirect(`/auth/login?message=Invalid credentials. Please check your username and password and try again!`);
+    } else {
+      return redirect('/auth/login?message=An error occured with our website.')
     }
+
 
     return redirect("/dashboard");
   };
