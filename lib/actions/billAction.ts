@@ -249,6 +249,7 @@ export const billAction = {
             description, 
             due_date, 
             assigned_users,
+            preset_status,
             biller: biller ( id, name, biller_code, biller_details )
           `);
 
@@ -467,7 +468,7 @@ export const billAction = {
         try {
             const { data, error } = await supabase
                 .from('admin_bills') // Replace 'admin_bills' with the actual table name in your database
-                .select('id, biller, amount, description, due_date, assigned_users, created_at')
+                .select('id, biller, amount, description, due_date, assigned_users, created_at, preset_status')
                 .eq('id', billId)
                 .single(); // We expect a single row since we are fetching by ID
 

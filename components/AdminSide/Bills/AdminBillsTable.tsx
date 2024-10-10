@@ -8,6 +8,7 @@ import TrashBillDetailSheet from './TrashBillDetialSheet';
 import AssignUserSheet from './AssignUserSheet';
 import UnassignUserSheet from './UnassignUserSheet';
 import AdminBillDetailSheet from './AdminBillSheet';
+import SavedStatus from '../Presets/SavedStatus';
 
 const AdminBillsTable = () => {
   const [bills, setBills] = useState<AdminBillWithBiller[]>([]);
@@ -207,6 +208,11 @@ const AdminBillsTable = () => {
               Due Date
               <span className="ml-2">{getSortIcon('due_date')}</span>
             </TableHead>
+            <TableHead className="font-inter px-2 font-normal tracking-wider cursor-pointer"
+              onClick={() => handleSort('preset_status')}>    
+              Preset
+              <span className="ml-2">{getSortIcon('preset_status')}</span>
+            </TableHead>
             <TableHead className="font-inter px-8 rounded-tr-2xl font-normal tracking-wider">
               Action
             </TableHead>
@@ -238,6 +244,10 @@ const AdminBillsTable = () => {
 
                 <TableCell className="font-inter min-w-32 pl-2 pr-10 text-[#475467]">
                   {dueDate.toDateString()}
+                </TableCell>
+
+                <TableCell className="font-inter text-base min-w-32 pl-2 pr-10">
+                  <SavedStatus status={bill.preset_status} />
                 </TableCell>
 
                 <TableCell>
