@@ -645,6 +645,28 @@ export const billAction = {
         // Return the bills with the full biller details
         return billsWithBillerDetails;
     },
+    
+    updatePresetStatus: async (billId: string, newStatus: boolean): Promise<void> => {
+        const supabase = createClient();
+
+        try {
+            // Update the preset_status field in the admin_bills table
+            const { error } = await supabase
+                .from('admin_bills')
+                .update({ preset_status: newStatus })
+                .eq('id', billId);
+
+            // Check if there was an error with the update
+            if (error) {
+                throw new Error(`Failed to update preset status for bill ${billId}: ${error.message}`);
+            }
+
+            console.log(`Preset status updated successfully for bill ID: ${billId}`);
+        } catch (error) {
+            console.error('Error updating preset status:', error);
+            throw error; // Re-throw the error for further handling if needed
+        }
+    },
 
 
 };

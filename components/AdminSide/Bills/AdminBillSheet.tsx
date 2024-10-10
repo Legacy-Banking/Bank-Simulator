@@ -8,20 +8,22 @@ import React, { useEffect, useState } from 'react'; import {
 } from '@/components/ui/dialog';
 import SheetDetails from '@/components/SheetDetails'; // Import the existing SheetDetails component
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
-import { useAppSelector } from '@/store/hooks';
 import StatusLabel from '@/components/StatusLabel';
 import { billAction } from '@/lib/actions/billAction';
+import { Switch } from "@/components/ui/switch";
 
 // Define the props for the component
 type AdminBillDetailProps = {
     bill: AdminBillWithBiller | null;
     onClose: () => void;
+    onPresetStatusChange: (billId: string, newStatus: boolean) => void;
 };
 
-const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, onClose }) => {
+const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, onClose, onPresetStatusChange }) => {
     if (!bill) return null;
     const [loading, setLoading] = useState(true);
     const [assignedUsersDetails, setAssignedUsersDetails] = useState<{ name: string, status: string }[]>([]);
+    const [presetStatus, setPresetStatus] = useState<boolean>(bill.preset_status);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -41,6 +43,17 @@ const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, onClose })
     }, [bill]); // Make sure "bill" is the only dependency
 
 
+    // Handle change for the switch
+    const handlePresetStatusChange = async (checked: boolean) => {
+        try {
+            setPresetStatus(checked); // Update the local state
+            await billAction.updatePresetStatus(bill.id, checked); // Call the action to update the preset status
+            onPresetStatusChange(bill.id, checked); // Update the parent component's state
+        } catch (error) {
+            console.error('Failed to update preset status:', error);
+        }
+    };
+
     return (
         <Dialog open={!!bill} onOpenChange={onClose}>
             <DialogContent className="bg-white-100 p-6 w-full max-w-4xl max-h-[88vh] overflow-auto shadow-lg">
@@ -51,11 +64,19 @@ const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, onClose })
                     </DialogDescription>
                 </DialogHeader>
 
+                <div className="absolute top-8 right-8 flex items-center mt-4">
+                            <span className="mr-2 text-sm font-medium">Preset Status:</span>
+                            <Switch
+                                checked={presetStatus}
+                                onCheckedChange={handlePresetStatusChange}
+                                className={`ml-2 ${presetStatus ? 'bg-blue-200' : 'bg-gray-300'}`}
+                            />
+                        </div>
+
                 {/* Bill details on the left */}
                 <div className="flex flex-col lg:flex-row gap-4 mt-4">
                     <div className="lg:w-[60%]">
-                        <SheetDetails bill={bill} biller={bill.biller}
-                        />
+                        <SheetDetails bill={bill} biller={bill.biller}/>
                     </div>
 
                     {/* Assigned users and status on the right */}

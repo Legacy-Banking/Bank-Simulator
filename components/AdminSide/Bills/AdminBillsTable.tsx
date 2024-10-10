@@ -50,6 +50,14 @@ const AdminBillsTable = () => {
     fetchData();
   }, []);
 
+  const updateBillPresetStatus = (billId: string, newStatus: boolean) => {
+    setBills((prevBills) =>
+        prevBills.map((bill) =>
+            bill.id === billId ? { ...bill, preset_status: newStatus } : bill
+        )
+    );
+};
+
   // Function to fetch updated assigned users for a specific bill
   const fetchUpdatedAssignedUsers = async (billId: string) => {
     try {
@@ -287,6 +295,7 @@ const AdminBillsTable = () => {
         <AdminBillDetailSheet
           bill={selectedBill}
           onClose={closeBillDetails}
+          onPresetStatusChange={updateBillPresetStatus}
         />
       )}
 
