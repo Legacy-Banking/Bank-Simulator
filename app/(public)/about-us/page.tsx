@@ -26,9 +26,9 @@ const AboutUs = () => {
             src="/oldlady.png"
             alt="Senior citizens using computer"
             width={480}
-            height={380}
+            height={480}
             quality={100}
-            className="rounded-xl drop-shadow-2xl contrast-100"
+            className="rounded-xl drop-shadow-2xl h-60 w-82 contrast-100"
           />
         </div>
       </div>
