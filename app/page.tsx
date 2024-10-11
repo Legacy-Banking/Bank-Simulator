@@ -82,7 +82,7 @@ export default async function Home() {
                     <Image src="/oldlady.png" alt="SeniorIT Program" fill style={{ objectFit: 'cover' }} />
                   </div>
                   <h3 className="text-2xl 3xl:text-2xl font-bold text-[#17181A] hover:underline">
-                    {contentEmbeddings?.resource_column3_title || 'SeniorIT Program'}
+                    {contentEmbeddings?.resource_column3_title || 'SeniorsIT Program'}
                   </h3>
                   <p className="text-base 3xl:text-lg text-[#5F5F64]">
                     {contentEmbeddings?.resource_column3_description || 'Learn more about other resources that are available to aid in your online learning'}

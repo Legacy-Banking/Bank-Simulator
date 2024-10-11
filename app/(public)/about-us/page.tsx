@@ -23,7 +23,7 @@ const AboutUs = () => {
         </div>
         <div className="hidden lg:block px-20 mx-auto">
           <Image
-            src="/senior.png"
+            src="/oldlady.png"
             alt="Senior citizens using computer"
             width={480}
             height={380}
