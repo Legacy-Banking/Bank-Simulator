@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import HeaderBox from '@/components/HeaderBox';
 import { ViewBillsTable } from '@/components/ViewBillsTable';
 import { useAppSelector } from '@/store/hooks';
@@ -10,7 +10,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 
 // Define the Transaction type
 
-const ViewBills = () => {
+const ViewBillsContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -70,6 +70,13 @@ const ViewBills = () => {
       </div>
     </section>
   );
-}
+};
+
+// Wrap in Suspense on export
+const ViewBills = () => (
+  <Suspense fallback={<div>Loading bills...</div>}>
+    <ViewBillsContent />
+  </Suspense>
+);
 
 export default ViewBills;
