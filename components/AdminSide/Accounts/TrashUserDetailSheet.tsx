@@ -252,8 +252,7 @@ const TrashUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status,
         </DialogHeader>
         {/* Error Message */}
         {error && (
-            <div className="text-red-200">
-              *<Button className="delete" onClick={() => setError('')}></Button>
+            <div className="font-semibold text-red-500">
               {error}
             </div>
           )}
