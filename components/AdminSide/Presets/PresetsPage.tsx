@@ -18,6 +18,7 @@ import AddConstantDetailSheet from './Inserting Items/AddConstantDetailSheet';
 import AccountPresetTable from './AccountPresetTable';
 import AddAccountPresetDetailSheet from './Inserting Items/AddAccountPresetDetailSheet';
 import AddTransactionPresetDetailSheet from './Inserting Items/AddTransactionPresetDetailSheet';
+import HeaderBox from '@/components/HeaderBox';
 
 const PresetsPage = () => {
   const [accountTypes, setAccountTypes] = useState<AccountPresetType[]>([]);
@@ -277,17 +278,15 @@ const PresetsPage = () => {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <div className="flex flex-auto bg-gray-100">
-      {/* <AdminSideBar /> */}
-      <div className="px-8 py-6 flex flex-col flex-auto border-[#a0b1b1] border-x-2">
-        <div className="px-8 py-2 border-b-2 border-[#D7D7D7]">
-          <h1 className="text-3xl font-semibold leading-9">Presets</h1>
-          <h1 className="text-base font-normal py-3 text-[#475467]">
-            View and edit all of the accounts, transaction and billers presets
-          </h1>
-        </div>
-
-        <div className="h-8"></div>
+    <section className="flex w-full flex-row max-xl:max-h-screen font-inter">
+      <div className="flex w-full flex-1 flex-col gap-8 px-4 py-6 lg:py-12 lg:px-10 xl:px-20 2xl:px-32 xl:max-h-screen">
+        <header className="home-header border-b pb-10">
+          <HeaderBox
+            type="title"
+            title={'Presets'}
+            subtext={'View and edit all of the preset accounts, transaction and billers presets'}
+          />
+        </header>
 
         <div className="px-8 py-2">
           <div className="flex flex-col">
@@ -307,7 +306,6 @@ const PresetsPage = () => {
             </section>
           </div>
         </div>
-      </div>
       <AddAccountPresetDetailSheet
         status={addAccountWindow}
         onClose={() => toggleAddItemDetailSheet()}
@@ -341,6 +339,7 @@ const PresetsPage = () => {
         <PopUp message="Successfully Added.." onClose={() => setShowAddPopUp(false)} />
       )}
     </div>
+    </section>
   );
 };
 

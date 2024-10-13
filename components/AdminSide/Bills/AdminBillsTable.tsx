@@ -10,11 +10,21 @@ import UnassignUserSheet from './UnassignUserSheet';
 import AdminBillDetailSheet from './AdminBillSheet';
 import SavedStatus from '../Presets/SavedStatus';
 
-const AdminBillsTable = () => {
-  const [bills, setBills] = useState<AdminBillWithBiller[]>([]);
-  const [loading, setLoading] = useState(true);
+const AdminBillsTable = ({
+    bills,
+    onUpdatePresetStatus,
+    onFetchUpdatedAssignedUsers,
+    onDeleteBill,
+    setDeleteBillId,
+  }: {
+    bills: AdminBillWithBiller[];
+    onUpdatePresetStatus: (billId: string, newStatus: boolean) => void;
+    onFetchUpdatedAssignedUsers: (billId: string) => Promise<void>;
+    onDeleteBill: () => void;
+    setDeleteBillId: (billId: string | null) => void;
+  }) => {
+
   const [sortConfig, setSortConfig] = useState<{ key: keyof AdminBill; direction: 'ascending' | 'descending' } | null>(null);
-  const [deleteBillId, setDeleteBillId] = useState<string | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isAssignSheetOpen, setIsAssignSheetOpen] = useState(false);
   const [isUnassignSheetOpen, setIsUnassignSheetOpen] = useState(false);
@@ -36,56 +46,11 @@ const AdminBillsTable = () => {
 
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await billAction.fetchAdminBills();
-        setBills(data);
-      } catch (error) {
-        console.error('Failed to fetch bills:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
-  const updateBillPresetStatus = (billId: string, newStatus: boolean) => {
-    setBills((prevBills) =>
-        prevBills.map((bill) =>
-            bill.id === billId ? { ...bill, preset_status: newStatus } : bill
-        )
-    );
-};
-
-  // Function to fetch updated assigned users for a specific bill
-  const fetchUpdatedAssignedUsers = async (billId: string) => {
-    try {
-      const updatedBill = await billAction.fetchAdminBillById(billId);
-      setBills((prevBills) =>
-        prevBills.map((bill) =>
-          bill.id === billId ? { ...bill, assigned_users: updatedBill.assigned_users } : bill
-        )
-      );
-    } catch (error) {
-      console.error("Error fetching updated assigned users:", error);
-    }
-  };
-
   // Delete the bill and remove it from the state
   const handleDelete = async () => {
-    if (deleteBillId) {
-      try {
-        //   await billAction.deleteAdminBill(deleteBillId); // Call the delete function
-        await billAction.deleteAdminBillWithReferences(deleteBillId);
-
-        setBills((prevBills) => prevBills.filter((bill) => bill.id !== deleteBillId));
+        onDeleteBill();
         setShowDeleteDialog(false); // Close the dialog after deleting
-      } catch (error) {
-        console.error('Failed to delete bill:', error);
-      }
-    }
-  };
+  }
 
   const handleSort = (key: keyof AdminBill) => {
     let direction: 'ascending' | 'descending' = 'ascending';
@@ -133,9 +98,9 @@ const AdminBillsTable = () => {
   //   return bills;
   // }, [bills, sortConfig]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  // if (loading) {
+  //   return <div>Loading...</div>;
+  // }
 
   const getSortIcon = (key: keyof AdminBill) => {
     if (sortConfig?.key === key) {
@@ -175,7 +140,7 @@ const AdminBillsTable = () => {
 
   // This function will be passed to AssignUserSheet to update the assigned users after assignment
   const handleAssignComplete = async (billId: string) => {
-    await fetchUpdatedAssignedUsers(billId);
+    await onFetchUpdatedAssignedUsers(billId);
     const updatedBill = await billAction.fetchAdminBillById(billId); // Re-fetch the entire bill including assigned users
     setSelectedBill(updatedBill); // Update the selectedBill with the newly fetched assigned users
     setIsAssignSheetOpen(false); // Close the assign sheet
@@ -183,7 +148,7 @@ const AdminBillsTable = () => {
   };
 
   const handleUnassignComplete = async (billId: string) => {
-    await fetchUpdatedAssignedUsers(billId);
+    await onFetchUpdatedAssignedUsers(billId);
     const updatedBill = await billAction.fetchAdminBillById(billId); // Re-fetch the entire bill including assigned users
     setSelectedBill(updatedBill); // Update the selectedBill with the newly fetched assigned users
     setIsUnassignSheetOpen(false); // Close the unassign sheet
@@ -295,7 +260,7 @@ const AdminBillsTable = () => {
         <AdminBillDetailSheet
           bill={selectedBill}
           onClose={closeBillDetails}
-          onPresetStatusChange={updateBillPresetStatus}
+          onPresetStatusChange={onUpdatePresetStatus}
         />
       )}
 

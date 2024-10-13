@@ -25,11 +25,13 @@ const formSchema = z.object({
 
 interface CreateBillFormProps {
   setIsCreatingBill: React.Dispatch<React.SetStateAction<boolean>>;
+  fetchBills: () => void;
 }
 
-const CreateBillForm: React.FC<CreateBillFormProps> = ({ setIsCreatingBill }) => {
+const CreateBillForm: React.FC<CreateBillFormProps> = ({ setIsCreatingBill, fetchBills }) => {
   // Handle Back/Cancel button click
   const handleBackClick = () => {
+    fetchBills();
     setIsCreatingBill(false); // Switch back to Admin Bills view
   };
 
@@ -107,13 +109,6 @@ const CreateBillForm: React.FC<CreateBillFormProps> = ({ setIsCreatingBill }) =>
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(submit)} className="flex flex-col">
-        {/* Back Button */}
-        {/* <Button
-          onClick={handleBackClick}
-          className="mb-6 w-fit bg-gray-100 hover:bg-gray-300 text-gray-700 text-base flex items-center"
-        >
-          <ArrowLeft className="mr-2" /> Back
-        </Button> */}
         <div className="flex max-w-[850px] w-full">
           <div className="flex flex-row pb-5 justify-between w-full">
             <div className="flex flex-col gap-1 pb-5">

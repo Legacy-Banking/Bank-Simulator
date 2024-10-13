@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { UsersTable } from './UsersTable';
 import { Pagination } from '@/components/Pagination';
 import PopUp from './PopUp';
+import HeaderBox from '@/components/HeaderBox';
 
 const UsersPage = () => {
   const [accounts, setUsers] = useState<Account[]>([]);
@@ -70,13 +71,17 @@ const UsersPage = () => {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <div className='flex flex-auto bg-gray-100'>
-      <div className='px-8 py-6 flex flex-col flex-auto border-[#a0b1b1] border-x-2'>
-        <div className='px-8 py-2 border-b-2 border-[#D7D7D7]'>
-          <h1 className='text-3xl font-semibold leading-9'>Admin Dashboard</h1>
-          <h1 className='text-base font-normal py-3 text-[#475467]'>View all account summaries</h1>
-        </div>
-        <div className='h-8'></div>
+    <section className="flex w-full flex-row max-xl:max-h-screen font-inter">
+      <div className="flex w-full flex-1 flex-col gap-8 px-4 py-6 lg:py-12 lg:px-10 xl:px-20 2xl:px-32 xl:max-h-screen">
+        <header className="home-header border-b pb-10">
+          <HeaderBox
+            type="title"
+            title={'Admin Dashboard'}
+            subtext={'View all user and account summaries'}
+          />
+        </header>
+
+
         <div className='px-8 py-2'>
           <div className='flex'>
             <div className='flex flex-1'>
@@ -99,7 +104,7 @@ const UsersPage = () => {
             )}
           </section>
         </div>
-      </div>
+      {/* </div> */}
       {showUpdatePopUp && (
         <PopUp
           message="Successfully Updated."
@@ -113,7 +118,8 @@ const UsersPage = () => {
         />
       )}
     </div>
-  );
+    </section>
+  )
 };
 
 export default UsersPage;
