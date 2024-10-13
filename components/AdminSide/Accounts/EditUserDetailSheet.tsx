@@ -9,10 +9,8 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { cn, formatAmount, formatDateTime } from "@/lib/utils"
 
-import { createClient } from '@/lib/supabase/client';
-import { create } from 'domain';
+import { serviceRoleClient } from '@/lib/supabase/serviceRoleClient';
 
 // Define the props type for the component
 type AccountDetailSheetProps = {
@@ -28,13 +26,13 @@ const EditAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, st
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const supabase = createClient();
+  const supabaseAdmin = serviceRoleClient();
   // Function to update password by user ID
   const updatePasswordById = async (userId: string | undefined, newPassword: string) => {
     if (userId == undefined) {
       return { success: false, message: "No user is selected" }
     }
-    const { error } = await supabase.auth.admin.updateUserById(userId, {
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
       password: newPassword,
     })
 
@@ -59,6 +57,7 @@ const EditAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, st
       console.log(result.message);
       // Show error notification
     }
+    updateUser();
   };
 
 
