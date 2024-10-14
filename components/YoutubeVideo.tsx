@@ -14,7 +14,7 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ videoUrl }) => {
     }
 
     return (
-        <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden' }}>
+        <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', borderRadius: '12px', maxWidth: '95%', margin: '0 auto' }}>
             <iframe
                 width="100%"
                 height="100%"
@@ -27,6 +27,7 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ videoUrl }) => {
                     left: 0,
                     width: '100%',
                     height: '100%',
+                    borderRadius: '12px',
                 }}
             />
         </div>
