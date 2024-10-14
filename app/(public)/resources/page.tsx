@@ -1,7 +1,12 @@
+"use client"; // This makes the component a Client Component
+
 import React from 'react'
 import YouTubeVideo from '@/components/YoutubeVideo'
+import { useAppSelector } from "@/store/hooks";
 
 const Resources = () => {
+  const userRole = useAppSelector(state => state.user.user_role);
+
   return (
     <section className="flex w-full flex-col items-center max-xl:max-h-screen max-xl:overflow-y-scroll font-inter bg-[#FFFFFF]">
       {/* Header with Background Gradient */}
@@ -35,15 +40,22 @@ const Resources = () => {
           <YouTubeVideo videoUrl="https://www.youtube.com/watch?v=PLACEHOLDER_URL_3" />
         </div>
 
-        {/* Video 4 */}
-        <div className="mb-8">
-          <h2 className="text-xl lg:text-4xl font-semibold text-[#1A70B8] mb-2">Admin</h2>
-          <p className="text-lg lg:text-xl font-medium text-slate-700 mb-6">Sign up, Log in, and Dashboard Overview</p>
-          <YouTubeVideo videoUrl="https://www.youtube.com/watch?v=PLACEHOLDER_URL_4" />
-        </div>
+        {/* Admin Video - visible only to admin users */}
+        {userRole === 'admin' && (
+          <div className="mb-8">
+            <h2 className="text-xl lg:text-3xl font-semibold text-[#1A70B8] mb-2">Admin</h2>
+            <p className="text-sm lg:text-base text-[#555555] mb-4">
+              Explore the admin features, including managing user accounts and settings.
+            </p>
+            <YouTubeVideo videoUrl="https://www.youtube.com/watch?v=PLACEHOLDER_URL_4" />
+          </div>
+        )}
       </div>
     </section>
   )
 }
 
 export default Resources
+
+
+
