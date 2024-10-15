@@ -115,47 +115,18 @@ export const accountAction = {
         }
     },
     signUpInitialization: async (user_id: string, owner_username: string): Promise<void> => {
-        const { bsb: perbsb, acc: peracc } = accbsbGenerator();
-        const { bsb: savbsb, acc: savacc } = accbsbGenerator();
 
         // Fetch preset bills using the new function in billerAction
         const presetBills = await billAction.fetchPresetBills();
-
-        // const accounts: Partial<Account>[] = [
-        //     {
-        //         type: AccountType.PERSONAL,
-        //         balance: 1500,
-        //         owner: user_id,
-        //         bsb: perbsb,
-        //         acc: peracc,
-        //         opening_balance: 500,
-        //         owner_username: owner_username
-        //     },
-        //     {
-        //         type: AccountType.SAVINGS,
-        //         balance: 1000,
-        //         owner: user_id,
-        //         bsb: savbsb,
-        //         acc: savacc,
-        //         opening_balance: 1000,
-        //         owner_username: owner_username
-        //     },
-        //     {
-        //         type: AccountType.CREDIT,
-        //         balance: 1000,
-        //         owner: user_id,
-        //         bsb: null,
-        //         acc: null,
-        //         opening_balance: 1000,
-        //         owner_username: owner_username
-        //     }
-        // ]
 
         const accounts: Partial<Account>[] = await accountAction.fetchAccountPresets(user_id, owner_username);
         for (const account of accounts) {
             await accountAction.createAccount(account as Account);
         }
-        await cardAction.cardSignUpInitialization(user_id);
+
+        console.log("userAccounts:", accounts);
+
+        await cardAction.cardSignUpInitialization(user_id, accounts);
 
         await billerAction.createDefaultSavedBillers(user_id);
 
@@ -192,8 +163,6 @@ export const accountAction = {
     
             // Update the admin bill with the new assigned users list
             await billAction.updateAssignedUsers(bill.id, updatedAssignedUsers);
-    
-            console.log("Updated assigned users in Admin Bill:", updatedAssignedUsers);
         }
 
 

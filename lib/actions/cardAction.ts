@@ -4,8 +4,11 @@ import { card_detailGenerator } from "../utils/accbsbGenerator";
 import { accountAction } from "./accountAction";
 
 enum AccountType {
-    CREDIT = 'credit',
-    DEBIT = 'debit',
+  SAVINGS = 'savings',
+  PERSONAL = 'personal',
+  CREDIT = 'credit',
+  DEBIT = 'debit',
+  OTHER = 'other'
 }
 
 type CardDetails = {
@@ -27,12 +30,29 @@ export const cardAction = {
         }
     },
 
-    cardSignUpInitialization: async (user_id: string): Promise<void> => {
+    cardSignUpInitialization: async (user_id: string, userAccounts: Partial<Account>[]): Promise<void> => {
+
+      // console.log("userAccounts:", userAccounts);
+
         // Generate card details for Debit and Credit cards
         const { card_num: debit_card_num, expiry: debit_expiry, cvv: debit_cvv } = card_detailGenerator();
         const { card_num: credit_card_num, expiry: credit_expiry, cvv: credit_cvv } = card_detailGenerator();
-        const owner_username = await accountAction.fetchUsernamebyUserId(user_id);
-        const userAccount = await accountAction.fetchAccountsbyUserId(user_id);
+
+        // Find the debit and credit accounts
+        const debitAccount = userAccounts.find(account => account.type === AccountType.PERSONAL);
+        const creditAccount = userAccounts.find(account => account.type === AccountType.CREDIT);
+
+    // // Log the found accounts to see if the filtering is correct
+    // console.log("Debit Account:", debitAccount);
+    // console.log("Credit Account:", creditAccount);
+
+    // if (!debitAccount || !debitAccount.id) {
+    //     throw new Error("Debit account not found or invalid for the user.");
+    // }
+    // if (!creditAccount || !creditAccount.id) {
+    //     throw new Error("Credit account not found or invalid for the user.");
+    // }
+
         const cards: Partial<Card>[] = [
             {
                 card_type: AccountType.DEBIT,
@@ -41,18 +61,18 @@ export const cardAction = {
                 card_number: debit_card_num,
                 expiry_date: debit_expiry,
                 cvv: debit_cvv,
-                owner_username: owner_username,
-                linked_to: userAccount[0].id,
+                owner_username: debitAccount!.owner_username,
+                linked_to: debitAccount!.id,
             },
             {
                 card_type: AccountType.CREDIT,
-                credit: userAccount[2].balance, // Assign some default credit limit for the credit card
+                credit: creditAccount!.balance, // Assign some default credit limit for the credit card
                 owner: user_id,
                 card_number: credit_card_num,
                 expiry_date: credit_expiry,
                 cvv: credit_cvv,
-                owner_username: owner_username,
-                linked_to: userAccount[2].id,
+                owner_username: creditAccount!.owner_username,
+                linked_to: creditAccount!.id,
             }
         ];
         for (const card of cards) {
