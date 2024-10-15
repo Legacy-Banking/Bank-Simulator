@@ -38,20 +38,11 @@ export const cardAction = {
         const { card_num: debit_card_num, expiry: debit_expiry, cvv: debit_cvv } = card_detailGenerator();
         const { card_num: credit_card_num, expiry: credit_expiry, cvv: credit_cvv } = card_detailGenerator();
 
+        const userAccount = await accountAction.fetchAccountsbyUserId(user_id);
+
         // Find the debit and credit accounts
-        const debitAccount = userAccounts.find(account => account.type === AccountType.PERSONAL);
-        const creditAccount = userAccounts.find(account => account.type === AccountType.CREDIT);
-
-    // // Log the found accounts to see if the filtering is correct
-    // console.log("Debit Account:", debitAccount);
-    // console.log("Credit Account:", creditAccount);
-
-    // if (!debitAccount || !debitAccount.id) {
-    //     throw new Error("Debit account not found or invalid for the user.");
-    // }
-    // if (!creditAccount || !creditAccount.id) {
-    //     throw new Error("Credit account not found or invalid for the user.");
-    // }
+        const debitAccount = userAccount.find(account => account.type === AccountType.PERSONAL);
+        const creditAccount = userAccount.find(account => account.type === AccountType.CREDIT);
 
         const cards: Partial<Card>[] = [
             {

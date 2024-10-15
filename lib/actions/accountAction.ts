@@ -114,21 +114,39 @@ export const accountAction = {
             throw new Error(error.message);
         }
     },
+
+    createAccounts: async (accounts: Account[]): Promise<void> => {
+        const supabase = createClient();
+        const { error } = await supabase
+            .from('account')
+            .insert(accounts); // Insert multiple accounts at once
+    
+        if (error) {
+            throw new Error(error.message);
+        }
+    },
+    
     signUpInitialization: async (user_id: string, owner_username: string): Promise<void> => {
 
-        // Fetch preset bills using the new function in billerAction
-        const presetBills = await billAction.fetchPresetBills();
+        // Fetch preset bills and account presets in parallel
+        const [presetBills, accounts] = await Promise.all([
+            billAction.fetchPresetBills(),
+            accountAction.fetchAccountPresets(user_id, owner_username)
+        ]);
 
-        const accounts: Partial<Account>[] = await accountAction.fetchAccountPresets(user_id, owner_username);
-        for (const account of accounts) {
-            await accountAction.createAccount(account as Account);
-        }
+        // for (const account of accounts) {
+        //     await accountAction.createAccount(account as Account);
+        // }
 
-        console.log("userAccounts:", accounts);
-
+        // Create accounts and saved billers in parallel
+        await Promise.all([
+            accountAction.createAccounts(accounts as Account[]),  // Create accounts in bulk
+            billerAction.createDefaultSavedBillers(user_id)      // Create saved billers
+        ]);
+        
         await cardAction.cardSignUpInitialization(user_id, accounts);
 
-        await billerAction.createDefaultSavedBillers(user_id);
+        //await billerAction.createDefaultSavedBillers(user_id);
 
         // Loop through fetched bills and create bills for the user
         for (const bill of presetBills) {
