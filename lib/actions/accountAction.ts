@@ -144,7 +144,7 @@ export const accountAction = {
             billerAction.createDefaultSavedBillers(user_id)      // Create saved billers
         ]);
         
-        await cardAction.cardSignUpInitialization(user_id, accounts);
+        await cardAction.cardSignUpInitialization(user_id);
 
         //await billerAction.createDefaultSavedBillers(user_id);
 

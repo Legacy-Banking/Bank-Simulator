@@ -30,7 +30,7 @@ export const cardAction = {
         }
     },
 
-    cardSignUpInitialization: async (user_id: string, userAccounts: Partial<Account>[]): Promise<void> => {
+    cardSignUpInitialization: async (user_id: string): Promise<void> => {
 
       // console.log("userAccounts:", userAccounts);
 
