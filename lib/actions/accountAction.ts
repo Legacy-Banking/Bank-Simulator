@@ -129,9 +129,10 @@ export const accountAction = {
     signUpInitialization: async (user_id: string, owner_username: string): Promise<void> => {
 
         // Fetch preset bills and account presets in parallel
-        const [accounts] = await Promise.all([
+        const [accounts, savedBillers] = await Promise.all([
             //billAction.fetchPresetBills(),
-            accountAction.fetchAccountPresets(user_id, owner_username)
+            accountAction.fetchAccountPresets(user_id, owner_username),
+            billerAction.fetchPresetSavedBillers()
         ]);
 
         // for (const account of accounts) {
@@ -141,7 +142,7 @@ export const accountAction = {
         // Create accounts and saved billers in parallel
         await Promise.all([
             accountAction.createAccounts(accounts as Account[]),  // Create accounts in bulk
-            billerAction.createDefaultSavedBillers(user_id)      // Create saved billers
+            billerAction.createDefaultSavedBillers(user_id, savedBillers)      // Create saved billers
         ]);
         
         await cardAction.cardSignUpInitialization(user_id);

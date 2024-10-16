@@ -30,6 +30,17 @@ export const cardAction = {
         }
     },
 
+    createCards: async (cards: Card[]): Promise<void> => {
+      const supabase = createClient();
+      const { error } = await supabase
+          .from('cards')
+          .insert(cards); // Insert multiple cards at once
+  
+      if (error) {
+          throw new Error(error.message);
+      }
+  },
+
     cardSignUpInitialization: async (user_id: string): Promise<void> => {
 
       // console.log("userAccounts:", userAccounts);
@@ -66,10 +77,12 @@ export const cardAction = {
                 linked_to: creditAccount!.id,
             }
         ];
-        for (const card of cards) {
-            await cardAction.createCard(card as Card);
-        }
+        // for (const card of cards) {
+        //     await cardAction.createCard(card as Card);
+        // }
+        await cardAction.createCards(cards as Card[]);
     },
+    
     // fetchCardById: async (ownerId: string): Promise<Card[]> => {
     //     const supabase = createClient();
 

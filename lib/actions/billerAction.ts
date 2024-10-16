@@ -52,63 +52,80 @@ export const billerAction={
         return biller;
       },
 
+      fetchPresetSavedBillers: async (): Promise<any[]> => {
+        const supabase = createClient();
+    
+        // Fetch all billers where save_biller_status is true
+        const { data: billers, error } = await supabase
+            .from('billers')
+            .select('*')
+            .eq('save_biller_status', true);
+    
+        if (error) {
+            console.error(`Error fetching billers: ${error.message}`);
+            throw new Error(`Error fetching billers: ${error.message}`);
+        }
+    
+        return billers || [];
+    },
+
     //Create Default Saved Billers
     // Example of a saved biller: "biller_name|biller_code|ref_num" , "biller_name2|biller_code2|ref_num"
-    createDefaultSavedBillers: async (user_id: string): Promise<void> => {
-    const supabase = createClient();
+      createDefaultSavedBillers: async (user_id: string, billers: any[]): Promise<void> => {
+      const supabase = createClient();
 
-    // Fetch all billers where save_biller_status is true
-    const { data: billers, error: fetchError } = await supabase
-      .from('billers')
-      .select('*')
-      .eq('save_biller_status', true); // Fetch billers where save_biller_status is true
+      // // Fetch all billers where save_biller_status is true
+      // const { data: billers, error: fetchError } = await supabase
+      //   .from('billers')
+      //   .select('*')
+      //   .eq('save_biller_status', true); // Fetch billers where save_biller_status is true
 
-      if (fetchError) {
-        throw new Error(`Error fetching billers: ${fetchError.message}`);
-      }
-  
-      if (!billers || billers.length === 0) {
-        throw new Error("No billers found to insert.");
-      }
-  
-    // Prepare the savedBillers array with a single unique reference number per biller
-    const savedBillersArray = billers.map((biller) => {
-      const referenceNumber = referenceNumberGenerator(); // Generate a unique reference number for each biller
+      //   if (fetchError) {
+      //     throw new Error(`Error fetching billers: ${fetchError.message}`);
+      //   }
+    
+        if (!billers || billers.length === 0) {
+          throw new Error("No billers found to insert.");
+        }
+    
+      // Prepare the savedBillers array with a single unique reference number per biller
+      const savedBillersArray = billers.map((biller) => {
+        const referenceNumber = referenceNumberGenerator(); // Generate a unique reference number for each biller
 
-      // For saved_billers: "biller_name|biller_code|reference_num"
-      return `${biller.name}|${biller.biller_code}|${referenceNumber}`;
-    });
+        // For saved_billers: "biller_name|biller_code|reference_num"
+        return `${biller.name}|${biller.biller_code}|${referenceNumber}`;
+      });
 
-    // Join the saved billers into a single string
-    const savedBillers = savedBillersArray.join(', ');
+      // Join the saved billers into a single string
+      const savedBillers = savedBillersArray.join(', ');
 
-    // Extract the reference number from the savedBillersArray to use in biller_reference
-    const billerReferencesArray = savedBillersArray.map((savedBiller) => {
-      const [billerName, , referenceNum] = savedBiller.split('|'); // Split '|' and get the reference number
-      return `${billerName}|${referenceNum}`; 
-    });
+      // Extract the reference number from the savedBillersArray to use in biller_reference
+      const billerReferencesArray = savedBillersArray.map((savedBiller) => {
+        const [billerName, , referenceNum] = savedBiller.split('|'); // Split '|' and get the reference number
+        return `${billerName}|${referenceNum}`; 
+      });
 
-    // Join the biller references into a single string
-    const billerReferences = billerReferencesArray.join(', ');
+      // Join the biller references into a single string
+      const billerReferences = billerReferencesArray.join(', ');
 
-    // Prepare the single user biller entry
-    const userBiller: Partial<SavedBiller> = {
-      owner: user_id, 
-      saved_billers: savedBillers, 
-      biller_reference: billerReferences, 
-    };
-  
-      console.log('Inserting the following saved billers:', userBiller); 
-  
-      // Insert a single row into the 'user_billers' table
-      const { error: insertError } = await supabase
-        .from('user_billers')
-        .insert([userBiller]);
-  
-      if (insertError) {
-        throw new Error(`Error inserting user billers: ${insertError.message}`);
-      }
-    },
+      // Prepare the single user biller entry
+      const userBiller: Partial<SavedBiller> = {
+        owner: user_id, 
+        saved_billers: savedBillers, 
+        biller_reference: billerReferences, 
+      };
+    
+        console.log('Inserting the following saved billers:', userBiller); 
+    
+        // Insert a single row into the 'user_billers' table
+        const { error: insertError } = await supabase
+          .from('user_billers')
+          .insert([userBiller]);
+    
+        if (insertError) {
+          throw new Error(`Error inserting user billers: ${insertError.message}`);
+        }
+      },
     
     // Function to fetch the saved billers from 'user_billers' table for a user
     fetchSavedBillers: async (user_id: string): Promise<string[]> => {
