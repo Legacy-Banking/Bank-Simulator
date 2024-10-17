@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -9,10 +9,8 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { cn, formatAmount, formatDateTime } from "@/lib/utils"
 
-import { createClient } from '@/lib/supabase/client';
-import { create } from 'domain';
+import { serviceRoleClient } from '@/lib/supabase/serviceRoleClient';
 
 // Define the props type for the component
 type AccountDetailSheetProps = {
@@ -28,13 +26,13 @@ const EditAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, st
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const supabase = createClient();
+  const supabaseAdmin = serviceRoleClient();
   // Function to update password by user ID
   const updatePasswordById = async (userId: string | undefined, newPassword: string) => {
     if (userId == undefined) {
       return { success: false, message: "No user is selected" }
     }
-    const { error } = await supabase.auth.admin.updateUserById(userId, {
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
       password: newPassword,
     })
 
@@ -48,6 +46,17 @@ const EditAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, st
   }
 
   const handlePasswordUpdate = async () => {
+      // Validation checks
+      if (newPassword.length < 6) {
+        setError('Password must be at least 6 characters long.');
+        return;
+      }
+  
+      if (newPassword !== confirmPassword) {
+        setError('Passwords do not match. Please re-enter.');
+        return;
+      }
+
     const userId = account?.owner; // Replace with the actual user ID from your app logic
 
     const result = await updatePasswordById(userId, newPassword);
@@ -59,8 +68,21 @@ const EditAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, st
       console.log(result.message);
       // Show error notification
     }
+    updateUser();
   };
 
+  const resetForm = () => {
+    setNewPassword('');
+    setConfirmPassword('');
+    setError('');
+  };
+
+  // Reset form when the modal closes
+  useEffect(() => {
+    if (!status) {
+      resetForm();
+    }
+  }, [status]);
 
   if (!status) return null;
 
@@ -82,6 +104,7 @@ const EditAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, st
 
           <label className="">New Password</label>
           <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm "
+            type="password"
             name="password"
             placeholder="Enter your password"
             value={newPassword}
@@ -90,6 +113,7 @@ const EditAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, st
 
           <label className="">Re-Type New Password</label>
           <input className="rounded-md px-3 py-2 mt-2 border mb-6 outline outline-1 outline-gray-400 placeholder-gray-400 text-base drop-shadow-sm "
+            type="password"
             name="password"
             placeholder="Enter your password"
             value={confirmPassword}
@@ -99,13 +123,12 @@ const EditAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, st
 
         {/* Error Message */}
         {error && (
-          <div className="text-red-200">
-            *<Button className="delete" onClick={() => setError('')}></Button>
+          <div className="font-semibold text-red-500">
             {error}
           </div>
         )}
         {/* Footer with Close button */}
-        <DialogFooter className="mt-8 flex ">
+        <DialogFooter className="mt-4 flex ">
           <Button onClick={handlePasswordUpdate} className="w-2/3 uppercase font-inter tracking-wider bg-blue-25 hover:bg-blue-200 text-white-100">Update</Button>
           <div className="mx-24"> </div>
 

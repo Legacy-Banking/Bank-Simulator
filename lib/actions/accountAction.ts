@@ -114,50 +114,111 @@ export const accountAction = {
             throw new Error(error.message);
         }
     },
-    signUpInitialization: async (user_id: string, owner_username: string): Promise<void> => {
-        const { bsb: perbsb, acc: peracc } = accbsbGenerator();
-        const { bsb: savbsb, acc: savacc } = accbsbGenerator();
 
-        // Fetch preset bills using the new function in billerAction
-        const presetBills = await billAction.fetchPresetBills();
-
-        // const accounts: Partial<Account>[] = [
-        //     {
-        //         type: AccountType.PERSONAL,
-        //         balance: 1500,
-        //         owner: user_id,
-        //         bsb: perbsb,
-        //         acc: peracc,
-        //         opening_balance: 500,
-        //         owner_username: owner_username
-        //     },
-        //     {
-        //         type: AccountType.SAVINGS,
-        //         balance: 1000,
-        //         owner: user_id,
-        //         bsb: savbsb,
-        //         acc: savacc,
-        //         opening_balance: 1000,
-        //         owner_username: owner_username
-        //     },
-        //     {
-        //         type: AccountType.CREDIT,
-        //         balance: 1000,
-        //         owner: user_id,
-        //         bsb: null,
-        //         acc: null,
-        //         opening_balance: 1000,
-        //         owner_username: owner_username
-        //     }
-        // ]
-
-        const accounts: Partial<Account>[] = await accountAction.fetchAccountPresets(user_id, owner_username);
-        for (const account of accounts) {
-            await accountAction.createAccount(account as Account);
+    createAccounts: async (accounts: Account[]): Promise<void> => {
+        const supabase = createClient();
+        const { error } = await supabase
+            .from('account')
+            .insert(accounts); // Insert multiple accounts at once
+    
+        if (error) {
+            throw new Error(error.message);
         }
+    },
+    
+    signUpInitialization: async (user_id: string, owner_username: string): Promise<void> => {
+
+        // Fetch preset bills and account presets in parallel
+        const [accounts, savedBillers] = await Promise.all([
+            //billAction.fetchPresetBills(),
+            accountAction.fetchAccountPresets(user_id, owner_username),
+            billerAction.fetchPresetSavedBillers()
+        ]);
+
+        // for (const account of accounts) {
+        //     await accountAction.createAccount(account as Account);
+        // }
+
+        // Create accounts and saved billers in parallel
+        await Promise.all([
+            accountAction.createAccounts(accounts as Account[]),  // Create accounts in bulk
+            billerAction.createDefaultSavedBillers(user_id, savedBillers)      // Create saved billers
+        ]);
+        
         await cardAction.cardSignUpInitialization(user_id);
 
-        await billerAction.createDefaultSavedBillers(user_id);
+        // await billerAction.createDefaultSavedBillers(user_id);
+
+        // // Loop through fetched bills and create bills for the user
+        // for (const bill of presetBills) {
+        //     await billAction.createBillForUsers(
+        //         [user_id], // The single user being assigned the bill
+        //         bill.biller, // Biller from the preset bill
+        //         bill.amount, // Amount from the preset bill
+        //         bill.description, // Description from the preset bill
+        //         new Date(bill.due_date), // Due date from the preset bill
+        //         bill.id // Linked bill from the preset bill
+        //     );
+    
+        //     // Now update the assigned_users in the Admin Bill
+        //     // Fetch the current assigned users for the linked bill
+        //     const { assigned_users: currentAssignedUsers } = await billAction.fetchAdminBillById(bill.id);
+    
+        //     // Create a string with the user details (username|id)
+        //     const newUserAssignment = `${owner_username}|${user_id}`;
+    
+        //     // If there are already assigned users, split them into an array, otherwise start with an empty array
+        //     const existingUserArray = currentAssignedUsers
+        //         ? currentAssignedUsers.split(",").map((user: string) => user.trim())
+        //         : [];
+    
+        //     // Add the new user to the list and remove duplicates
+        //     const updatedAssignedUsersArray = [...existingUserArray, newUserAssignment].filter(
+        //         (value, index, self) => self.indexOf(value) === index
+        //     );
+    
+        //     // Join the updated array into a string
+        //     const updatedAssignedUsers = updatedAssignedUsersArray.join(", ");
+    
+        //     // Update the admin bill with the new assigned users list
+        //     await billAction.updateAssignedUsers(bill.id, updatedAssignedUsers);
+        // } 
+
+        // await Promise.all(
+        //         presetBills.map(async (bill) => {
+        //             // Fetch the current assigned users for the linked bill
+        //             const { assigned_users: currentAssignedUsers } = await billAction.fetchAdminBillById(bill.id);
+            
+        //             // Create a string with the user details (username|id)
+        //             const newUserAssignment = `${owner_username}|${user_id}`;
+            
+        //             // If there are already assigned users, split them into an array, otherwise start with an empty array
+        //             const existingUserArray = currentAssignedUsers
+        //                 ? currentAssignedUsers.split(",").map((user: string) => user.trim())
+        //                 : [];
+            
+        //             // Add the new user to the list and remove duplicates
+        //             const updatedAssignedUsersArray = [...existingUserArray, newUserAssignment].filter(
+        //                 (value, index, self) => self.indexOf(value) === index
+        //             );
+            
+        //             // Join the updated array into a string
+        //             const updatedAssignedUsers = updatedAssignedUsersArray.join(", ");
+            
+        //             // Update the admin bill with the new assigned users list
+        //             await billAction.updateAssignedUsers(bill.id, updatedAssignedUsers);
+        //         })
+        //     );
+
+    },
+
+    finalizeSignUpInitialization: async (user_id: string, owner_username: string): Promise<void> => {
+
+        // Fetch preset bills and account presets in parallel
+        const [presetBills] = await Promise.all([
+            billAction.fetchPresetBills(),
+        ]);
+
 
         // Loop through fetched bills and create bills for the user
         for (const bill of presetBills) {
@@ -192,11 +253,7 @@ export const accountAction = {
     
             // Update the admin bill with the new assigned users list
             await billAction.updateAssignedUsers(bill.id, updatedAssignedUsers);
-    
-            console.log("Updated assigned users in Admin Bill:", updatedAssignedUsers);
-        }
-
-
+        } 
     },
 
     fetchAccountPresets: async (userId: string, ownerUsername: string): Promise<Partial<Account>[]> => {

@@ -10,9 +10,7 @@ import { useRouter } from 'next/navigation';
 import BankNavbar from '@/components/BankNavbar';
 import { accountAction } from '@/lib/actions/accountAction';
 
-
 const AdminDashboard = () => {
-
   const [activePage, setActivePage] = useState('accounts');
   const userRole = useAppSelector(state => state.user.user_role);
   const router = useRouter();
@@ -57,11 +55,11 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col">
       <BankNavbar personalAccount={personalAccount} />
-      <div className="flex">
+      <div className="flex flex-auto">
         <AdminSideBar activePage={activePage} setActivePage={setActivePage} />
-        <main className="bg-[#FCFCFD] flex flex-auto border-[#D7D7D7] border-x-2">
+        <main className="bg-[#FCFCFD] flex-auto border-[#D7D7D7] border-x-2 overflow-y-auto">
           {renderActivePage()}
         </main>
       </div>
@@ -69,4 +67,6 @@ const AdminDashboard = () => {
   )
 }
 
-export default AdminDashboard
+export default AdminDashboard;
+
+

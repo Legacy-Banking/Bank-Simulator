@@ -8,8 +8,9 @@ interface CreateDefaultBillersButtonProps {
 
 const CreateDefaultBillersButton: React.FC<CreateDefaultBillersButtonProps> = ({ user_id }) => {
   const handleCreateDefaultBillers = async () => {
+    const savedBillers = await billerAction.fetchPresetSavedBillers()
     try {
-      await billerAction.createDefaultSavedBillers(user_id);
+      await billerAction.createDefaultSavedBillers(user_id, savedBillers);
       console.log('Default billers created successfully.');
     } catch (error) {
       console.error('Error creating default billers:', error);
