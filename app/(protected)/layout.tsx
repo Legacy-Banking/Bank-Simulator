@@ -33,7 +33,6 @@ const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children
             const supabase = createClient();
             const { data, error } = await supabase.auth.getUser();
             if (error || !data?.user) {
-                console.log(error);
                 toast.error("Not logged in, redirecting..."); // Show toast notification
                 router.push('/')
             } else {
