@@ -137,74 +137,74 @@ export const accountAction = {
             throw new Error(error.message);
         }
     },
-    signUpInitialization: async (user_id: string, owner_username:string): Promise<void> => {
-        const { bsb: perbsb, acc: peracc } = accbsbGenerator();
-        const { bsb: savbsb, acc: savacc } = accbsbGenerator();
-        const bills = [
-            {
-                biller: {
-                    id: '1',
-                    name:'Melbourne Electricity',
-                    biller_code: '2513',
-                }as Biller,
-                amount: 100,
-                description: 'Electricity Bill'
-            },
-            {
-                biller:{
-                    id:'2',
-                    name:'Daily News',
-                    biller_code:'8351'
+    // signUpInitialization: async (user_id: string, owner_username:string): Promise<void> => {
+    //     const { bsb: perbsb, acc: peracc } = accbsbGenerator();
+    //     const { bsb: savbsb, acc: savacc } = accbsbGenerator();
+    //     const bills = [
+    //         {
+    //             biller: {
+    //                 id: '1',
+    //                 name:'Melbourne Electricity',
+    //                 biller_code: '2513',
+    //             }as Biller,
+    //             amount: 100,
+    //             description: 'Electricity Bill'
+    //         },
+    //         {
+    //             biller:{
+    //                 id:'2',
+    //                 name:'Daily News',
+    //                 biller_code:'8351'
 
-                }as Biller,
-                amount: 28.8,
-                description: 'Monthly Subscription'
-            }
-        ]
+    //             }as Biller,
+    //             amount: 28.8,
+    //             description: 'Monthly Subscription'
+    //         }
+    //     ]
 
-        const accounts: Partial<Account>[] = [
-            {
-                type: AccountType.PERSONAL,
-                balance: 1000,
-                owner: user_id,
-                bsb: perbsb,
-                acc: peracc,
-                opening_balance: 1000,
-                owner_username: owner_username
-            },
-            {
-                type: AccountType.SAVINGS,
-                balance: 1000,
-                owner: user_id,
-                bsb: savbsb,
-                acc: savacc,
-                opening_balance: 1000,
-                owner_username: owner_username
-            },
-            {
-                type: AccountType.CREDIT,
-                balance: 1000,
-                owner: user_id,
-                bsb: null,
-                acc: null,
-                opening_balance: 1000,
-                owner_username: owner_username
-            }
-        ]
+    //     const accounts: Partial<Account>[] = [
+    //         {
+    //             type: AccountType.PERSONAL,
+    //             balance: 1000,
+    //             owner: user_id,
+    //             bsb: perbsb,
+    //             acc: peracc,
+    //             opening_balance: 1000,
+    //             owner_username: owner_username
+    //         },
+    //         {
+    //             type: AccountType.SAVINGS,
+    //             balance: 1000,
+    //             owner: user_id,
+    //             bsb: savbsb,
+    //             acc: savacc,
+    //             opening_balance: 1000,
+    //             owner_username: owner_username
+    //         },
+    //         {
+    //             type: AccountType.CREDIT,
+    //             balance: 1000,
+    //             owner: user_id,
+    //             bsb: null,
+    //             acc: null,
+    //             opening_balance: 1000,
+    //             owner_username: owner_username
+    //         }
+    //     ]
 
-        for (const account of accounts) {
-            await accountAction.createAccount(account as Account);
-        }        
-        await cardAction.cardSignUpInitialization(user_id);
+    //     for (const account of accounts) {
+    //         await accountAction.createAccount(account as Account);
+    //     }        
+    //     await cardAction.cardSignUpInitialization(user_id);
 
-        await billerAction.createDefaultSavedBillers(user_id);
+    //     await billerAction.createDefaultSavedBillers(user_id);
 
-        for (const bill of bills) {
-            await billAction.createBill(user_id, bill.biller, bill.amount, bill.description);
-        }        
+    //     for (const bill of bills) {
+    //         await billAction.createBill(user_id, bill.biller, bill.amount, bill.description);
+    //     }        
         
 
-    },
+    // },
 
     fetchUsernamebyUserId: async (user_id: string): Promise<string> => {
         const supabase = createClient();
