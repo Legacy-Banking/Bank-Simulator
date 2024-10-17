@@ -50,7 +50,7 @@ export default function SignUp({
     }
     const user_id = data.user?.id || '';
     await accountAction.signUpInitialization(user_id, username);
-    await accountAction.finalizeSignUpInitialization(user_id, username);
+    //await accountAction.finalizeSignUpInitialization(user_id, username);
 
     return redirect("/dashboard");
 
