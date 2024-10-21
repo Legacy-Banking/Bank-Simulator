@@ -145,7 +145,7 @@ class ScheduleAction {
 
 
     // Unified method to create a schedule entry
-    public async createScheduleEntry(fromAccount: Account, toAccount: Account | null, biller_name: string | null, biller_code: string | null, reference_number: string | null, amount: number, description: string, schedule: Date): Promise<string> {
+    public async createScheduleEntry(fromAccount: Account, toAccount: Account | null, biller_name: string | null, biller_code: string | null, reference_number: string | null, amount: number, description: string, schedule: Date, user_id:string|null): Promise<string> {
         const schedule_ref = referenceNumberGenerator();
     
         let payload: any = {
@@ -155,7 +155,8 @@ class ScheduleAction {
             amount: amount,
             description: description,
             schedule_ref: schedule_ref,
-            schedule_type: this.scheduleType
+            schedule_type: this.scheduleType,
+            related_user: user_id 
         };
 
         // Modify payload based on the schedule type
@@ -164,7 +165,6 @@ class ScheduleAction {
             payload.biller_code = biller_code;
             payload.reference_number = reference_number;
         }
-        console.log(payload);
 
         const { data, error } = await this.supabase.from('schedule_payments').insert([payload]);
 
@@ -248,8 +248,10 @@ class ScheduleAction {
     private async executeBpay(schedule: any): Promise<void> {
         const { data:biller, error:billerError } = await this.supabase.from('billers').select('*').eq('biller_code', schedule.biller_code).single();
         if(biller){
-            const billerReference=await billerAction.fetchReferenceNumberByBillerName(schedule.related_user[0],schedule.biller_name);
-            await bpayAction.payBills(schedule.from_account,schedule.biller_name, schedule.biller_code, billerReference!, schedule.amount, schedule.description, schedule.related_user[0]);
+            const billerReference=await billerAction.fetchReferenceNumberByBillerName(schedule.related_user,schedule.biller_name);
+            console.log(schedule.from_account,schedule.biller_name, schedule.biller_code, billerReference!, schedule.amount, schedule.description, schedule.related_user)
+            const account={id:schedule.from_account}
+            await bpayAction.payBills(account,schedule.biller_name, schedule.biller_code, billerReference!, schedule.amount, schedule.description, schedule.related_user);
             await this.supabase.from('schedule_payments').update({status: 'completed'}).eq('id', schedule.id);
         }
     }
