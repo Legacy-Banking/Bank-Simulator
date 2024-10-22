@@ -1,10 +1,11 @@
+'use client';
 import React, { useEffect, useState } from 'react';
 import { billAction } from '@/lib/actions/billAction';
 import HeaderBox from '@/components/HeaderBox';
-import AdminBillsTable from './AdminBillsTable';
+import AdminBillsTable from '@/components/AdminSide/Bills/AdminBillsTable';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react'
-import CreateBillForm from './CreateBillForm';
+import CreateBillForm from '@/components/AdminSide/Bills/CreateBillForm';
 import { Pagination } from '@/components/Pagination';
 
 const CreateBillPage = () => {
@@ -88,7 +89,11 @@ const CreateBillPage = () => {
   const currentBills = bills.slice(indexOfFirstBill, indexOfLastBill);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen w-full">
+        <div className="spinner"></div> {/* Replace with your actual spinner component */}
+      </div>
+    );
   }
 
   return (

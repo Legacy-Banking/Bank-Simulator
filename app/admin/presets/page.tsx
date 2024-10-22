@@ -6,18 +6,16 @@ import { createClient } from '@/lib/supabase/client';
 // import { AccountsTable } from '../Accounts/AccountsTable';
 import { useSearchParams } from 'next/navigation';
 import { Pagination } from '@/components/Pagination';
-import PopUp from '../Accounts/PopUp';
+import PopUp from '@/components/AdminSide/Accounts/PopUp';
 import { Button } from '@/components/ui/button';
-import { TransactionAdminTable } from './TransactionAdminTable';
-import { BillersTable } from './BillersTable';
-import ConstantTable from '../CMS/ConstantTable';
-import PresetOption from './PresetOption';
-import AddButton from './AddButton';
-import AddBillerDetailSheet from './Inserting Items/AddBillerDetailSheet';
-import AddConstantDetailSheet from '../CMS/AddConstantDetailSheet';
-import AccountPresetTable from './AccountPresetTable';
-import AddAccountPresetDetailSheet from './Inserting Items/AddAccountPresetDetailSheet';
-import AddTransactionPresetDetailSheet from './Inserting Items/AddTransactionPresetDetailSheet';
+import { TransactionAdminTable } from '@/components/AdminSide/Presets/TransactionAdminTable';
+import { BillersTable } from '@/components/AdminSide/Presets/BillersTable';
+import PresetOption from '@/components/AdminSide/Presets/PresetOption';
+import AddButton from '@/components/AdminSide/Presets/AddButton';
+import AddBillerDetailSheet from '@/components/AdminSide/Presets/Inserting Items/AddBillerDetailSheet';
+import AccountPresetTable from '@/components/AdminSide/Presets/AccountPresetTable';
+import AddAccountPresetDetailSheet from '@/components/AdminSide/Presets/Inserting Items/AddAccountPresetDetailSheet';
+import AddTransactionPresetDetailSheet from '@/components/AdminSide/Presets/Inserting Items/AddTransactionPresetDetailSheet';
 import HeaderBox from '@/components/HeaderBox';
 
 const PresetsPage = () => {
@@ -233,7 +231,14 @@ const PresetsPage = () => {
     );
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen w-full">
+        <div className="spinner"></div> {/* Replace with your actual spinner component */}
+      </div>
+    );
+  }
+
   if (error) return <p>Error: {error}</p>;
 
   return (

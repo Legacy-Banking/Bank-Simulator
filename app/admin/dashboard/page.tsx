@@ -1,75 +1,131 @@
-"use client";
+'use client';
+import React, { useEffect, useState } from 'react';
+import SearchBar from '@/components/SearchBar';
+import { createClient } from '@/lib/supabase/client';
+import { UsersTable } from '@/components/AdminSide/Accounts/UsersTable';
+import { Pagination } from '@/components/Pagination';
+import PopUp from '@/components/AdminSide/Accounts/PopUp';
+import HeaderBox from '@/components/HeaderBox';
 
-import AccountsPage from '@/components/AdminSide/Accounts/AccountsPage';
-import AdminSideBar from '@/components/AdminSide/AdminSideBar'
-import CreateBillPage from '@/components/AdminSide/Bills/CreateBillPage';
-import PresetsPage from '@/components/AdminSide/Presets/PresetsPage';
-import { useAppSelector } from '@/store/hooks';
-import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation';
-import BankNavbar from '@/components/BankNavbar';
-import { accountAction } from '@/lib/actions/accountAction';
-import CMSPage from '@/components/AdminSide/CMS/CMSPage';
+const UsersPage = () => {
+  const [accounts, setUsers] = useState<Account[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-const AdminDashboard = () => {
-  const [activePage, setActivePage] = useState('accounts');
-  const userRole = useAppSelector(state => state.user.user_role);
-  const router = useRouter();
-  const user_id = useAppSelector(state => state.user.user_id);
-  const [personalAccount, setPersonalAccount] = useState(null); // Store personal account
+  // Search Bar
+  const [inputValue, setInputValue] = useState('');
 
-  if (userRole !== 'admin') {
-    router.push('/'); // Redirect to home if not admin
-  }
-
-  // Fetch the personal account using the utility function
-  const fetchUserPersonalAccount = async () => {
-    try {
-      const personalAccountData = await accountAction.fetchPersonalAccountByUserId(user_id);
-      setPersonalAccount(personalAccountData);
-    } catch (error) {
-      console.error('Error fetching personal account:', error);
-    }
-  };
+  // Pagination
+  const [page, setPage] = useState(1); // Initialize to page 1
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      if (user_id) {
-        await fetchUserPersonalAccount(); // Fetch personal account after user ID is set
+    // Access query parameters after component mounts
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const pageParam = params.get('page');
+      if (pageParam) {
+        setPage(parseInt(pageParam));
       }
-    };
-    fetchUserData();
-
-  }, [user_id]); // Watch for changes in user_id
-
-  const renderActivePage = () => {
-    switch (activePage) {
-      case 'accounts':
-        return <AccountsPage />;
-      case 'presets':
-        return <PresetsPage />;
-      case 'create-bill':
-        return <CreateBillPage />;
-      case 'content-management-system':
-        return <CMSPage />;
-      default:
-        return <AccountsPage />;
     }
+  }, []);
+
+  const rowsPerPage = 10;
+
+  // Filter the accounts based on the input value
+  const filteredUsers = accounts.filter((account) =>
+    (account.owner_username ?? '').toLowerCase().includes(inputValue.toLowerCase())
+  );
+
+  const uniqueUsers = filteredUsers.filter((account, index, self) =>
+    index === self.findIndex((t) => t.owner === account.owner)
+  );
+  const totalPages = Math.ceil(uniqueUsers.length / rowsPerPage);
+  const indexOfLastTransaction = page * rowsPerPage;
+  const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
+  const currentUsers = uniqueUsers.slice(indexOfFirstTransaction, indexOfLastTransaction);
+
+  // Fetching data from Supabase
+  const supabase = createClient();
+  const fetchUsers = async () => {
+    const { data, error } = await supabase.from('account').select('*');
+
+    if (error) {
+      setError(error.message);
+    } else {
+      setUsers(data || []);
+    }
+    setLoading(false);
   };
+  useEffect(() => {
+
+    fetchUsers();
+  }, []); // Run once when the component mounts
+
+
+
+  // Pop-up states
+  const [showUpdatePopUp, setShowUpdatePopUp] = useState(false);
+  const [showDeletePopUp, setShowDeletePopUp] = useState(false);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen w-full">
+        <div className="spinner"></div> {/* Replace with your actual spinner component */}
+      </div>
+    );
+  }
+
+  if (error) return <p>Error: {error}</p>;
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <BankNavbar personalAccount={personalAccount} />
-      <div className="flex flex-auto">
-        <AdminSideBar activePage={activePage} setActivePage={setActivePage} />
-        <main className="bg-[#FCFCFD] flex-auto border-[#D7D7D7] border-x-2 overflow-y-auto">
-          {renderActivePage()}
-        </main>
-      </div>
+    <section className="flex w-full flex-row max-xl:max-h-screen font-inter">
+      <div className="flex w-full flex-1 flex-col gap-8 px-4 py-6 lg:py-12 lg:px-10 xl:px-20 2xl:px-32 xl:max-h-screen">
+        <header className="home-header border-b pb-10">
+          <HeaderBox
+            type="title"
+            title={'Admin Dashboard'}
+            subtext={'View all user and account summaries'}
+          />
+        </header>
+
+
+        <div className='px-8 py-2'>
+          <div className='flex'>
+            <div className='flex flex-1'>
+              <h1 className="text-xl text-black font-semibold">Users</h1>
+            </div>
+            <SearchBar inputValue={inputValue} setInputValue={setInputValue} />
+          </div>
+          <section className="flex w-full flex-col mt-6 bg-white-100 rounded-b-3xl">
+            <UsersTable
+              accounts={currentUsers}
+              setShowUpdatePopUp={setShowUpdatePopUp}
+              setShowDeletePopUp={setShowDeletePopUp}
+              onEditStatus={fetchUsers}
+            />
+            {totalPages > 1 && (
+              <div className="pt-4 mb-2 px-5 w-full border-t-2">
+                <Pagination totalPages={totalPages} page={page} setPage={setPage} />
+              </div>
+            )}
+          </section>
+        </div>
+      {/* </div> */}
+      {showUpdatePopUp && (
+        <PopUp
+          message="Successfully Updated."
+          onClose={() => setShowUpdatePopUp(false)}
+        />
+      )}
+      {showDeletePopUp && (
+        <PopUp
+          message="Successfully Deleted."
+          onClose={() => setShowDeletePopUp(false)}
+        />
+      )}
     </div>
+    </section>
   )
-}
+};
 
-export default AdminDashboard;
-
-
+export default UsersPage;

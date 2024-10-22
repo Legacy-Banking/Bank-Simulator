@@ -79,3 +79,22 @@ export const specialNavLinks = [
     label: "Dashboard",
   },
 ];
+
+export const adminSideBarNavLinks = [
+  {
+    route: "/admin/dashboard",
+    label: "Admin Dashboard",
+  },
+  {
+    route: "/admin/presets",
+    label: "Presets",
+  },
+  {
+    route: "/admin/bills",
+    label: "Assign & Create Bills",
+  },
+  {
+    route: "/admin/cms",
+    label: "Content Management",
+  },
+];

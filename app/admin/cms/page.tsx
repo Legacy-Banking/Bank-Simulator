@@ -1,11 +1,12 @@
+'use client';
 import HeaderBox from "@/components/HeaderBox";
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
-import ConstantTable from "./ConstantTable";
+import ConstantTable from "@/components/AdminSide/CMS/ConstantTable";
 import { Pagination } from "@/components/Pagination";
-import PopUp from "../Accounts/PopUp";
-import AddButton from "../Presets/AddButton";
-import AddConstantDetailSheet from "./AddConstantDetailSheet";
+import PopUp from "@/components/AdminSide/Accounts/PopUp";
+import AddButton from "@/components/AdminSide/Presets/AddButton";
+import AddConstantDetailSheet from "@/components/AdminSide/CMS/AddConstantDetailSheet";
 
 const CMSPage = () => {
     const [constants, setConstants] = useState<Constant[]>([]);
@@ -56,7 +57,13 @@ const CMSPage = () => {
       }, []);
 
 
-    if (loading) return <p>Loading...</p>;
+      if (loading) {
+        return (
+          <div className="flex items-center justify-center h-screen w-full">
+            <div className="spinner"></div> {/* Replace with your actual spinner component */}
+          </div>
+        );
+      }
     if (error) return <p>Error: {error}</p>;
 
     return (
@@ -66,7 +73,7 @@ const CMSPage = () => {
             <HeaderBox
             type="title"
             title={'Content Management System'}
-            subtext={'View all user and account summaries'}
+            subtext={'View and Change content on the website'}
             />
         </header>
 

@@ -1,19 +1,37 @@
+import { usePathname } from 'next/navigation'
+import Link from 'next/link';
+import { adminSideBarNavLinks } from '@/constants';
 
-import AdminNavLink from './AdminNavLink'
+const unstyled = "font-semibold py-3 px-4 rounded-lg block mb-2 bg-white transition-colors duration-300 ease-in-out hover:bg-[rgb(255,231,163)] cursor-pointer";
+const styled = "font-semibold py-3 px-4 rounded-lg block mb-2 transition-all duration-300 bg-gradient-to-r from-[#f8bf5b] to-[rgb(255,231,163)] cursor-pointer";
 
-const AdminSideBar = ({ activePage, setActivePage }: { activePage: string, setActivePage: (page: string) => void }) => {
+const AdminSideBar = () => {
+    const pathname = usePathname();
     return (
-        <nav className="sticky top-0 w-64 min-h-screen pt-28 bg-white z-10">
-            <div className='px-4 space-y-8'>
-                <AdminNavLink page={'accounts'} activePage={activePage} setActivePage={setActivePage}>Accounts</AdminNavLink>
-                <AdminNavLink page={'presets'} activePage={activePage} setActivePage={setActivePage}>Presets</AdminNavLink>
-                <AdminNavLink page={'create-bill'} activePage={activePage} setActivePage={setActivePage}>Assign & Create Bill</AdminNavLink>
-                <AdminNavLink page={'content-management-system'} activePage={activePage} setActivePage={setActivePage}>CMS</AdminNavLink>
+        <section className='h-screen flex-col border-l border-gray-200'>
+            <nav className="sticky top-0 w-64 h-full pt-28 bg-gray-50 z-10">
+                <ul className="px-4 space-y-12 list-none">
+                    {adminSideBarNavLinks.map((item) => {
+                    const isActive = pathname === item.route || pathname.startsWith(`${item.route}/`);
+                    const linkStyle = isActive ? styled : unstyled;
 
-            </div>
-        </nav>
+                    return (
+                        <li key={item.route} className='font-inter'>
+                        <Link href={item.route} className={linkStyle}>
+                            {item.label}
+                        </Link>
+                        </li>
+                    );
+                    })}
+                </ul>
+            </nav>
+        </section>
     );
 }
+
+
+
+
 
 export default AdminSideBar;
 
