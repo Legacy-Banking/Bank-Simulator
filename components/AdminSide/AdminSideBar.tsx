@@ -8,6 +8,8 @@ const AdminSideBar = ({ activePage, setActivePage }: { activePage: string, setAc
                 <AdminNavLink page={'accounts'} activePage={activePage} setActivePage={setActivePage}>Accounts</AdminNavLink>
                 <AdminNavLink page={'presets'} activePage={activePage} setActivePage={setActivePage}>Presets</AdminNavLink>
                 <AdminNavLink page={'create-bill'} activePage={activePage} setActivePage={setActivePage}>Assign & Create Bill</AdminNavLink>
+                <AdminNavLink page={'content-management-system'} activePage={activePage} setActivePage={setActivePage}>CMS</AdminNavLink>
+
             </div>
         </nav>
     );
