@@ -69,6 +69,7 @@ const ScheduleTransferForm: React.FC<ScheduleTransferProps> = ({ user_id }) => {
                         amount,
                         description,
                         schedule,
+                        user_id
                     );
                     alert('Transfer scheduled successfully!');
                 } catch (error) {
@@ -106,6 +107,7 @@ const ScheduleTransferForm: React.FC<ScheduleTransferProps> = ({ user_id }) => {
                         amount,
                         description,
                         schedule,
+                        user_id,
                     );
                     alert('BPAY scheduled successfully!');
                 } catch (error) {

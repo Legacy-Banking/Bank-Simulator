@@ -1,7 +1,7 @@
 import { createClient } from "../supabase/client";
 
 export const inboxAction = {
-    createMessage: async (fromName: string, user_id: string, description: string, type: string, bill_id: string, linked_bill: string): Promise<void> => {
+    createMessage: async (fromName: string, user_id: string, description: string, type: string, bill_id: string, linked_bill: string, linked_schedule: string): Promise<void> => {
         const supabase = createClient();
 
         try {
@@ -12,7 +12,8 @@ export const inboxAction = {
                 to_user: user_id,
                 type: type,
                 bill_id: bill_id,
-                linked_bill: linked_bill
+                linked_bill: linked_bill,
+                linked_schedule: linked_schedule
             };
             const { error: insertError } = await supabase
                 .from('messages')
@@ -70,5 +71,16 @@ export const inboxAction = {
         }
         const unreadMessages = data.length;
         return unreadMessages;
+    },
+    cancelSchedule: async (message:Partial<Message>):Promise<void>=>{
+        const supabase = createClient();
+        const id = message.id;
+        const {data,error} = await supabase
+            .from('schedule_payments')
+            .update({status:'cancelled'})
+            .eq('schedule_ref', message.linked_schedule);
+        if(error){
+            throw error;
+        }
     }
 };
