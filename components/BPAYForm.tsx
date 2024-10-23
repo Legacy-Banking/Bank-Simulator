@@ -398,6 +398,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
             amountF,
             data.description || '',
             scheduleDate,
+            user_id
           );
           console.log("Scheduled BPAY Entry Created:", scheduleRef);
         } catch (error) {

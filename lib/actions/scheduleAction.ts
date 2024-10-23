@@ -243,11 +243,11 @@ class ScheduleAction {
         if(fromAccount && toAccount){
             if(fromAccount.balance < schedule.amount){
                 const messageDescription = `Your scheduled payment to ${toAccount} of $${schedule.amount} has not been processed due to insufficient balance.`;
-                await inboxAction.createMessage('System', schedule.related_user, messageDescription, 'insufficient', null, null, schedule.schedule_ref);
+                await inboxAction.createMessage('System', schedule.related_user, messageDescription, 'insufficient', '', '', schedule.schedule_ref);
             }
             else{
                 const messageDescription = `Your scheduled payment to ${toAccount} of $${schedule.amount} has been processed.`;
-                await inboxAction.createMessage('System', schedule.related_user, messageDescription, 'schedule', null, null, schedule.schedule_ref);
+                await inboxAction.createMessage('System', schedule.related_user, messageDescription, 'schedule', '', '', schedule.schedule_ref);
                 await transactionAction.createTransaction(fromAccount, toAccount, schedule.amount, schedule.description, "pay anyone");
                 await this.supabase.from('schedule_payments').update({status: 'completed'}).eq('id', schedule.id);
             }
@@ -260,11 +260,11 @@ class ScheduleAction {
         if(biller){
             if(fromAccount.balance < schedule.amount){
                 const messageDescription = `Your scheduled payment to ${biller.name} of $${schedule.amount} has not been processed due to insufficient balance.`;
-                await inboxAction.createMessage('System', schedule.related_user, messageDescription, 'insufficient', null, null, schedule.schedule_ref);
+                await inboxAction.createMessage('System', schedule.related_user, messageDescription, 'insufficient', '', '', schedule.schedule_ref);
             }
             else{
                 const messageDescription = `Your scheduled payment to ${biller.name} of $${schedule.amount} has been processed.`;
-                await inboxAction.createMessage('System', schedule.related_user, messageDescription, 'schedule', null, null, schedule.schedule_ref);
+                await inboxAction.createMessage('System', schedule.related_user, messageDescription, 'schedule', '', '', schedule.schedule_ref);
                 const billerReference=await billerAction.fetchReferenceNumberByBillerName(schedule.related_user,schedule.biller_name);
                 console.log(schedule.from_account,schedule.biller_name, schedule.biller_code, billerReference!, schedule.amount, schedule.description, schedule.related_user)
                 const account={id:schedule.from_account}
