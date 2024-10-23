@@ -17,8 +17,8 @@ import TrashAccountDetailSheet from '../Accounts/TrashAccountDetailSheet';
 import { boolean } from 'zod';
 // import EditAccountDetailSheet from '../Accounts/EditAccountDetailSheet';
 import PopUp from '../Accounts/PopUp';
-import EditConstantDetailSheet from './Editing Items/EditConstantDetailSheet';
-import TrashConstantDetailSheet from './Deleting Items/TrashConstantDetailSheet';
+import EditConstantDetailSheet from './EditConstantDetailSheet';
+import TrashConstantDetailSheet from './TrashConstantDetailSheet';
 
 // ConstantTable component
 export const ConstantTable = ({ constants = [], setShowUpdatePopUp, setShowDeletePopUp, onEditStatus }: ConstantsTableProps) => {
