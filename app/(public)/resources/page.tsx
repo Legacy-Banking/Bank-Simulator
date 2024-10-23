@@ -47,7 +47,7 @@ const Resources = () => {
             <p className="text-lg lg:text-xl font-medium text-slate-700 mb-6">
               Explore the admin features, including managing user accounts and settings.
             </p>
-            <YouTubeVideo videoUrl="https://www.youtube.com/watch?v=PLACEHOLDER_URL_4" />
+            <YouTubeVideo videoUrl="https://www.youtube.com/watch?v=mpJ4KV8n4Dg" />
           </div>
         )}
       </div>
