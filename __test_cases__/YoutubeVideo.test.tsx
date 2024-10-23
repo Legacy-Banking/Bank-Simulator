@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import YouTubeVideo from '@/components/YouTubeVideo'; // Adjust the import path if needed
+import YouTubeVideo from '@/components/YoutubeVideo';
 import '@testing-library/jest-dom';
 
 describe('YouTubeVideo component', () => {

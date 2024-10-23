@@ -3,7 +3,6 @@ import { referenceNumberGenerator } from '../utils/accbsbGenerator';
 import { bpayAction } from "./bpayAction";
 import { billerAction } from "./billerAction";
 import { transactionAction } from "./transactionAction";
-import { inboxAction } from "./inboxAction";
 
 export enum ScheduleType {
     transfer_schedule = 'transfer_schedule',
@@ -146,7 +145,7 @@ class ScheduleAction {
 
 
     // Unified method to create a schedule entry
-    public async createScheduleEntry(fromAccount: Account, toAccount: Account | null, biller_name: string | null, biller_code: string | null, reference_number: string | null, amount: number, description: string, schedule: Date, user_id:string|null): Promise<string> {
+    public async createScheduleEntry(fromAccount: Account, toAccount: Account | null, biller_name: string | null, biller_code: string | null, reference_number: string | null, amount: number, description: string, schedule: Date): Promise<string> {
         const schedule_ref = referenceNumberGenerator();
     
         let payload: any = {
@@ -156,8 +155,7 @@ class ScheduleAction {
             amount: amount,
             description: description,
             schedule_ref: schedule_ref,
-            schedule_type: this.scheduleType,
-            related_user: user_id 
+            schedule_type: this.scheduleType
         };
 
         // Modify payload based on the schedule type
@@ -166,6 +164,7 @@ class ScheduleAction {
             payload.biller_code = biller_code;
             payload.reference_number = reference_number;
         }
+        console.log(payload);
 
         const { data, error } = await this.supabase.from('schedule_payments').insert([payload]);
 
@@ -241,37 +240,17 @@ class ScheduleAction {
         const { data:toAccount, error:toAccountError } = await this.supabase.from('account').select('*').eq('id', schedule.to_account).single();
         console.log(fromAccount, toAccount);
         if(fromAccount && toAccount){
-            if(fromAccount.balance < schedule.amount){
-                const messageDescription = `Your scheduled payment to ${toAccount} of $${schedule.amount} has not been processed due to insufficient balance.`;
-                await inboxAction.createMessage('System', schedule.related_user, messageDescription, 'insufficient', null, null, schedule.schedule_ref);
-            }
-            else{
-                const messageDescription = `Your scheduled payment to ${toAccount} of $${schedule.amount} has been processed.`;
-                await inboxAction.createMessage('System', schedule.related_user, messageDescription, 'schedule', null, null, schedule.schedule_ref);
-                await transactionAction.createTransaction(fromAccount, toAccount, schedule.amount, schedule.description, "pay anyone");
-                await this.supabase.from('schedule_payments').update({status: 'completed'}).eq('id', schedule.id);
-            }
+            await transactionAction.createTransaction(fromAccount, toAccount, schedule.amount, schedule.description, "pay anyone");
+            await this.supabase.from('schedule_payments').update({status: 'completed'}).eq('id', schedule.id);
         }
         console.log('transaction executed')
     }
     private async executeBpay(schedule: any): Promise<void> {
-        const { data:fromAccount, error:fromAccountError } = await this.supabase.from('account').select('*').eq('id', schedule.from_account).single();
         const { data:biller, error:billerError } = await this.supabase.from('billers').select('*').eq('biller_code', schedule.biller_code).single();
         if(biller){
-            if(fromAccount.balance < schedule.amount){
-                const messageDescription = `Your scheduled payment to ${biller.name} of $${schedule.amount} has not been processed due to insufficient balance.`;
-                await inboxAction.createMessage('System', schedule.related_user, messageDescription, 'insufficient', null, null, schedule.schedule_ref);
-            }
-            else{
-                const messageDescription = `Your scheduled payment to ${biller.name} of $${schedule.amount} has been processed.`;
-                await inboxAction.createMessage('System', schedule.related_user, messageDescription, 'schedule', null, null, schedule.schedule_ref);
-                const billerReference=await billerAction.fetchReferenceNumberByBillerName(schedule.related_user,schedule.biller_name);
-                console.log(schedule.from_account,schedule.biller_name, schedule.biller_code, billerReference!, schedule.amount, schedule.description, schedule.related_user)
-                const account={id:schedule.from_account}
-                await bpayAction.payBills(account,schedule.biller_name, schedule.biller_code, billerReference!, schedule.amount, schedule.description, schedule.related_user);
-                await this.supabase.from('schedule_payments').update({status: 'completed'}).eq('id', schedule.id);
-
-            }
+            const billerReference=await billerAction.fetchReferenceNumberByBillerName(schedule.related_user[0],schedule.biller_name);
+            await bpayAction.payBills(schedule.from_account,schedule.biller_name, schedule.biller_code, billerReference!, schedule.amount, schedule.description, schedule.related_user[0]);
+            await this.supabase.from('schedule_payments').update({status: 'completed'}).eq('id', schedule.id);
         }
     }
     private async executeTransferRecur(schedule: any): Promise<void> {
@@ -322,26 +301,10 @@ class ScheduleAction {
         if (shouldCompleteSchedule) {
             await this.supabase.from('schedule_payments').update({ status: 'completed' }).eq('id', schedule.id);
         } else {
-            await this.supabase.from('schedule_payments').update({ pay_at: this.formatToISOString(next_pay_at), status: 'pending' }).eq('id', schedule.id);
-            
-            // Send recurring message here
-            let recipientInfo = '';
-            
-            if (schedule.schedule_type === ScheduleType.transfer_recur) {
-                const { data: toAccount } = await this.supabase.from('account').select('account_name').eq('id', schedule.to_account).single();
-                recipientInfo = `to ${toAccount.account_name}`;
-            } else if (schedule.schedule_type === ScheduleType.bpay_recur) {
-                const { data: biller } = await this.supabase.from('billers').select('name').eq('biller_code', schedule.biller_code).single();
-                recipientInfo = `to ${biller.name}`;
-            }
-    
-            const messageDescription = `Your next recurring payment of $${schedule.amount} is scheduled for ${next_pay_at.toDateString()} ${recipientInfo}.`;
-            await inboxAction.createMessage('System', schedule.related_user, messageDescription, 'recurring', null, null, schedule.schedule_ref);
+            await this.supabase.from('schedule_payments').update({ pay_at: this.formatToISOString(next_pay_at) ,status:'pending'}).eq('id', schedule.id);
         }
-    
         console.log(`Recurring payment updated for schedule: ${schedule.id}, pay_at updated to: ${next_pay_at}`);
     }
-    
     
     
 
