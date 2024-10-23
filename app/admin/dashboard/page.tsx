@@ -9,6 +9,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation';
 import BankNavbar from '@/components/BankNavbar';
 import { accountAction } from '@/lib/actions/accountAction';
+import CMSPage from '@/components/AdminSide/CMS/CMSPage';
 
 const AdminDashboard = () => {
   const [activePage, setActivePage] = useState('accounts');
@@ -49,6 +50,8 @@ const AdminDashboard = () => {
         return <PresetsPage />;
       case 'create-bill':
         return <CreateBillPage />;
+      case 'content-management-system':
+        return <CMSPage />;
       default:
         return <AccountsPage />;
     }

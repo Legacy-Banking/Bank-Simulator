@@ -129,8 +129,8 @@ export const accountAction = {
     signUpInitialization: async (user_id: string, owner_username: string): Promise<void> => {
 
         // Fetch preset bills and account presets in parallel
-        const [accounts, savedBillers] = await Promise.all([
-            //billAction.fetchPresetBills(),
+        const [presetBills, accounts, savedBillers] = await Promise.all([
+            billAction.fetchPresetBills(),
             accountAction.fetchAccountPresets(user_id, owner_username),
             billerAction.fetchPresetSavedBillers()
         ]);
@@ -149,40 +149,40 @@ export const accountAction = {
 
         // await billerAction.createDefaultSavedBillers(user_id);
 
-        // // Loop through fetched bills and create bills for the user
-        // for (const bill of presetBills) {
-        //     await billAction.createBillForUsers(
-        //         [user_id], // The single user being assigned the bill
-        //         bill.biller, // Biller from the preset bill
-        //         bill.amount, // Amount from the preset bill
-        //         bill.description, // Description from the preset bill
-        //         new Date(bill.due_date), // Due date from the preset bill
-        //         bill.id // Linked bill from the preset bill
-        //     );
+        // Loop through fetched bills and create bills for the user
+        for (const bill of presetBills) {
+            await billAction.createBillForUsers(
+                [user_id], // The single user being assigned the bill
+                bill.biller, // Biller from the preset bill
+                bill.amount, // Amount from the preset bill
+                bill.description, // Description from the preset bill
+                new Date(bill.due_date), // Due date from the preset bill
+                bill.id // Linked bill from the preset bill
+            );
     
-        //     // Now update the assigned_users in the Admin Bill
-        //     // Fetch the current assigned users for the linked bill
-        //     const { assigned_users: currentAssignedUsers } = await billAction.fetchAdminBillById(bill.id);
+            // Now update the assigned_users in the Admin Bill
+            // Fetch the current assigned users for the linked bill
+            const { assigned_users: currentAssignedUsers } = await billAction.fetchAdminBillById(bill.id);
     
-        //     // Create a string with the user details (username|id)
-        //     const newUserAssignment = `${owner_username}|${user_id}`;
+            // Create a string with the user details (username|id)
+            const newUserAssignment = `${owner_username}|${user_id}`;
     
-        //     // If there are already assigned users, split them into an array, otherwise start with an empty array
-        //     const existingUserArray = currentAssignedUsers
-        //         ? currentAssignedUsers.split(",").map((user: string) => user.trim())
-        //         : [];
+            // If there are already assigned users, split them into an array, otherwise start with an empty array
+            const existingUserArray = currentAssignedUsers
+                ? currentAssignedUsers.split(",").map((user: string) => user.trim())
+                : [];
     
-        //     // Add the new user to the list and remove duplicates
-        //     const updatedAssignedUsersArray = [...existingUserArray, newUserAssignment].filter(
-        //         (value, index, self) => self.indexOf(value) === index
-        //     );
+            // Add the new user to the list and remove duplicates
+            const updatedAssignedUsersArray = [...existingUserArray, newUserAssignment].filter(
+                (value, index, self) => self.indexOf(value) === index
+            );
     
-        //     // Join the updated array into a string
-        //     const updatedAssignedUsers = updatedAssignedUsersArray.join(", ");
+            // Join the updated array into a string
+            const updatedAssignedUsers = updatedAssignedUsersArray.join(", ");
     
-        //     // Update the admin bill with the new assigned users list
-        //     await billAction.updateAssignedUsers(bill.id, updatedAssignedUsers);
-        // } 
+            // Update the admin bill with the new assigned users list
+            await billAction.updateAssignedUsers(bill.id, updatedAssignedUsers);
+        } 
 
         // await Promise.all(
         //         presetBills.map(async (bill) => {
