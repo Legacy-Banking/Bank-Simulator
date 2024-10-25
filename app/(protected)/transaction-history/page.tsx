@@ -17,6 +17,7 @@ import 'jspdf-autotable';
 import { startOfMonth, format } from "date-fns"
 import { Calendar as CalendarIcon, X } from "lucide-react"
 import MonthPicker from '@/components/MonthPicker';
+import { Tooltip } from 'react-tooltip';
 
 import { cn } from "@/lib/utils";
 import {
@@ -78,143 +79,143 @@ const TransactionHistoryContent = () => {
           accountAction.fetchUsernamebyUserId(user_id)
             .then((fetchedUsername) => {
               var updatedDummyData: Transaction[] = [];
-          
+
               accountAction.fetchAccountTypebyId(accountId)
-              .then((fetchedType) => {
-                transactionAction.fetchTransactionPresets(accountId, fetchedUsername).then((presetData) => {
-                var combinedData = data;
+                .then((fetchedType) => {
+                  transactionAction.fetchTransactionPresets(accountId, fetchedUsername).then((presetData) => {
+                    var combinedData = data;
 
-                if (fetchedType == 'personal') {
+                    if (fetchedType == 'personal') {
 
-                    setTransactionsPresets(presetData);
-                    combinedData = combinedData.concat(presetData);
-                    
+                      setTransactionsPresets(presetData);
+                      combinedData = combinedData.concat(presetData);
 
 
-                    // updatedDummyData = [
-                    //   {
-                    //     id: "1",
-                    //     description: "Rent Payment",
-                    //     amount: 1200.0,
-                    //     paid_on: new Date("2024-09-16T14:00:00.000Z"),
-                    //     from_account: "",
-                    //     from_account_username: "Jack Smith",
-                    //     to_account: user_id,
-                    //     to_biller: "",
-                    //     to_account_username: fetchedUsername,
-                    //     transaction_type: 'pay anyone',
-                    //   },
-                    //   {
-                    //     id: "2",
-                    //     description: "Food for lunch",
-                    //     amount: 25.50,
-                    //     paid_on: new Date("2024-09-17T09:15:00.000Z"),
-                    //     from_account: "",
-                    //     from_account_username: "Linda Rose",
-                    //     to_account: user_id,
-                    //     to_biller: "",
-                    //     to_account_username: fetchedUsername,
-                    //     transaction_type: 'pay anyone',
-                    //   },
-                    //   {
-                    //     id: "3",
-                    //     description: "| Biller: Gas Service, Code: 1234, Ref: 567834512452",
-                    //     amount: -45.51,
-                    //     paid_on: new Date("2024-09-15T10:00:00.000Z"),
-                    //     from_account: user_id,
-                    //     from_account_username: fetchedUsername,
-                    //     to_account: "",
-                    //     to_biller: "100",
-                    //     to_account_username: "Gas Service",
-                    //     transaction_type: 'bpay',
-                    //   },
-                    //   {
-                    //     id: "4",
-                    //     description: "Funds Transfer to Savings",
-                    //     amount: -100.0,
-                    //     paid_on: new Date("2024-09-15T12:30:00.000Z"),
-                    //     from_account: user_id,
-                    //     from_account_username: fetchedUsername,
-                    //     to_account: "100",
-                    //     to_biller: "",
-                    //     to_account_username: "Jon Doe",
-                    //     transaction_type: 'pay anyone',
-                    //   },
-                    //   {
-                    //     id: "5",
-                    //     description: "| Biller: Internet Service, Code: 8765, Ref: 432132861542",
-                    //     amount: -79.99,
-                    //     paid_on: new Date("2024-09-14T08:45:00.000Z"),
-                    //     from_account: user_id,
-                    //     from_account_username: fetchedUsername,
-                    //     to_account: "",
-                    //     to_biller: "101",
-                    //     to_account_username: "Internet Service",
-                    //     transaction_type: 'bpay',
-                    //   },
-                    // ];
 
-                  } else if (fetchedType == 'credit') {
-                    // updatedDummyData = [
-                    //   {
-                    //     id: "3",
-                    //     description: "| Biller: Gas Service, Code: 1234, Ref: 567834512452",
-                    //     amount: -45.51,
-                    //     paid_on: new Date("2024-09-15T10:00:00.000Z"),
-                    //     from_account: user_id,
-                    //     from_account_username: fetchedUsername,
-                    //     to_account: "",
-                    //     to_biller: "100",
-                    //     to_account_username: "Gas Service",
-                    //     transaction_type: 'bpay',
-                    //   },
-                    //   {
-                    //     id: "4",
-                    //     description: "Funds Transfer to Savings",
-                    //     amount: -100.0,
-                    //     paid_on: new Date("2024-09-15T12:30:00.000Z"),
-                    //     from_account: user_id,
-                    //     from_account_username: fetchedUsername,
-                    //     to_account: "100",
-                    //     to_biller: "",
-                    //     to_account_username: "Jon Doe",
-                    //     transaction_type: 'pay anyone',
-                    //   },
-                    //   {
-                    //     id: "5",
-                    //     description: "| Biller: Internet Service, Code: 8765, Ref: 432132861542",
-                    //     amount: -79.99,
-                    //     paid_on: new Date("2024-09-14T08:45:00.000Z"),
-                    //     from_account: user_id,
-                    //     from_account_username: fetchedUsername,
-                    //     to_account: "",
-                    //     to_biller: "101",
-                    //     to_account_username: "Internet Service",
-                    //     transaction_type: 'bpay',
-                    //   },
-                    // ];
-                    
-                  }
+                      // updatedDummyData = [
+                      //   {
+                      //     id: "1",
+                      //     description: "Rent Payment",
+                      //     amount: 1200.0,
+                      //     paid_on: new Date("2024-09-16T14:00:00.000Z"),
+                      //     from_account: "",
+                      //     from_account_username: "Jack Smith",
+                      //     to_account: user_id,
+                      //     to_biller: "",
+                      //     to_account_username: fetchedUsername,
+                      //     transaction_type: 'pay anyone',
+                      //   },
+                      //   {
+                      //     id: "2",
+                      //     description: "Food for lunch",
+                      //     amount: 25.50,
+                      //     paid_on: new Date("2024-09-17T09:15:00.000Z"),
+                      //     from_account: "",
+                      //     from_account_username: "Linda Rose",
+                      //     to_account: user_id,
+                      //     to_biller: "",
+                      //     to_account_username: fetchedUsername,
+                      //     transaction_type: 'pay anyone',
+                      //   },
+                      //   {
+                      //     id: "3",
+                      //     description: "| Biller: Gas Service, Code: 1234, Ref: 567834512452",
+                      //     amount: -45.51,
+                      //     paid_on: new Date("2024-09-15T10:00:00.000Z"),
+                      //     from_account: user_id,
+                      //     from_account_username: fetchedUsername,
+                      //     to_account: "",
+                      //     to_biller: "100",
+                      //     to_account_username: "Gas Service",
+                      //     transaction_type: 'bpay',
+                      //   },
+                      //   {
+                      //     id: "4",
+                      //     description: "Funds Transfer to Savings",
+                      //     amount: -100.0,
+                      //     paid_on: new Date("2024-09-15T12:30:00.000Z"),
+                      //     from_account: user_id,
+                      //     from_account_username: fetchedUsername,
+                      //     to_account: "100",
+                      //     to_biller: "",
+                      //     to_account_username: "Jon Doe",
+                      //     transaction_type: 'pay anyone',
+                      //   },
+                      //   {
+                      //     id: "5",
+                      //     description: "| Biller: Internet Service, Code: 8765, Ref: 432132861542",
+                      //     amount: -79.99,
+                      //     paid_on: new Date("2024-09-14T08:45:00.000Z"),
+                      //     from_account: user_id,
+                      //     from_account_username: fetchedUsername,
+                      //     to_account: "",
+                      //     to_biller: "101",
+                      //     to_account_username: "Internet Service",
+                      //     transaction_type: 'bpay',
+                      //   },
+                      // ];
 
-                  // Combine fetched transactions with dummy data
+                    } else if (fetchedType == 'credit') {
+                      // updatedDummyData = [
+                      //   {
+                      //     id: "3",
+                      //     description: "| Biller: Gas Service, Code: 1234, Ref: 567834512452",
+                      //     amount: -45.51,
+                      //     paid_on: new Date("2024-09-15T10:00:00.000Z"),
+                      //     from_account: user_id,
+                      //     from_account_username: fetchedUsername,
+                      //     to_account: "",
+                      //     to_biller: "100",
+                      //     to_account_username: "Gas Service",
+                      //     transaction_type: 'bpay',
+                      //   },
+                      //   {
+                      //     id: "4",
+                      //     description: "Funds Transfer to Savings",
+                      //     amount: -100.0,
+                      //     paid_on: new Date("2024-09-15T12:30:00.000Z"),
+                      //     from_account: user_id,
+                      //     from_account_username: fetchedUsername,
+                      //     to_account: "100",
+                      //     to_biller: "",
+                      //     to_account_username: "Jon Doe",
+                      //     transaction_type: 'pay anyone',
+                      //   },
+                      //   {
+                      //     id: "5",
+                      //     description: "| Biller: Internet Service, Code: 8765, Ref: 432132861542",
+                      //     amount: -79.99,
+                      //     paid_on: new Date("2024-09-14T08:45:00.000Z"),
+                      //     from_account: user_id,
+                      //     from_account_username: fetchedUsername,
+                      //     to_account: "",
+                      //     to_biller: "101",
+                      //     to_account_username: "Internet Service",
+                      //     transaction_type: 'bpay',
+                      //   },
+                      // ];
 
-                  combinedData = combinedData.concat(updatedDummyData);
-                  console.log(combinedData);
-                  // Filter transactions by the selected month
-                  if (selectedMonth) {
-                    combinedData = combinedData.filter((transaction) => {
-                      const transactionDate = new Date(transaction.paid_on);
-                      return (
-                        transactionDate.getMonth() === selectedMonth.getMonth() &&
-                        transactionDate.getFullYear() === selectedMonth.getFullYear()
-                      );
-                    });
-                  }
-                  setTransactions(combinedData);
-                  setLoading(false); // Set loading to false after fetching data
+                    }
 
+                    // Combine fetched transactions with dummy data
+
+                    combinedData = combinedData.concat(updatedDummyData);
+                    console.log(combinedData);
+                    // Filter transactions by the selected month
+                    if (selectedMonth) {
+                      combinedData = combinedData.filter((transaction) => {
+                        const transactionDate = new Date(transaction.paid_on);
+                        return (
+                          transactionDate.getMonth() === selectedMonth.getMonth() &&
+                          transactionDate.getFullYear() === selectedMonth.getFullYear()
+                        );
+                      });
+                    }
+                    setTransactions(combinedData);
+                    setLoading(false); // Set loading to false after fetching data
+
+                  });
                 });
-              });
             })
 
             .catch((error) => {
@@ -258,20 +259,20 @@ const TransactionHistoryContent = () => {
 
     const openingBalance = formatAmount(account.opening_balance);
     const currentBalance = isCreditAccount
-    ? formatAmount(account.opening_balance - account.balance) // Credit used is opening balance - current balance
-    : formatAmount(account.balance);
+      ? formatAmount(account.opening_balance - account.balance) // Credit used is opening balance - current balance
+      : formatAmount(account.balance);
 
     doc.text(`Account: ${accountType} Account`, 14, 30);
     doc.text(`${openingBalanceLabel}: ${openingBalance}`, 14, 40);
     doc.text(`${currentBalanceLabel}: ${currentBalance}`, 14, 50);
 
-      // Display selected month if one is chosen
-  if (selectedMonth) {
-    const formattedMonth = format(selectedMonth, "LLLL yyyy");
-    doc.text(`Statement for: ${formattedMonth}`, 14, 60);
-  } else {
-    doc.text(`Statement for: All time`, 14, 60); // Fallback if no month is selected
-  }
+    // Display selected month if one is chosen
+    if (selectedMonth) {
+      const formattedMonth = format(selectedMonth, "LLLL yyyy");
+      doc.text(`Statement for: ${formattedMonth}`, 14, 60);
+    } else {
+      doc.text(`Statement for: All time`, 14, 60); // Fallback if no month is selected
+    }
 
     doc.setFontSize(10);
     const currentDate = new Date();
@@ -354,19 +355,18 @@ const TransactionHistoryContent = () => {
                         id="date"
                         variant={"outline"}
                         className={cn(
-                          "w-[220px] text-base justify-start text-left font-normal bg-white-100 border border-gray-300 hover:bg-gray-100 font-inter", // Ensuring proper button background and border
-                          !selectedMonth && "text-gray-500" // Text contrast when no date is selected
+                          "w-[220px] text-base justify-start text-left font-normal bg-white-100 border border-gray-300 hover:bg-gray-100 font-inter",
+                          !selectedMonth && "text-gray-500"
                         )}
                       >
                         <div className="flex items-center">
-                          <CalendarIcon className="mr-2 h-4 w-4 text-blue-500" /> {/* Ensuring icon visibility */}
+                          <CalendarIcon className="mr-2 h-4 w-4 text-blue-500" />
                           {selectedMonth ? format(selectedMonth, "LLLL yyyy") : <span>Select Month</span>}
                         </div>
-
-                        {selectedMonth && ( // Conditionally render the "X" icon when a month is selected
-                          <div className="ml-auto mt-1"> {/* This ensures the "X" icon is all the way to the right */}
+                        {selectedMonth && (
+                          <div className="ml-auto mt-1">
                             <button
-                              onClick={() => setSelectedMonth(undefined)} // Clear the selected month
+                              onClick={() => setSelectedMonth(undefined)}
                               className="text-gray-500 hover:text-black focus:outline-none"
                               aria-label="Clear month filter"
                             >
@@ -376,24 +376,45 @@ const TransactionHistoryContent = () => {
                         )}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0 bg-white-100 border border-gray-200 shadow-lg"> {/* Adding a solid background and shadow to make it non-transparent */}
+                    <PopoverContent className="w-auto p-0 bg-white-100 border border-gray-200 shadow-lg">
                       <MonthPicker
-                        currentMonth={selectedMonth || new Date()} // Default to current date if undefined
+                        currentMonth={selectedMonth || new Date()}
                         onMonthChange={setSelectedMonth}
                       />
                     </PopoverContent>
                   </Popover>
                 </div>
 
+                {/* Separate Tooltip ID usage for the Download Statement button */}
                 <Button
                   onClick={handleDownloadStatement}
-                  className="ml-auto border font-normal border-gray-300 px-8 text-base bg-white-100 hover:bg-gray-200 text-black" // Text contrast on button and hover effect
+                  className="ml-auto border font-normal border-gray-300 px-8 text-base bg-white-100 hover:bg-gray-200 text-black"
+                  data-tooltip-id="download-tooltip"
                 >
                   Download Statement
                 </Button>
+
+                <Tooltip id="download-tooltip" place="top" className="max-w-sm text-sm bg-gray-800 text-white p-2 rounded shadow-lg z-50">
+                  <p>Try this if you want to keep track of your transactions in a given time! Real banks usually keep track of up to two years of records.</p>
+                </Tooltip>
               </div>
 
+
+
+              {/* Add Tooltip to the Download Statement button */}
+              <Tooltip content="Try this if you want to keep track of your transactions in a given time! Real banks usually keep track of up to two years of records.">
+                <Button
+                  onClick={handleDownloadStatement}
+                  className="ml-auto border font-normal border-gray-300 px-8 text-base bg-white-100 hover:bg-gray-200 text-black"
+                >
+                  Download Statement
+                </Button>
+              </Tooltip>
+
+
             </div>
+
+
 
             <section className="flex w-full flex-col gap-6">
               <TransactionsTable transactions={currentTransactions} />
@@ -406,7 +427,7 @@ const TransactionHistoryContent = () => {
           </>
         )}
       </div>
-    </section>
+    </section >
   );
 };
 
