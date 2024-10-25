@@ -10,6 +10,7 @@ const customJestConfig = {
   moduleNameMapper: {
     '^@/components/(.*)$': '<rootDir>/components/$1',
     '^@/pages/(.*)$': '<rootDir>/pages/$1',
+    '^@/(.*)$': '<rootDir>/$1', // Resolve "@" alias
   },
   testEnvironment: 'jest-environment-jsdom',
 }

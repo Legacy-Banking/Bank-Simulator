@@ -9,7 +9,7 @@ export const revalidate = 60
 
 export default async function Home() {
   const contentEmbeddings = await contentAction.fetchEmbedding('home');
-  return (
+  return ( 
     <RootLayout>
       <div className="flex flex-col min-h-screen items-center bg-white-100">
         <div className="flex w-full m-12 px-12 justify-center items-center bg-white-100 2xl:px-40 3xl:px-72 3xl:m-20">
