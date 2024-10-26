@@ -159,6 +159,45 @@ const TrashUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status,
       updateAdminBills(ownerUsername, ownerId);
 
 
+      // Schedule payments
+
+      // From [related user]
+      const { data: fromSchedulePaymentData, error: fromSchedulePaymentError } = await supabase
+      .from('schedule_payments') // Replace with your fromSchedulePayments table name
+      .delete()
+      .eq('related_user', ownerId); // Match by ownerId
+
+      if (fromSchedulePaymentError) {
+        throw new Error(`Error deleting From Scheduled Payment: ${fromSchedulePaymentError.message}`);
+      } else {
+        console.log('From Schedule Payment deleted:', fromSchedulePaymentData);
+      }
+
+      // To
+      // const { data: toSchedulePaymentData, error: toSchedulePaymentError } = await supabase
+      // .from('schedule_payments') // Replace with your toSchedulePayments table name
+      // .delete()
+      // .eq('to_account', ownerId); // Match by ownerId
+
+      // if (toSchedulePaymentError) {
+      //   throw new Error(`Error deleting To Scheduled Payment: ${toSchedulePaymentError.message}`);
+      // } else {
+      //   console.log('To Schedule Payment deleted:', toSchedulePaymentData);
+      // }
+
+      // Delete Admin User
+      const { data: adminUserData, error: adminUserError } = await supabase
+      .from('admin_users') // Replace with your adminUsers table name
+      .delete()
+      .eq('id', ownerId); // Match by ownerId
+
+      if (adminUserError) {
+        throw new Error(`Error deleting Admin User: ${adminUserError.message}`);
+      } else {
+        console.log('Admin User deleted:', adminUserData);
+      }
+
+
       // Delete from supabase [hard delete]
       const supabaseAdmin = serviceRoleClient();
       const { data, error } = await supabaseAdmin.auth.admin.deleteUser(ownerId!);
@@ -171,11 +210,6 @@ const TrashUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status,
         console.log('User deleted:', data);
       }
 
-      // Schedule payments
-        // #############################
-        // #############################
-        // #############################
-        // #############################
       // Call parent function or refresh data after deletion
       deleteUser(); // Assuming you have a function to refresh the data
     } catch (error: unknown) {

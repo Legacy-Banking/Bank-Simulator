@@ -260,7 +260,7 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
                         {userRole === 'admin' && (
                             <li className='font-inter text-left'>
                                 <Link
-                                    href="/admin"
+                                    href="/admin/dashboard"
                                     className='block px-10 py-4 hover:text-blue-25 hover:underline underline-blue-25'
                                     onClick={handleLinkClick}
                                 >
