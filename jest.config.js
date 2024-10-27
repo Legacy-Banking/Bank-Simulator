@@ -10,6 +10,8 @@ const customJestConfig = {
   moduleNameMapper: {
     '^@/components/(.*)$': '<rootDir>/components/$1',
     '^@/pages/(.*)$': '<rootDir>/pages/$1',
+    '^@/(.*)$': '<rootDir>/$1', // Resolve "@" alias
+    '\\.(jpg|jpeg|png|gif|webp|svg)$': '<rootDir>/__mocks__/fileMock.js', 
   },
   testEnvironment: 'jest-environment-jsdom',
 }
