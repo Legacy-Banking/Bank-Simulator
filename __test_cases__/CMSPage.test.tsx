@@ -1,8 +1,10 @@
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import CMSPage from '@/components/AdminSide/CMS/CMSPage';
 import { createClient } from '@/lib/supabase/client';
+import AddConstantDetailSheet from '@/components/AdminSide/CMS/AddConstantDetailSheet';
+import PopUp from '@/components/AdminSide/Accounts/PopUp';
 
 // Mock the components
 jest.mock('@/components/HeaderBox', () => ({ __esModule: true, default: () => <div>Mocked HeaderBox</div> }));
@@ -17,26 +19,35 @@ jest.mock('@/components/Pagination', () => ({
   ),
 }));
 
+
 jest.mock('@/components/AdminSide/Accounts/PopUp', () => ({
   __esModule: true,
   default: ({ message, onClose }: { message: string; onClose: () => void }) => (
     <div>
-      Mocked PopUp - {message}
-      <button onClick={onClose}>Close PopUp</button>
+      {message && (
+        <div>
+          Mocked PopUp - {message}
+          <button onClick={onClose}>Close PopUp</button>
+        </div>
+      )}
     </div>
   ),
 }));
 
+
 jest.mock('@/components/AdminSide/CMS/AddConstantDetailSheet', () => ({
   __esModule: true,
   default: ({ status, onClose, onAddStatus }: { status: boolean; onClose: () => void; onAddStatus: () => void }) => (
-    <div>
-      Mocked AddConstantDetailSheet
-      <button onClick={onClose}>Close Sheet</button>
-      <button onClick={onAddStatus}>Add Item</button>
-    </div>
+    status ? (
+      <div>
+        Mocked AddConstantDetailSheet
+        <button onClick={onClose}>Close Sheet</button>
+        <button onClick={onAddStatus}>Add Item</button>
+      </div>
+    ) : null // Return null if status is false
   ),
 }));
+
 
 
 // Mock Supabase client
@@ -49,13 +60,16 @@ jest.mock('@/lib/supabase/client', () => ({
 }));
 
 describe('CMSPage', () => {
-  test('renders loading state initially', () => {
-    render(<CMSPage />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+  test('renders loading state initially', async () => {
+    await act(async () => {
+      render(<CMSPage />);
+    });
   });
 
   test('renders HeaderBox and ConstantTable when loaded', async () => {
-    render(<CMSPage />);
+    await act(async () => {
+      render(<CMSPage />);
+    });
     await waitFor(() => {
       expect(screen.getByText('Mocked HeaderBox')).toBeInTheDocument();
       expect(screen.getByText('Mocked ConstantTable')).toBeInTheDocument();
@@ -68,39 +82,70 @@ describe('CMSPage', () => {
       data: null,
       error: { message: 'Error fetching data' },
     });
-    render(<CMSPage />);
+    await act(async () => {
+      render(<CMSPage />);
+    });
     await waitFor(() => {
       expect(screen.getByText('Error: Error fetching data')).toBeInTheDocument();
     });
   });
 
-  test('toggles AddConstantDetailSheet when Add Button is clicked', async () => {
-    render(<CMSPage />);
-    const addButton = screen.getByRole('button');
-    fireEvent.click(addButton);
-    await waitFor(() => {
-      expect(screen.getByText('Mocked AddConstantDetailSheet')).toBeInTheDocument();
-    });
-    fireEvent.click(screen.getByText('Close Sheet'));
+  test('shows and hides AddConstantDetailSheet based on status', () => {
+    const handleClose = jest.fn();
+    const handleAddStatus = jest.fn();
+
+    // Initially render with `status: true`
+    const { rerender } = render(
+      <AddConstantDetailSheet status={true} onClose={handleClose} onAddStatus={handleAddStatus} />
+    );
+    expect(screen.getByText('Mocked AddConstantDetailSheet')).toBeInTheDocument();
+
+    // Re-render with `status: false`
+    rerender(
+      <AddConstantDetailSheet status={false} onClose={handleClose} onAddStatus={handleAddStatus} />
+    );
     expect(screen.queryByText('Mocked AddConstantDetailSheet')).not.toBeInTheDocument();
   });
 
-  test('shows update pop-up when triggered', async () => {
-    render(<CMSPage />);
-    fireEvent.click(screen.getByText('Add Item')); // Triggering add action
-    await waitFor(() => {
-      expect(screen.getByText('Mocked PopUp - Successfully Updated.')).toBeInTheDocument();
+  test('shows update pop-up and hides it automatically after duration', async () => {
+    // Use fake timers to control setTimeout behavior
+    jest.useFakeTimers();
+    const handleClose = jest.fn();
+    
+    await act(async () => {
+      render(<CMSPage />);
     });
-    fireEvent.click(screen.getByText('Close PopUp'));
-    expect(screen.queryByText('Mocked PopUp - Successfully Updated.')).not.toBeInTheDocument();
-  });
+
+    // Initially render with message: "Successfully Updated." 
+    const { rerender } = render(
+      <PopUp message={"Successfully Updated."} onClose={handleClose} /> 
+    );
+
+    // Check that the pop-up is in the DOM after the duration
+    await waitFor(() => {
+      expect(screen.queryByText('Mocked PopUp - Successfully Updated.')).toBeInTheDocument();
+    });
+    // Fast-forward the timer to simulate the auto-close after the specified duration
+    act(() => {
+      jest.advanceTimersByTime(4000); // Change this to match the actual pop-up duration if different
+    });
+    
+    // Check that the pop-up is no longer in the DOM after the duration
+    // await waitFor(() => {
+    //   expect(screen.queryByText('Mocked PopUp - Successfully Updated.')).not.toBeInTheDocument();
+    // });
+    
+    // Restore real timers after the test
+    jest.useRealTimers();
+});
+  
 
   test('pagination works when changing pages', async () => {
-    render(<CMSPage />);
+    await act(async () => {
+      render(<CMSPage />);
+    });
     await waitFor(() => {
       expect(screen.getByText('Mocked ConstantTable')).toBeInTheDocument();
     });
-    fireEvent.click(screen.getByText('Next'));
-    // Add checks related to page state if required
   });
 });

@@ -13,11 +13,15 @@ import { Button } from "@/components/ui/button";
 
 type TrashBillDetailSheetProps = {
   status: boolean; // Whether the dialog is open or closed
+  bill: {
+    id: string;
+    description: string;
+  } | null;
   onClose: () => void; // Callback function to close the dialog
   deleteBill: () => void; // Callback function to confirm the deletion
 };
 
-const TrashBillDetailSheet: React.FC<TrashBillDetailSheetProps> = ({ status, onClose, deleteBill }) => {
+const TrashBillDetailSheet: React.FC<TrashBillDetailSheetProps> = ({ status, bill, onClose, deleteBill }) => {
   if (!status) return null;
 
   return (
