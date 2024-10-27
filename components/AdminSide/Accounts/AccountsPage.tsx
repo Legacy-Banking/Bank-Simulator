@@ -6,12 +6,14 @@ import { UsersTable } from './UsersTable';
 import { Pagination } from '@/components/Pagination';
 import PopUp from './PopUp';
 import HeaderBox from '@/components/HeaderBox';
+import { userAction } from '@/lib/actions/userAction';
 
 const UsersPage = () => {
   const [accounts, setUsers] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [usersTest, setUserss] = useState<User[]>([]);
   // Search Bar
   const [inputValue, setInputValue] = useState('');
 
@@ -48,7 +50,8 @@ const UsersPage = () => {
   const supabase = createClient();
   const fetchUsers = async () => {
     const { data, error } = await supabase.from('account').select('*');
-
+    const testUsers = await userAction.listOldUsers();
+    setUserss(testUsers);
     if (error) {
       setError(error.message);
     } else {
@@ -117,6 +120,31 @@ const UsersPage = () => {
           onClose={() => setShowDeletePopUp(false)}
         />
       )}
+    <div className="bg-slate-400">
+     
+      {usersTest.map(user => {
+        // Find the account associated with this user by matching user_id with owner in accounts
+        const userAccount = accounts.find(account => account.owner === user.user_id);
+
+        return (
+          <option key={user.user_id} value={user.user_id}>
+            {userAccount ? (
+              <>
+                {userAccount.owner_username} - {user.last_sign_in_at}
+              </>
+            ) : (
+              <>
+                No account found for {user.user_id}
+              </>
+            )}
+          </option>
+        );
+      })}
+    </div>
+
+
+
+
     </div>
     </section>
   )

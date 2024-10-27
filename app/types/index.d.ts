@@ -157,6 +157,7 @@ declare interface SavedBiller {
 
 declare interface User {
   user_id: string;
+  last_sign_in_at: string | null;
 }
 
 declare interface Message {
