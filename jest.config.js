@@ -12,8 +12,14 @@ const customJestConfig = {
     '^@/pages/(.*)$': '<rootDir>/pages/$1',
     '^@/(.*)$': '<rootDir>/$1', // Resolve "@" alias
     '\\.(jpg|jpeg|png|gif|webp|svg)$': '<rootDir>/__mocks__/fileMock.js', 
+    "^query-string$": "<rootDir>/__mocks__/query-string.js",
+    '^@/lib/supabase/client$': '<rootDir>/__mocks__/supabaseClient.js',
   },
   testEnvironment: 'jest-environment-jsdom',
+  transformIgnorePatterns: [
+    "node_modules/(?!query-string)"  // Exclude query-string from ignored node_modules
+  ],
+  moduleFileExtensions: ['js', 'mjs', 'cjs', 'jsx', 'ts', 'tsx', 'json', 'node'],
 }
 
 module.exports = createJestConfig(customJestConfig)

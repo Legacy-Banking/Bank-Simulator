@@ -56,10 +56,10 @@ const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, onClose, o
 
     return (
         <Dialog open={!!bill} onOpenChange={onClose}>
-            <DialogContent className="bg-white-100 p-6 w-full max-w-4xl max-h-[88vh] overflow-auto shadow-lg">
+            <DialogContent data-testid="admin-bill-details-dialog" className="bg-white-100 p-6 w-full max-w-4xl max-h-[88vh] overflow-auto shadow-lg">
                 <DialogHeader>
-                    <DialogTitle className="text-2xl font-semibold">Admin Bill Details</DialogTitle>
-                    <DialogDescription className="text-base text-gray-500">
+                    <DialogTitle data-testid="dialog-title" className="text-2xl font-semibold">Admin Bill Details</DialogTitle>
+                    <DialogDescription data-testid="dialog-description" className="text-base text-gray-500">
                         Detailed information about the selected bill.
                     </DialogDescription>
                 </DialogHeader>
@@ -67,6 +67,7 @@ const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, onClose, o
                 <div className="absolute top-8 right-8 flex items-center mt-4">
                             <span className="mr-2 text-sm font-medium">Preset Status:</span>
                             <Switch
+                                data-testid="preset-status-switch"
                                 checked={presetStatus}
                                 onCheckedChange={handlePresetStatusChange}
                                 className={`ml-2 ${presetStatus ? 'bg-blue-200' : 'bg-gray-300'}`}
@@ -75,14 +76,14 @@ const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, onClose, o
 
                 {/* Bill details on the left */}
                 <div className="flex flex-col lg:flex-row gap-4 mt-4">
-                    <div className="lg:w-[60%]">
+                    <div data-testid="bill-details-section" className="lg:w-[60%]">
                         <SheetDetails bill={bill} biller={bill.biller}/>
                     </div>
 
                     {/* Assigned users and status on the right */}
                     <div className="lg:w-[50%] bg-white border border-gray-200 rounded-lg p-3 max-h-[540px] overflow-y-auto">
 
-                        <Table>
+                        <Table data-testid="assigned-users-table">
                             <TableHeader className="bg-blue-200">
                                 <TableRow>
                                     <TableHead className="p-2 text-base text-white-200 text-center rounded-tl-2xl">Assigned Users</TableHead>
@@ -90,9 +91,21 @@ const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, onClose, o
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {!loading && assignedUsersDetails.length > 0 ? (
+                                {loading ? (
+                                    <TableRow>
+                                        <TableCell colSpan={2} data-testid="assigned-users-message" className="text-center p-4">
+                                            Loading assigned users...
+                                        </TableCell>
+                                    </TableRow>
+                                ) : assignedUsersDetails.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={2} data-testid="assigned-users-message" className="text-center p-4">
+                                            No users assigned.
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
                                     assignedUsersDetails.map((user, index) => (
-                                        <TableRow key={index} className="bg-white rounded-lg shadow-sm mb-2">
+                                        <TableRow key={index} data-testid="assigned-user-row" className="bg-white rounded-lg shadow-sm mb-2">
                                             <TableCell className="p-3">
                                                 <div className="flex text-sm items-center">
                                                     {user.name}
@@ -103,14 +116,9 @@ const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, onClose, o
                                             </TableCell>
                                         </TableRow>
                                     ))
-                                ) : (
-                                    <TableRow>
-                                        <TableCell colSpan={2} className="text-center p-4">
-                                            {loading ? 'Loading assigned users...' : 'No users assigned.'}
-                                        </TableCell>
-                                    </TableRow>
                                 )}
                             </TableBody>
+
                         </Table>
                     </div>
                 </div>
