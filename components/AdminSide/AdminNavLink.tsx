@@ -14,7 +14,9 @@ const AdminNavLink = ({ href, activePage, page, setActivePage, children }: { hre
       };
     
       return (
-        <li className={style} onClick={handleClick}>
+        <li 
+        data-testid={page+'-admin-link-button'}
+        className={style} onClick={handleClick}>
           {href ? (
             <Link href={href}>{children}</Link>
           ) : (

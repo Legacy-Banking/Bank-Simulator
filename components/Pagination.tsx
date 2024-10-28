@@ -26,7 +26,9 @@ export const Pagination = ({ page, totalPages, setPage }: PaginationProps) => {
   };
 
   return (
-    <div className="flex justify-between gap-3">
+    <div 
+    data-testid={'pagination'}
+    className="flex justify-between gap-3">
       <Button
         size="lg"
         variant="ghost"
@@ -47,6 +49,7 @@ export const Pagination = ({ page, totalPages, setPage }: PaginationProps) => {
         {page} / {totalPages}
       </p>
       <Button
+        data-testid={'pagination-next'}
         size="lg"
         variant="ghost"
         className="p-0 hover:bg-transparent"

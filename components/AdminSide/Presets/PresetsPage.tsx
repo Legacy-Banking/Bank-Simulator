@@ -20,12 +20,12 @@ import AddAccountPresetDetailSheet from './Inserting Items/AddAccountPresetDetai
 import AddTransactionPresetDetailSheet from './Inserting Items/AddTransactionPresetDetailSheet';
 import HeaderBox from '@/components/HeaderBox';
 
-const PresetsPage = () => {
+const PresetsPage = ({initialLoading = true}) => {
   const [accountTypes, setAccountTypes] = useState<AccountPresetType[]>([]);
   const [transactionPresets, setTransactionPresets] = useState<TransactionPresetType[]>([]);
   const [billers, setBillers] = useState<Biller[]>([]);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(initialLoading);
   const [error, setError] = useState<string | null>(null);
 
   const [activeTable, setActiveTable] = useState('Accounts');
@@ -233,11 +233,13 @@ const PresetsPage = () => {
     );
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <p data-testid={'loading-message'}>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <section className="flex w-full flex-row max-xl:max-h-screen font-inter">
+    <section 
+    data-testid={'presets-page'}
+    className="flex w-full flex-row max-xl:max-h-screen font-inter">
       <div className="flex w-full flex-1 flex-col gap-8 px-4 py-6 lg:py-12 lg:px-10 xl:px-20 2xl:px-32 xl:max-h-screen">
         <header className="home-header border-b pb-10">
           <HeaderBox
@@ -255,7 +257,9 @@ const PresetsPage = () => {
                 <PresetOption name="Transaction" activeTable={activeTable} setActiveTable={setActiveTable} />
                 <PresetOption name="Billers" activeTable={activeTable} setActiveTable={setActiveTable} />
               </div>
-              <AddButton onClick={toggleAddItemDetailSheet}></AddButton>
+              <AddButton  
+                onClick={toggleAddItemDetailSheet}>
+              </AddButton>
             </div>
             <section className="flex w-full flex-col mt-6 bg-white-100 rounded-b-3xl">
               {renderActiveTable()}
@@ -282,7 +286,7 @@ const PresetsPage = () => {
       />
 
       {showUpdatePopUp && (
-        <PopUp message="Successfully Updated.." onClose={() => setShowUpdatePopUp(false)} />
+        <PopUp data-testid={'add-popup'} message="Successfully Updated.." onClose={() => setShowUpdatePopUp(false)} />
       )}
       {showDeletePopUp && (
         <PopUp message="Successfully Deleted.." onClose={() => setShowDeletePopUp(false)} />

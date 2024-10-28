@@ -87,7 +87,9 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
 
     return (
         <>
-            <nav className="flexBetween navbar relative z-10 bg-white-200 text-black shadow-md">
+            <nav
+            data-testid={'bank-navbar'} 
+            className="flexBetween navbar relative z-10 bg-white-200 text-black shadow-md">
                 <div className='flex-1 flexStart gap-12'>
                     <Link href="/" className="flex items-center gap-0.5" onClick={handleLinkClick}>
                         <Image className='w-9 h-9 sm:w-12 sm:h-12'
