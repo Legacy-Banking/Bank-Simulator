@@ -7,6 +7,7 @@ interface AddButtonProps {
 const AddButton: React.FC<AddButtonProps> = ({ onClick }) => {
   return (
     <button
+    data-testid={'add-button'}
       onClick={onClick}
       aria-label="Add Button"
       className="flex h-3/4 w-44 items-center justify-start bg-blue-200 text-white-100 px-4 rounded-lg shadow-md hover:bg-blue-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
