@@ -172,38 +172,46 @@ export const transactionAction = {
     
     },
 
-    fetchTransactionPresets: async (accountId: string, accountUsername: string): Promise<Transaction[]> => {
-
+    fetchTransactionPresets: async (): Promise<Transaction[]> => {
         const supabase = createClient();
-
+    
+        // Fetching transaction presets from the 'transaction_presets' table
         const { data, error } = await supabase
             .from('transaction_presets')
-            .select('*')
-            
+            .select('*');
+    
         if (error) {
             console.error('Error fetching transaction presets:', error);
             throw error;
         }
+    
+        // Ensuring data is defined to avoid runtime errors
+        if (!data) {
+            console.warn('No transaction presets found.');
+            return [];
+        }
+    
         const transactions = data as TransactionPresetType[];
-        // Assuming `fetchedTransactions` is the result of fetching from the database
+    
+        // Transforming the fetched transactions into the desired structure
         const transformedData = transactions.map(transaction => {
             const isPayingRecipient = transaction.amount < 0;
             
             return {
-            id: transaction.recipient + transaction.id,
-            description: "Some description", // Add logic to build the description
-            amount: transaction.amount,
-            paid_on: transaction.date_issued,
-            from_account: isPayingRecipient ? accountId : "default",
-            from_account_username: isPayingRecipient ? accountUsername : transaction.recipient,
-            to_account: isPayingRecipient ? "default" : accountId,
-            to_account_username: isPayingRecipient ? transaction.recipient: accountUsername,
-            transaction_type: 'pay anyone', // Adjust this based on your logic
+                id: `${transaction.id}-${transaction.recipient}`, // Ensure unique ID format
+                description: "A 'Preset Transaction' set by your instructor.",
+                amount: transaction.amount,
+                paid_on: transaction.date_issued,
+                from_account: isPayingRecipient ? 'user' : 'default', // Replace with actual logic if needed
+                from_account_username: isPayingRecipient ? 'user' : transaction.recipient,
+                to_account: isPayingRecipient ? 'default' : 'user',
+                to_account_username: isPayingRecipient ? transaction.recipient : 'user',
+                transaction_type: 'pay anyone', // Adjust based on your requirements
             };
         });
-        
+    
         return transformedData as Transaction[];
-    },
+    },    
 
     fetchTotalTransactionAmount : async (): Promise<number> => {
         const supabase = createClient();

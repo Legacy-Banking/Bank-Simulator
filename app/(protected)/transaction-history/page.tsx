@@ -40,7 +40,6 @@ const TransactionHistoryContent = () => {
   const rowsPerPage = 10;
 
   const [selectedMonth, setSelectedMonth] = useState<Date | undefined>(undefined);
-  const [transactionPresets, setTransactionsPresets] = useState<Transaction[]>([]);
 
   // Inside the main component
   useEffect(() => {
@@ -65,10 +64,10 @@ const TransactionHistoryContent = () => {
       accountAction.fetchAccountById(accountId)
         .then((data) => {
           setAccount(data);
-
         })
         .catch((error) => {
           console.error('Error fetching account:', error);
+          return;
         });
 
       // Fetch transactions for the account
@@ -81,125 +80,17 @@ const TransactionHistoryContent = () => {
           
               accountAction.fetchAccountTypebyId(accountId)
               .then((fetchedType) => {
-                transactionAction.fetchTransactionPresets(accountId, fetchedUsername).then((presetData) => {
                 var combinedData = data;
 
                 if (fetchedType == 'personal') {
 
-                    setTransactionsPresets(presetData);
-                    combinedData = combinedData.concat(presetData);
-                    
-
-
-                    // updatedDummyData = [
-                    //   {
-                    //     id: "1",
-                    //     description: "Rent Payment",
-                    //     amount: 1200.0,
-                    //     paid_on: new Date("2024-09-16T14:00:00.000Z"),
-                    //     from_account: "",
-                    //     from_account_username: "Jack Smith",
-                    //     to_account: user_id,
-                    //     to_biller: "",
-                    //     to_account_username: fetchedUsername,
-                    //     transaction_type: 'pay anyone',
-                    //   },
-                    //   {
-                    //     id: "2",
-                    //     description: "Food for lunch",
-                    //     amount: 25.50,
-                    //     paid_on: new Date("2024-09-17T09:15:00.000Z"),
-                    //     from_account: "",
-                    //     from_account_username: "Linda Rose",
-                    //     to_account: user_id,
-                    //     to_biller: "",
-                    //     to_account_username: fetchedUsername,
-                    //     transaction_type: 'pay anyone',
-                    //   },
-                    //   {
-                    //     id: "3",
-                    //     description: "| Biller: Gas Service, Code: 1234, Ref: 567834512452",
-                    //     amount: -45.51,
-                    //     paid_on: new Date("2024-09-15T10:00:00.000Z"),
-                    //     from_account: user_id,
-                    //     from_account_username: fetchedUsername,
-                    //     to_account: "",
-                    //     to_biller: "100",
-                    //     to_account_username: "Gas Service",
-                    //     transaction_type: 'bpay',
-                    //   },
-                    //   {
-                    //     id: "4",
-                    //     description: "Funds Transfer to Savings",
-                    //     amount: -100.0,
-                    //     paid_on: new Date("2024-09-15T12:30:00.000Z"),
-                    //     from_account: user_id,
-                    //     from_account_username: fetchedUsername,
-                    //     to_account: "100",
-                    //     to_biller: "",
-                    //     to_account_username: "Jon Doe",
-                    //     transaction_type: 'pay anyone',
-                    //   },
-                    //   {
-                    //     id: "5",
-                    //     description: "| Biller: Internet Service, Code: 8765, Ref: 432132861542",
-                    //     amount: -79.99,
-                    //     paid_on: new Date("2024-09-14T08:45:00.000Z"),
-                    //     from_account: user_id,
-                    //     from_account_username: fetchedUsername,
-                    //     to_account: "",
-                    //     to_biller: "101",
-                    //     to_account_username: "Internet Service",
-                    //     transaction_type: 'bpay',
-                    //   },
-                    // ];
-
                   } else if (fetchedType == 'credit') {
-                    // updatedDummyData = [
-                    //   {
-                    //     id: "3",
-                    //     description: "| Biller: Gas Service, Code: 1234, Ref: 567834512452",
-                    //     amount: -45.51,
-                    //     paid_on: new Date("2024-09-15T10:00:00.000Z"),
-                    //     from_account: user_id,
-                    //     from_account_username: fetchedUsername,
-                    //     to_account: "",
-                    //     to_biller: "100",
-                    //     to_account_username: "Gas Service",
-                    //     transaction_type: 'bpay',
-                    //   },
-                    //   {
-                    //     id: "4",
-                    //     description: "Funds Transfer to Savings",
-                    //     amount: -100.0,
-                    //     paid_on: new Date("2024-09-15T12:30:00.000Z"),
-                    //     from_account: user_id,
-                    //     from_account_username: fetchedUsername,
-                    //     to_account: "100",
-                    //     to_biller: "",
-                    //     to_account_username: "Jon Doe",
-                    //     transaction_type: 'pay anyone',
-                    //   },
-                    //   {
-                    //     id: "5",
-                    //     description: "| Biller: Internet Service, Code: 8765, Ref: 432132861542",
-                    //     amount: -79.99,
-                    //     paid_on: new Date("2024-09-14T08:45:00.000Z"),
-                    //     from_account: user_id,
-                    //     from_account_username: fetchedUsername,
-                    //     to_account: "",
-                    //     to_biller: "101",
-                    //     to_account_username: "Internet Service",
-                    //     transaction_type: 'bpay',
-                    //   },
-                    // ];
                     
                   }
 
                   // Combine fetched transactions with dummy data
 
                   combinedData = combinedData.concat(updatedDummyData);
-                  console.log(combinedData);
                   // Filter transactions by the selected month
                   if (selectedMonth) {
                     combinedData = combinedData.filter((transaction) => {
@@ -221,11 +112,6 @@ const TransactionHistoryContent = () => {
               console.error('Error fetching username:', error);
               setLoading(false);
             });
-        })
-        .catch((error) => {
-          console.error('Error fetching transactions:', error);
-          setLoading(false);
-        });
 
       setPage(pageFromUrl);
     }
