@@ -4,7 +4,7 @@ import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@
 import { Button } from '@/components/ui/button';
 import { formatAmount } from "@/lib/utils";
 import { ChevronUp, ChevronDown, ChevronsUpDown, Trash2Icon, UserPlus, UserMinus } from 'lucide-react';
-import TrashBillDetailSheet from './TrashBillDetialSheet';
+import TrashBillDetailSheet from './TrashBillDetailSheet';
 import AssignUserSheet from './AssignUserSheet';
 import UnassignUserSheet from './UnassignUserSheet';
 import AdminBillDetailSheet from './AdminBillSheet';
@@ -30,6 +30,12 @@ const AdminBillsTable = ({
   const [isUnassignSheetOpen, setIsUnassignSheetOpen] = useState(false);
   const [selectedBill, setSelectedBill] = useState<AdminBillWithBiller | null>(null);
   const [isAdminBillSheetOpen, setIsAdminBillSheetOpen] = useState(false);
+
+  // Filtered bill data to pass to TrashBillDetailSheet
+const filteredBill = selectedBill ? { 
+  id: selectedBill.id, 
+  description: selectedBill.description 
+} : null;
 
   // Function to open the admin bill details popup
   const openBillDetails = (bill: AdminBillWithBiller) => {
@@ -309,6 +315,7 @@ const AdminBillsTable = ({
       {/* Delete Confirmation Dialog */}
       <TrashBillDetailSheet
         status={showDeleteDialog}
+        bill={filteredBill}
         onClose={() => setShowDeleteDialog(false)}
         deleteBill={handleDelete}
       />

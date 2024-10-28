@@ -105,11 +105,13 @@ const AddAccountPresetDetailSheet: React.FC<AccountPresetDetailSheetProps> = ({ 
 
   return (
     <Dialog open={!!status} onOpenChange={onClose}>
-      <DialogContent className="bg-white-100 p-6">
+      <DialogContent className="bg-white-100 p-6" aria-description='account detail sheet'>
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold font-inter mb-3">Add Account Preset</DialogTitle>
         </DialogHeader>
-        <form className="flex flex-col w-full rounded-md text-[#344054]">
+        <form
+        data-testid={'add-preset-detail-sheet'}
+        className="flex flex-col w-full rounded-md text-[#344054]">
           <label className="">Account Type</label>
           <select
             className='rounded-md px-3 py-2 mt-2 border mb-6 outline-1 outline-blue-25 placeholder-gray-400 text-base drop-shadow-sm '

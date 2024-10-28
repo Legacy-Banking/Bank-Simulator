@@ -42,7 +42,7 @@ const CardSidebar: React.FC<CardSidebarProps> = ({ owner }) => {
       <h2 className="text-lg font-semibold mb-4">Your Cards</h2>
       {loading ? (
         <div className="flex items-center justify-center">
-          <div className="spinner"></div>
+          <div className="spinner" role="status"></div>
         </div>
       ) : (
         <div className="flex flex-col gap-6">

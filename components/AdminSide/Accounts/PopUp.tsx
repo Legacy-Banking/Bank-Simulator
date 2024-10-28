@@ -18,7 +18,9 @@ const PopUp: React.FC<PopUpProps> = ({ message, duration = 4000, onClose }) => {
   }, [duration, onClose]);
 
   return (
-    <div className="fixed bottom-4 left-4 bg-green-300 text-white px-6 py-3 rounded-md shadow-lg flex items-center">
+    <div
+    data-testid={message} 
+    className="fixed bottom-4 left-4 bg-green-300 text-white px-6 py-3 rounded-md shadow-lg flex items-center">
       <span>{message}</span>
     </div>
   );

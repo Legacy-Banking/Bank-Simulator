@@ -95,7 +95,9 @@ const AddTransactionPresetDetailSheet: React.FC<TransactionPresetDetailSheetProp
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold font-inter mb-3">Add Transaction Preset</DialogTitle>
         </DialogHeader>
-        <form className="flex flex-col w-full rounded-md text-[#344054]">
+        <form 
+        data-testid={'add-preset-detail-sheet'}
+        className="flex flex-col w-full rounded-md text-[#344054]">
           <label className="">Recipient</label>
           <input
             className="rounded-md px-3 py-2 mt-2 border mb-5 outline-1 outline-blue-25 text-base drop-shadow-sm read-only:bg-gray-100"

@@ -35,6 +35,8 @@ export const InboxTable = ({ messages = [] }: InboxTableProps) => {
                 return '/insufficient.png';
             case 'schedule':
                 return '/schedule.png';
+            case 'recurring':
+                return '/recurring.png';
             default:
                 return null;
         }
