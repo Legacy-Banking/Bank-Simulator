@@ -13,3 +13,11 @@ if (typeof Element.prototype.hasPointerCapture !== 'function') {
 if (typeof Element.prototype.scrollIntoView !== 'function') {
     Element.prototype.scrollIntoView = jest.fn();
   }
+
+// Mock ResizeObserver for Jest tests
+global.ResizeObserver = class {
+  constructor(callback) {}
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
