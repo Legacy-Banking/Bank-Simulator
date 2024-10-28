@@ -118,13 +118,21 @@ describe('AdminBillDetailSheet', () => {
 
 
 
-  // test('renders the bill details section', () => {
-  //     const billDetailsSection = screen.getByTestId('bill-details-section');
-      
-  //     // Scope the search for "Electricity Provider" within the bill details section
-  //     const providerName = within(billDetailsSection).getByText(/Electricity Provider/i);
-  //     expect(providerName).toBeInTheDocument();
-  // });
+  test('renders the bill details section with correct information', () => {
+    const billDetailsSection = screen.getByTestId('bill-details-section');
+    
+    // Get all occurrences of "Electricity Provider" within the bill details section
+    const providerElements = within(billDetailsSection).getAllByText(/Electricity Provider/i);
+
+    // Check that there are two elements containing "Electricity Provider"
+    expect(providerElements.length).toBe(2);
+
+    // Check for other relevant bill information
+    expect(within(billDetailsSection).getByText(/Monthly electricity bill/i)).toBeInTheDocument();
+    expect(within(billDetailsSection).getByText(/200/i)).toBeInTheDocument();
+    expect(within(billDetailsSection).getByText(/May 5, 2023/i)).toBeInTheDocument();
+
+  });
 
 
   test('renders the assigned users table', () => {
@@ -133,7 +141,7 @@ describe('AdminBillDetailSheet', () => {
   });
 
   test('renders assigned user rows', async () => {
-    // Explicitly cast `fetchAssignedUsersStatus` to `jest.Mock`
+
     (billAction.fetchAssignedUsersStatus as jest.Mock).mockResolvedValue([
         { name: 'user1', status: 'unpaid' },
         { name: 'user2', status: 'paid' }
