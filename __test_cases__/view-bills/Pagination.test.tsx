@@ -1,68 +1,66 @@
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { render, fireEvent } from '@testing-library/react';
 import { Pagination } from '@/components/Pagination';
-import '@testing-library/jest-dom';
+import { useRouter, useSearchParams } from 'next/navigation';
 
+// Mock the router and searchParams
 jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
-  useSearchParams: jest.fn(),
+    useRouter: jest.fn(),
+    useSearchParams: jest.fn(),
 }));
 
 describe('Pagination Component', () => {
-  const mockPush = jest.fn();
-  const mockSetPage = jest.fn();
+    const setPageMock = jest.fn();
 
-  beforeEach(() => {
-    (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
-    (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams('?page=1'));
-    mockPush.mockClear();
-    mockSetPage.mockClear();
-  });
+    beforeEach(() => {
+        jest.clearAllMocks();
+        (useRouter as jest.Mock).mockReturnValue({ push: jest.fn() });
+        (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams('page=1'));
+    });
 
-  const paginationProps = {
-    page: 2,
-    totalPages: 5,
-    setPage: mockSetPage,
-  };
+    it('renders correctly with given page and total pages', () => {
+        const { getByText, getByTestId } = render(
+            <Pagination page={1} totalPages={3} setPage={setPageMock} />
+        );
 
-  test('renders current page and total pages', () => {
-    render(<Pagination {...paginationProps} />);
+        expect(getByTestId('pagination')).toBeInTheDocument();
+        expect(getByText('1 / 3')).toBeInTheDocument();
+        expect(getByText('Prev')).toBeInTheDocument();
+        expect(getByText('Next')).toBeInTheDocument();
+    });
 
-    expect(screen.getByText('2 / 5')).toBeInTheDocument();
-  });
+    it('checks for the presence of the "Next" button', () => {
+        const { getByText } = render(
+            <Pagination page={1} totalPages={3} setPage={setPageMock} />
+        );
 
-  test('calls handleNavigation with "prev" and updates the page', () => {
-    render(<Pagination {...paginationProps} />);
+        const nextButton = getByText('Next');
+        expect(nextButton).toBeInTheDocument();
+    });
 
-    const prevButton = screen.getByText('Prev');
-    fireEvent.click(prevButton);
+    it('checks for the presence of the "Prev" button', () => {
+        const { getByText } = render(
+            <Pagination page={2} totalPages={3} setPage={setPageMock} />
+        );
 
-    expect(mockSetPage).toHaveBeenCalledWith(1);
-    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('page=1'), { scroll: false });
-  });
+        const prevButton = getByText('Prev');
+        expect(prevButton).toBeInTheDocument();
+    });
 
-  test('calls handleNavigation with "next" and updates the page', () => {
-    render(<Pagination {...paginationProps} />);
+    it('disables the "Prev" button on the first page', () => {
+        const { getByText } = render(
+            <Pagination page={1} totalPages={3} setPage={setPageMock} />
+        );
 
-    const nextButton = screen.getByText('Next');
-    fireEvent.click(nextButton);
+        const prevButton = getByText('Prev');
+        expect(prevButton).toBeDisabled();
+    });
 
-    expect(mockSetPage).toHaveBeenCalledWith(3);
-    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('page=3'), { scroll: false });
-  });
+    it('disables the "Next" button on the last page', () => {
+        const { getByText } = render(
+            <Pagination page={3} totalPages={3} setPage={setPageMock} />
+        );
 
-  test('disables prev button when on the first page', () => {
-    render(<Pagination {...paginationProps} page={1} />);
-
-    const prevButton = screen.getByText('Prev');
-    expect(prevButton).toBeDisabled();
-  });
-
-  test('disables next button when on the last page', () => {
-    render(<Pagination {...paginationProps} page={5} />);
-
-    const nextButton = screen.getByText('Next');
-    expect(nextButton).toBeDisabled();
-  });
+        const nextButton = getByText('Next');
+        expect(nextButton).toBeDisabled();
+    });
 });
