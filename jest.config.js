@@ -13,6 +13,12 @@ const customJestConfig = {
     '^@/(.*)$': '<rootDir>/$1', // Resolve "@" alias
     '\\.(jpg|jpeg|png|gif|webp|svg)$': '<rootDir>/__mocks__/fileMock.js', 
   },
+  transform: {
+    '^.+\\.(js|jsx|ts|tsx|mjs)$': 'babel-jest',
+  },
+  transformIgnorePatterns: [
+    '/node_modules/(?!(query-string)/)',
+  ],
   testEnvironment: 'jest-environment-jsdom',
 }
 
