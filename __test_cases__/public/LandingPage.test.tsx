@@ -8,10 +8,6 @@ import { configureStore } from '@reduxjs/toolkit';
 import userReducer, { UserState } from '@/store/userSlice';
 import { useRouter } from 'next/navigation';
 
-// Set dummy environment variables for Supabase
-process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://ueuxycryiojbgkujsgqx.supabase.co/';
-process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVldXh5Y3J5aW9qYmdrdWpzZ3F4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMxNjk4MDgsImV4cCI6MjAzODc0NTgwOH0.J1V0AmOYYK58hH0zz2wlr7sqNxcyFWSATwgUWWZmXm4';
-
 // Mock fetchEmbedding function
 jest.spyOn(contentAction, 'fetchEmbedding').mockResolvedValue({
     title: 'Test Title',
