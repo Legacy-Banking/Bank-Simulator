@@ -336,7 +336,7 @@ class ScheduleAction {
             }
     
             const messageDescription = `Your next recurring payment of $${schedule.amount} is scheduled for ${next_pay_at.toDateString()} ${recipientInfo}.`;
-            await inboxAction.createMessage('System', schedule.related_user, messageDescription, 'recurring', null, null, schedule.schedule_ref);
+            await inboxAction.createMessage('System', schedule.related_user, messageDescription, 'recurring', '', '', schedule.schedule_ref);
         }
     
         console.log(`Recurring payment updated for schedule: ${schedule.id}, pay_at updated to: ${next_pay_at}`);
