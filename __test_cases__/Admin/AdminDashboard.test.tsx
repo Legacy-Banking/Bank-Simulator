@@ -1,38 +1,11 @@
 import React from 'react';
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, screen, waitFor, act, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import AdminDashboard from '@/app/admin/dashboard/page';
-import { useAppSelector } from '@/store/hooks';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { useRouter } from 'next/navigation';
 import { RootState } from '@/store/store';
 import { accountAction } from '@/lib/actions/accountAction';
-
-// Mock hooks and components
-jest.mock('@/store/hooks', () => ({
-  useAppSelector: jest.fn(),
-}));
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
-}));
-jest.mock('@/components/BankNavbar', () => {
-  return { __esModule: true, default: () => <div>Mocked BankNavbar</div> };
-});
-jest.mock('@/components/AdminSide/AdminSideBar', () => {
-  return { __esModule: true, default: () => <div>Mocked AdminSideBar</div> };
-});
-
-jest.mock('@/components/AdminSide/Accounts/AccountsPage', () => {
-  return { __esModule: true, default: () => <div>Mocked AccountsPage</div> };
-});
-jest.mock('@/components/AdminSide/Bills/CreateBillPage', () => {
-  return { __esModule: true, default: () => <div>Mocked CreateBillPage</div> };
-});
-jest.mock('@/components/AdminSide/Presets/PresetsPage', () => {
-  return { __esModule: true, default: () => <div>Mocked PresetsPage</div> };
-});
-jest.mock('@/components/AdminSide/CMS/CMSPage', () => {
-  return { __esModule: true, default: () => <div>Mocked CMSPage</div> };
-});
 
 // Mock accountAction to prevent actual async call
 jest.mock('@/lib/actions/accountAction', () => ({
@@ -41,10 +14,71 @@ jest.mock('@/lib/actions/accountAction', () => ({
   },
 }));
 
+jest.mock('next/navigation', () => ({
+  useRouter: jest.fn(),
+}));
+
+jest.mock('@/store/hooks', () => ({
+  useAppSelector: jest.fn(),
+  useAppDispatch: jest.fn(),
+}));
+
+jest.mock('@/lib/supabase/client', () => ({
+  createClient: jest.fn(() => ({
+    from: jest.fn(() => ({
+      select: jest.fn().mockReturnValue({
+        data: [
+          {
+            id: 'bill1',
+            biller: { name: 'Biller One' },
+            amount: 100,
+            due_date: '2024-10-01',
+          },
+          {
+            id: 'bill2',
+            biller: { name: 'Biller Two' },
+            amount: 200,
+            due_date: '2024-11-01',
+          },
+        ],
+        error: null,
+      }),
+    })),
+    auth: {
+      admin: {
+        listUsers: jest.fn().mockResolvedValue({
+          data: [
+            { id: 'user1', last_sign_in_at: '2024-01-01T00:00:00Z' },
+            { id: 'user2', last_sign_in_at: '2024-01-02T00:00:00Z' },
+          ],
+          error: null,
+        }),
+      },
+    },
+    channel: jest.fn(() => ({
+      on: jest.fn().mockReturnThis(),
+      subscribe: jest.fn().mockResolvedValue({ status: 'SUBSCRIBED' }),
+    })),
+    removeChannel: jest.fn(),
+  })),
+}));
+
+
+
+
 const mockPush = jest.fn();
+const mockDispatch = jest.fn();
 
 describe('AdminDashboard', () => {
+  beforeAll(() => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://dummy.supabase.co'; // Use a valid-looking dummy URL
+    process.env.NEXT_PUBLIC_SERVICE_ROLE_KEY = 'dummy-service-role-key'; // Dummy service role key
+  });
+
   beforeEach(() => {
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    jest.spyOn(console, 'error').mockImplementation(() => {});
     (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
     (useAppSelector as jest.Mock).mockImplementation((selector: (state: RootState) => any) => {
       return selector({
@@ -56,18 +90,22 @@ describe('AdminDashboard', () => {
         transfer: {},
       } as RootState);
     });
+    (useAppDispatch as jest.Mock).mockReturnValue(mockDispatch);
   });
 
   afterEach(() => {
     jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
 
   test('renders AdminDashboard with BankNavbar and AdminSideBar', async () => {
     await act(async () => {
       render(<AdminDashboard />);
     });
-    expect(screen.getByText('Mocked BankNavbar')).toBeInTheDocument();
-    expect(screen.getByText('Mocked AdminSideBar')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('bank-navbar')).toBeInTheDocument();
+      expect(screen.getByTestId('admin-sidebar')).toBeInTheDocument();
+    });
   });
 
   test('renders AccountsPage by default', async () => {
@@ -75,7 +113,7 @@ describe('AdminDashboard', () => {
       render(<AdminDashboard />);
     });
     await waitFor(() => {
-      expect(screen.getByText('Mocked AccountsPage')).toBeInTheDocument();
+      expect(screen.getByTestId('accounts-page')).toBeInTheDocument();
     });
   });
 
@@ -87,12 +125,27 @@ describe('AdminDashboard', () => {
     expect(mockPush).toHaveBeenCalledWith('/');
   });
 
-  test('fetches personal account data when user_id is available', async () => {
+  test('handles click event on <li> element', async () => {
     await act(async () => {
       render(<AdminDashboard />);
     });
-    await waitFor(() => {
-      expect(screen.getByText('Mocked BankNavbar')).toBeInTheDocument();
-    });
+
+    const items = ['accounts', 'presets', 'create-bill', 'content-management-system'];
+
+    for (const item of items) {
+      // Find the <li> element by its test ID
+      const listItem = screen.getByTestId(`${item}-admin-link-button`);
+
+      // Simulate a click event
+      fireEvent.click(listItem);
+
+      // Assert that the selected item message appears
+      await waitFor(() => {
+        const selectedItem = screen.getByTestId(`${item}-page`);
+        expect(selectedItem).toBeInTheDocument();
+      });
+    }
   });
+
+
 });

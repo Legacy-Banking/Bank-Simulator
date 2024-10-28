@@ -20,6 +20,7 @@ const customJestConfig = {
     "node_modules/(?!query-string)"  // Exclude query-string from ignored node_modules
   ],
   moduleFileExtensions: ['js', 'mjs', 'cjs', 'jsx', 'ts', 'tsx', 'json', 'node'],
+  testMatch: ['**/__test_cases__/**/*.test.[jt]s?(x)'],
 }
 
 module.exports = createJestConfig(customJestConfig)
