@@ -11,7 +11,7 @@ jest.mock('@/components/DatePicker', () => ({
 }));
 
 // Mock Select components (if necessary)
-jest.mock('@/components/ui/select', () => ({
+jest.mock('@/components/shadcn_ui/select', () => ({
   Select: ({ children }: any) => <div>{children}</div>,
   SelectTrigger: ({ children, ...props }: any) => (
     <div {...props} role="button">

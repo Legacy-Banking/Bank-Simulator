@@ -9,7 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/shadcn_ui/table";
 import TransactionDetailSheet from './TransactionDetailSheet'; // Import the sheet component
 import { formatAmount, formatDateTime, capitalizeFirstLetter } from "@/lib/utils";
 

@@ -6,7 +6,7 @@ import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { useRouter } from 'next/navigation';
 import { RootState } from '@/store/store';
 import { accountAction } from '@/lib/actions/accountAction';
-import AccountsPage from '@/components/AdminSide/Accounts/AccountsPage';
+import AccountsPage from '@/components/admin/Accounts/AccountsPage';
 
 // Mock accountAction to prevent actual async call
 jest.mock('@/lib/actions/accountAction', () => ({

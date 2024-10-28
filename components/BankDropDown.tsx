@@ -9,7 +9,7 @@ import {
   SelectItem,
   SelectLabel,
   SelectTrigger,
-} from "@/components/ui/select";
+} from "@/components/shadcn_ui/select";
 
 // Utility to format currency amounts
 const formatCurrency = (amount: number) => {

@@ -8,10 +8,10 @@ import { Loader2 } from "lucide-react";
 import * as z from "zod";
 import { BankDropdown } from "./BankDropDown";
 import CardSidebar from './CardSidebar';
-import { Button } from "./ui/button";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
-import { Input } from "./ui/input";
-import { Checkbox } from "@/components/ui/checkbox"; // Import Checkbox from shadcn
+import { Button } from "./shadcn_ui/button";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./shadcn_ui/form";
+import { Input } from "./shadcn_ui/input";
+import { Checkbox } from "@/components/shadcn_ui/checkbox"; // Import Checkbox from shadcn
 import { PaymentWhenOptions } from "./PaymentWhenOptions";
 import { BillerDropdown } from './BillerDropDown';
 import { useAppSelector } from '@/store/hooks';

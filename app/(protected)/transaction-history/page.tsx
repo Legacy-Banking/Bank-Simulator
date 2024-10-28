@@ -3,8 +3,8 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import HeaderBox from '@/components/HeaderBox';
 import { TransactionsTable } from '@/components/TransactionsTable';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/shadcn_ui/select';
+import { Button } from '@/components/shadcn_ui/button';
 import { accountAction } from '@/lib/actions/accountAction';
 import { transactionAction } from '@/lib/actions/transactionAction';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -23,7 +23,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/shadcn_ui/popover"
 import "react-day-picker/dist/style.css";
 
 const TransactionHistoryContent = () => {

@@ -1,15 +1,15 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import AdminBillSheet from '@/components/AdminSide/Bills/AdminBillSheet';
-import AdminBillsTable from '@/components/AdminSide/Bills/AdminBillsTable';
-import AssignUserSheet from '@/components/AdminSide/Bills/AssignUserSheet';
-import CreateBillForm from '@/components/AdminSide/Bills/CreateBillForm';
-import TrashBillDetailSheet from '@/components/AdminSide/Bills/TrashBillDetailSheet';
+import AdminBillSheet from '@/components/admin/Bills/AdminBillSheet';
+import AdminBillsTable from '@/components/admin/Bills/AdminBillsTable';
+import AssignUserSheet from '@/components/admin/Bills/AssignUserSheet';
+import CreateBillForm from '@/components/admin/Bills/CreateBillForm';
+import TrashBillDetailSheet from '@/components/admin/Bills/TrashBillDetailSheet';
 import AdminDashboard from '@/app/admin/dashboard/page';
 import { Provider } from 'react-redux';
 import { store } from '@/store/store';
-import AdminBillDetailSheet from '@/components/AdminSide/Bills/AdminBillSheet';
+import AdminBillDetailSheet from '@/components/admin/Bills/AdminBillSheet';
 import { billAction } from '@/lib/actions/billAction';
 
 // Mock props

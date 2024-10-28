@@ -8,7 +8,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/shadcn_ui/table";
 import { cn, formatAmount, formatDateTime } from "@/lib/utils";
 import StatusLabel from './StatusLabel';
 import BillSheet from './BillsDetailSheet';

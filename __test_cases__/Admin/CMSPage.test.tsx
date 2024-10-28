@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import CMSPage from '@/components/AdminSide/CMS/CMSPage';
+import CMSPage from '@/components/admin/CMS/CMSPage';
 
 
 jest.mock('next/navigation', () => ({

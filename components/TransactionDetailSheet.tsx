@@ -6,8 +6,8 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+} from '@/components/shadcn_ui/dialog';
+import { Button } from '@/components/shadcn_ui/button';
 import { formatAmount, formatDateTime } from "@/lib/utils";
 
 // Define the props type for the component

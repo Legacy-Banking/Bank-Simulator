@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import PresetsPage from '@/components/AdminSide/Presets/PresetsPage';
+import PresetsPage from '@/components/admin/Presets/PresetsPage';
 import { Provider } from 'react-redux';
 import { store } from '@/store/store';
 jest.mock('@/lib/supabase/client', () => {

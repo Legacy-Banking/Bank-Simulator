@@ -27,6 +27,31 @@ export const accountAction = {
         }
         return data || [];
     },
+    fetchAccountsTotalBalance: async (user_id: string): Promise<number> => {
+        const supabase = createClient();
+
+        // Sum the balance of all accounts for a given user
+        const { data, error } = await supabase
+            .from('account')
+            .select('balance') // Fetch only the balance column
+            .eq('owner', user_id);
+
+        if (error) {
+            console.error('Error fetching total balance:', error);
+            throw error;
+        }
+
+        // If no accounts found, return 0 as the total balance
+        if (!data || data.length === 0) {
+            return 0;
+        }
+
+        // Calculate the total balance
+        const totalBalance = data.reduce((sum, account) => sum + account.balance, 0);
+
+        return totalBalance;
+    },
+
     fetchAccountById: async (account_id: string): Promise<Account> => {
         const supabase = createClient();
         const { data, error } = await supabase
@@ -183,32 +208,6 @@ export const accountAction = {
             // Update the admin bill with the new assigned users list
             await billAction.updateAssignedUsers(bill.id, updatedAssignedUsers);
         } 
-
-        // await Promise.all(
-        //         presetBills.map(async (bill) => {
-        //             // Fetch the current assigned users for the linked bill
-        //             const { assigned_users: currentAssignedUsers } = await billAction.fetchAdminBillById(bill.id);
-            
-        //             // Create a string with the user details (username|id)
-        //             const newUserAssignment = `${owner_username}|${user_id}`;
-            
-        //             // If there are already assigned users, split them into an array, otherwise start with an empty array
-        //             const existingUserArray = currentAssignedUsers
-        //                 ? currentAssignedUsers.split(",").map((user: string) => user.trim())
-        //                 : [];
-            
-        //             // Add the new user to the list and remove duplicates
-        //             const updatedAssignedUsersArray = [...existingUserArray, newUserAssignment].filter(
-        //                 (value, index, self) => self.indexOf(value) === index
-        //             );
-            
-        //             // Join the updated array into a string
-        //             const updatedAssignedUsers = updatedAssignedUsersArray.join(", ");
-            
-        //             // Update the admin bill with the new assigned users list
-        //             await billAction.updateAssignedUsers(bill.id, updatedAssignedUsers);
-        //         })
-        //     );
 
     },
 

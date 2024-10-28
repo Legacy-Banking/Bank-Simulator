@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import AddFundsSheet from './AdminSide/Accounts/AddFundsSheet';
+import { Button } from '@/components/shadcn_ui/button';
+import AddFundsSheet from './admin/Accounts/AddFundsSheet';
 
 // Define props for the component
 type AdminAccountBoxProps = {
