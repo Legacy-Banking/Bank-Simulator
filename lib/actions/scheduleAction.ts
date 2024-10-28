@@ -267,7 +267,7 @@ class ScheduleAction {
                 await inboxAction.createMessage('System', schedule.related_user, messageDescription, 'schedule', '', '', schedule.schedule_ref);
                 const billerReference=await billerAction.fetchReferenceNumberByBillerName(schedule.related_user,schedule.biller_name);
                 console.log(schedule.from_account,schedule.biller_name, schedule.biller_code, billerReference!, schedule.amount, schedule.description, schedule.related_user)
-                const account={id:schedule.from_account}
+                const account:Partial<Account>={id:schedule.from_account}
                 await bpayAction.payBills(account,schedule.biller_name, schedule.biller_code, billerReference!, schedule.amount, schedule.description, schedule.related_user);
                 await this.supabase.from('schedule_payments').update({status: 'completed'}).eq('id', schedule.id);
 

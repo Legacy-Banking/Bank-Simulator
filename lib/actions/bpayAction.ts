@@ -4,7 +4,7 @@ import { accountAction } from "./accountAction";
 
 export const bpayAction = {
     payBills: async (
-        from_account: Account, 
+        from_account: Partial<Account>, 
         biller_name: string, 
         biller_code: string, 
         reference_number: string, 
@@ -13,7 +13,7 @@ export const bpayAction = {
         user_id: string,
 
     ): Promise<void> => {
-        const account = await accountAction.fetchAccountById(from_account.id);
+        const account = await accountAction.fetchAccountById(from_account.id!);
         const bills = await billAction.fetchBillsByUserIdAndBillerName(user_id, biller_name);
         console.log('account_balance', account.balance);
         console.log('amount', amount);
