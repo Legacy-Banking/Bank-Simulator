@@ -63,6 +63,7 @@
     "@types/react": "18.2.48",
     "@types/react-dom": "18.2.18",
     "@types/redux-mock-store": "^1.0.6",
+    "@types/testing-library__react": "^10.2.0",
     "babel-jest": "^29.7.0",
     "encoding": "^0.1.13",
     "identity-obj-proxy": "^3.0.0",
