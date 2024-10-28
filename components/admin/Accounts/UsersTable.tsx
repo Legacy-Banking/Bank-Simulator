@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/shadcn_ui/table";
 // import TransactionDetailSheet from './TransactionDetailSheet'; // Import the sheet component
-import { cn, formatAmount, formatDateTime } from "@/lib/utils";
+import { cn, formatAmount, formatDateTime } from "@/lib/utils/utils";
 import { Button } from '@/components/shadcn_ui/button';
 import { boolean } from 'zod';
 import PopUp from './PopUp';

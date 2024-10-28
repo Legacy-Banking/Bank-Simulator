@@ -8,7 +8,7 @@ import {
   DialogFooter,
 } from '@/components/shadcn_ui/dialog';
 import { Button } from '@/components/shadcn_ui/button';
-import { cn, formatAmount, formatDateTime } from "@/lib/utils"
+import { cn, formatAmount, formatDateTime } from "@/lib/utils/utils"
 import { createClient } from '@/lib/supabase/client';
 import { Popover, PopoverTrigger, PopoverContent } from '@radix-ui/react-popover';
 import { setDate } from 'date-fns';

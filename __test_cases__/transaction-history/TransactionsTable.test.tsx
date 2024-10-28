@@ -2,7 +2,7 @@ import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { TransactionsTable } from '@/components/TransactionsTable'
-import { formatAmount, formatDateTime } from '@/lib/utils'
+import { formatAmount, formatDateTime } from '@/lib/utils/utils'
 
 // Mock the TransactionDetailSheet to exclude it from tests
 jest.mock('@/components/TransactionDetailSheet', () => () => <div data-testid="transaction-detail-sheet" />)

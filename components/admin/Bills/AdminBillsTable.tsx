@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { billAction } from '@/lib/actions/billAction';
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@/components/shadcn_ui/table';
 import { Button } from '@/components/shadcn_ui/button';
-import { formatAmount } from "@/lib/utils";
+import { formatAmount } from "@/lib/utils/utils";
 import { ChevronUp, ChevronDown, ChevronsUpDown, Trash2Icon, UserPlus, UserMinus } from 'lucide-react';
 import TrashBillDetailSheet from './TrashBillDetailSheet';
 import AssignUserSheet from './AssignUserSheet';

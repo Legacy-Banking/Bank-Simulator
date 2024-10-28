@@ -2,7 +2,7 @@ import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import TransactionDetailSheet from '@/components/TransactionDetailSheet'
-import { formatAmount, formatDateTime } from "@/lib/utils"
+import { formatAmount, formatDateTime } from "@/lib/utils/utils"
 
 const mockTransaction = {
   id: '1',

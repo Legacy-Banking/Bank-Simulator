@@ -8,7 +8,7 @@ import {
     DialogFooter,
 } from '@/components/shadcn_ui/dialog';
 import { Button } from '@/components/shadcn_ui/button';
-import { formatDateTime } from "@/lib/utils";
+import { formatDateTime } from "@/lib/utils/utils";
 import { useRouter } from 'next/navigation';
 import { inboxAction } from '@/lib/actions/inboxAction';
 

@@ -8,7 +8,7 @@ import {
   DialogFooter,
 } from '@/components/shadcn_ui/dialog';
 import { Button } from '@/components/shadcn_ui/button';
-import { formatAmount, formatDateTime } from "@/lib/utils";
+import { formatAmount, formatDateTime } from "@/lib/utils/utils";
 
 // Define the props type for the component
 type TransactionDetailSheetProps = {

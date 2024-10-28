@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/utils';
 import { Button } from '@/components/shadcn_ui/button';
 import AddFundsSheet from './admin/Accounts/AddFundsSheet';
 

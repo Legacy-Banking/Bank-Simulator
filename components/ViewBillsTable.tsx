@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/shadcn_ui/table";
-import { cn, formatAmount, formatDateTime } from "@/lib/utils";
+import { cn, formatAmount, formatDateTime } from "@/lib/utils/utils";
 import StatusLabel from './StatusLabel';
 import BillSheet from './BillsDetailSheet';
 import { useRouter, useSearchParams } from 'next/navigation';

@@ -8,7 +8,7 @@ import {
   DialogFooter,
 } from '@/components/shadcn_ui/dialog';
 import { Button } from '@/components/shadcn_ui/button';
-import { cn, formatAmount, formatDateTime } from "@/lib/utils"
+import { cn, formatAmount, formatDateTime } from "@/lib/utils/utils"
 import { createClient } from '@/lib/supabase/client';
 
 // Define the props type for the component

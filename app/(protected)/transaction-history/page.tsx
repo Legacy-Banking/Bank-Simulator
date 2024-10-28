@@ -11,14 +11,14 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import AccountBox from '@/components/AccountBox';
 import { Pagination } from '@/components/Pagination';
 import { useAppSelector } from '@/store/hooks';
-import { capitalizeFirstLetter, formatAmount } from '@/lib/utils';
+import { capitalizeFirstLetter, formatAmount } from '@/lib/utils/utils';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { startOfMonth, format } from "date-fns"
 import { Calendar as CalendarIcon, X } from "lucide-react"
 import MonthPicker from '@/components/MonthPicker';
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 import {
   Popover,
   PopoverContent,
