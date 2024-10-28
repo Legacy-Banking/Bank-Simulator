@@ -30,7 +30,7 @@ const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, onClose, o
             if (bill) {
                 try {
                     const data = await billAction.fetchAssignedUsersStatus(bill);
-                    console.log("Fetched Assigned User Details:", data); // Log fetched data here
+                    // console.log("Fetched Assigned User Details:", data); // Log fetched data here
                     setAssignedUsersDetails(data); // Correctly set the state
                 } catch (error) {
                     console.error('Failed to fetch assigned users:', error);
@@ -93,13 +93,13 @@ const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, onClose, o
                             <TableBody>
                                 {loading ? (
                                     <TableRow>
-                                        <TableCell colSpan={2} data-testid="assigned-users-message" className="text-center p-4">
+                                        <TableCell colSpan={2} data-testid="loading-message" className="text-center p-4">
                                             Loading assigned users...
                                         </TableCell>
                                     </TableRow>
                                 ) : assignedUsersDetails.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={2} data-testid="assigned-users-message" className="text-center p-4">
+                                        <TableCell colSpan={2} data-testid="no-users-message" className="text-center p-4">
                                             No users assigned.
                                         </TableCell>
                                     </TableRow>
@@ -118,6 +118,8 @@ const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, onClose, o
                                     ))
                                 )}
                             </TableBody>
+
+
 
                         </Table>
                     </div>
