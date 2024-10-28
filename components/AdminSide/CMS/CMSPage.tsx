@@ -68,7 +68,7 @@ const CMSPage = () => {
             <HeaderBox
             type="title"
             title={'Content Management System'}
-            subtext={'View all user and account summaries'}
+            subtext={'View all content embeddings'}
             />
         </header>
 

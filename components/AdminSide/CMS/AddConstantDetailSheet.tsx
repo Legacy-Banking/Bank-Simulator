@@ -129,7 +129,9 @@ const AddConstantDetailSheet: React.FC<ConstantDetailSheetProps> = ({ status, on
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold font-inter mb-3">Add Constant</DialogTitle>
         </DialogHeader>
-        <form className="flex flex-col w-full rounded-md text-[#344054]">
+        <form 
+        data-testid={'constant-add-detail-sheet'}
+        className="flex flex-col w-full rounded-md text-[#344054]">
           <label className="">Key</label>
           <input
             className="rounded-md px-3 py-2 mt-2 border mb-5 outline-1 outline-blue-25 text-base drop-shadow-sm read-only:bg-gray-100"
@@ -174,7 +176,9 @@ const AddConstantDetailSheet: React.FC<ConstantDetailSheetProps> = ({ status, on
         {/* Footer with Close button */}
         <DialogFooter className="mt-8 flex ">
           <Button onClick={onClose} className="grow uppercase font-inter border-2 hover:bg-slate-200 tracking-wider">Cancel</Button>
-          <Button onClick={(e) => addConstant(key, content, pageKey)} className="grow uppercase font-inter tracking-wider bg-blue-25 hover:bg-blue-200 text-white-100">Add</Button>
+          <Button 
+          data-testid={'success-add-constant'}
+          onClick={(e) => addConstant(key, content, pageKey)} className="grow uppercase font-inter tracking-wider bg-blue-25 hover:bg-blue-200 text-white-100">Add</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

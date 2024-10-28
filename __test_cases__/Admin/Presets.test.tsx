@@ -67,24 +67,10 @@ describe('PresetsPage', () => {
     });
   });
 
-  // test('displays loading message initially', async () => {
-  //   jest.useFakeTimers();
-
-  
-  //   await act(async () => {
-  //     render(
-  //         <PresetsPage />
-  //     );
-  //   });
-  
-  //   // Fast-forward until all timers have been executed
-  //   jest.runAllTimers();
-  
-  //   expect(screen.getByTestId('loading-message')).toBeInTheDocument();
-  
-  //   jest.useRealTimers();
-  //   jest.restoreAllMocks();
-  // });
+  test('displays loading message initially', async () => {
+    render(<PresetsPage />);
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
+  });
   
   
 });

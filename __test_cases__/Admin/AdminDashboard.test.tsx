@@ -6,6 +6,7 @@ import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { useRouter } from 'next/navigation';
 import { RootState } from '@/store/store';
 import { accountAction } from '@/lib/actions/accountAction';
+import AccountsPage from '@/components/AdminSide/Accounts/AccountsPage';
 
 // Mock accountAction to prevent actual async call
 jest.mock('@/lib/actions/accountAction', () => ({
@@ -15,6 +16,9 @@ jest.mock('@/lib/actions/accountAction', () => ({
 }));
 
 jest.mock('next/navigation', () => ({
+  useSearchParams: jest.fn().mockReturnValue({
+    toString: jest.fn().mockReturnValue('page=1'),
+  }),
   useRouter: jest.fn(),
 }));
 
@@ -27,20 +31,12 @@ jest.mock('@/lib/supabase/client', () => ({
   createClient: jest.fn(() => ({
     from: jest.fn(() => ({
       select: jest.fn().mockReturnValue({
-        data: [
-          {
-            id: 'bill1',
-            biller: { name: 'Biller One' },
-            amount: 100,
-            due_date: '2024-10-01',
-          },
-          {
-            id: 'bill2',
-            biller: { name: 'Biller Two' },
-            amount: 200,
-            due_date: '2024-11-01',
-          },
-        ],
+        data:  Array.from({ length: 25 }, (_, i) => ({
+          id: `user${i + 1}`,
+          owner_username: `User ${i + 1}`,
+          owner: `owner${i + 1}`,
+          biller: { name: 'Biller One' },
+        })),
         error: null,
       }),
     })),
@@ -146,6 +142,19 @@ describe('AdminDashboard', () => {
       });
     }
   });
+
+  test('there is pagination ', async () => {
+
+    await act(async () => {
+      render(<AccountsPage />);
+    });
+  
+    const paginationElement = screen.getByTestId('pagination');
+    expect(paginationElement).toBeInTheDocument();
+  
+  });
+  
+  
 
 
 });
