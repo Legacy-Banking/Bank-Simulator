@@ -77,6 +77,34 @@ export const transactionAction = {
         }
     },
 
+    createTransactionPreset: async (preset: string, owner_account: Account, owner_username: string ,amount: number, description: string, date_issued: Date): Promise<void> => {
+        const supabase = createClient();
+
+        try {
+            // Insert the new transaction
+            const newTransaction: Partial<Transaction> = {
+                description: description,
+                from_account: amount > 0 ? undefined : owner_account.id,
+                from_account_username: amount > 0 ? preset : owner_username,
+                to_account: amount > 0 ? owner_account.id : undefined,
+                to_account_username: amount > 0 ? owner_username : preset,
+                amount: amount < 0 ? amount * -1 : amount,
+                paid_on: date_issued,
+                transaction_type: 'pay anyone',
+            };
+
+            const { error: insertError } = await supabase
+                .from('transaction')
+                .insert(newTransaction);
+            }
+         catch (error) {
+            // If updating either account fails, revert any successful updates
+            console.error('Transaction error:', error);
+
+            throw error;
+        }
+    },
+
     createBPAYTransaction: async (
         fromAccount: Account,
         billerName: string,
@@ -172,7 +200,7 @@ export const transactionAction = {
     
     },
 
-    fetchTransactionPresets: async (): Promise<Transaction[]> => {
+    fetchTransactionPresetsOnCreation: async (): Promise<TransactionPresetType[]> => {
         const supabase = createClient();
     
         // Fetching transaction presets from the 'transaction_presets' table
@@ -193,7 +221,18 @@ export const transactionAction = {
     
         const transactions = data as TransactionPresetType[];
     
-        // Transforming the fetched transactions into the desired structure
+        return transactions;
+    },    
+    fetchTransactionPresets: async (): Promise<Transaction[]> => {
+        const supabase = createClient();
+
+        // Fetching transaction presets from the 'transaction_presets' table
+        const { data, error } = await supabase
+            .from('transaction_presets')
+            .select('*');
+
+        const transactions = data as TransactionPresetType[]
+
         const transformedData = transactions.map(transaction => {
             const isPayingRecipient = transaction.amount < 0;
             
@@ -211,7 +250,7 @@ export const transactionAction = {
         });
     
         return transformedData as Transaction[];
-    },    
+    },
 
     fetchTotalTransactionAmount : async (): Promise<number> => {
         const supabase = createClient();

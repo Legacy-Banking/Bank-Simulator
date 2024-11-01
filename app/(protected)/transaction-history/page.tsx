@@ -289,6 +289,7 @@ const TransactionHistoryContent = () => {
                 </div>
               )}
             </section>
+            {/* {console.log(transactionAction.fetchTransactionPresets())} */}
           </>
         )}
       </div>

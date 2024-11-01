@@ -159,24 +159,16 @@ export const accountAction = {
             accountAction.fetchAccountPresets(user_id, owner_username),
             billerAction.fetchPresetSavedBillers(),
         ]);
-
-        
-
-        // for (const account of accounts) {
-        //     await accountAction.createAccount(account as Account);
-        // }
-
+    
         // Create accounts and saved billers in parallel
         await Promise.all([
             accountAction.createAccounts(accounts as Account[]),  // Create accounts in bulk
-            billerAction.createDefaultSavedBillers(user_id, savedBillers)      // Create saved billers
+            billerAction.createDefaultSavedBillers(user_id, savedBillers) // Create saved billers
         ]);
-
-
+    
+        // Initialize card for the user
         await cardAction.cardSignUpInitialization(user_id);
-
-        // await billerAction.createDefaultSavedBillers(user_id);
-
+    
         // Loop through fetched bills and create bills for the user
         for (const bill of presetBills) {
             await billAction.createBillForUsers(
@@ -188,32 +180,37 @@ export const accountAction = {
                 bill.id // Linked bill from the preset bill
             );
     
-            // Now update the assigned_users in the Admin Bill
-            // Fetch the current assigned users for the linked bill
+            // Update the assigned_users in the Admin Bill
             const { assigned_users: currentAssignedUsers } = await billAction.fetchAdminBillById(bill.id);
-    
-            // Create a string with the user details (username|id)
             const newUserAssignment = `${owner_username}|${user_id}`;
-    
-            // If there are already assigned users, split them into an array, otherwise start with an empty array
             const existingUserArray = currentAssignedUsers
                 ? currentAssignedUsers.split(",").map((user: string) => user.trim())
                 : [];
-    
-            // Add the new user to the list and remove duplicates
             const updatedAssignedUsersArray = [...existingUserArray, newUserAssignment].filter(
                 (value, index, self) => self.indexOf(value) === index
             );
-    
-            // Join the updated array into a string
             const updatedAssignedUsers = updatedAssignedUsersArray.join(", ");
-    
-            // Update the admin bill with the new assigned users list
             await billAction.updateAssignedUsers(bill.id, updatedAssignedUsers);
-        } 
-        
+        }
+    
+        // Fetch the user's personal account and transaction presets
+        const transactionsPreset = await transactionAction.fetchTransactionPresetsOnCreation();
+        const personalAcc = await accountAction.fetchPersonalAccountByUserId(user_id);
 
+        console.log(transactionsPreset);
+        // Loop through transaction presets and create transactions for the user
+        for (const transaction of transactionsPreset) {
+            await transactionAction.createTransactionPreset(
+                transaction.recipient,
+                personalAcc,
+                owner_username,
+                transaction.amount,
+                'A preset transaction',
+                transaction.date_issued
+            );
+        }
     },
+    
 
     finalizeSignUpInitialization: async (user_id: string, owner_username: string): Promise<void> => {
 
@@ -223,20 +220,6 @@ export const accountAction = {
         ]);
 
 
-
-        const accountForTransaction = await accountAction.fetchPersonalAccountByUserId(user_id);
-        const transactionsPreset = await transactionAction.fetchTransactionPresets();
-        for (const transaction of transactionsPreset) {
-            
-            await transactionAction.createTransaction(
-                transaction.amount > 0 ? transaction.from_account_username : accountForTransaction.owner_username,
-                transaction.amount < 0 ? transaction.to_account_username : accountForTransaction.owner_username,
-                transaction.amount,
-                transaction.description,
-                transaction.transaction_type
-            )
-
-        }
         // Loop through fetched bills and create bills for the user
         for (const bill of presetBills) {
             await billAction.createBillForUsers(
