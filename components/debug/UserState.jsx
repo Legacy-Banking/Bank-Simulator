@@ -5,7 +5,6 @@ import { useAppSelector } from '@/store/hooks'
 const UserState = () => {
     const user = useAppSelector(state => state.user)
     const onClick = () => {
-        console.log('user', user)
     }
   return (
     <div>

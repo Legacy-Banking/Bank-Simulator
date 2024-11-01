@@ -113,14 +113,6 @@ const EditConstantDetailSheet: React.FC<ConstantDetailSheetProps> = ({ constant,
     const constantId = constant?.id // Replace with the actual user ID from your app logic
 
     const result = await updateConstantById(constantId, key, content, pageKey);
-
-    if (result.success) {
-      console.log(result.message);
-      // Show success notification
-    } else {
-      console.log(result.message);
-      // Show error notification
-    }
   };
 
 

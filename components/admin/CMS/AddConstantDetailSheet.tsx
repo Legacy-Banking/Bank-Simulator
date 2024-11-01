@@ -109,7 +109,6 @@ const AddConstantDetailSheet: React.FC<ConstantDetailSheetProps> = ({ status, on
         setError(`Failed to add constant: ${error.message}`);
       } else {
         // Handle successful insertion (optional)
-        console.log('Constant added successfully:', data);
         onClose(); // Close the dialog after adding the constant
         onAddStatus();
       }

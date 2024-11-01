@@ -88,8 +88,6 @@ const CreateBillForm: React.FC<CreateBillFormProps> = ({ setIsCreatingBill, fetc
         data.description || ""
       );
 
-      console.log("Admin bill created successfully");
-
       form.reset();
       handleBackClick(); // Navigate back to the bills page after submission
     } catch (error) {
@@ -149,7 +147,6 @@ const CreateBillForm: React.FC<CreateBillFormProps> = ({ setIsCreatingBill, fetc
                       onChange={(id) => {
                         if (id) {
                           form.setValue("biller", id);  // Ensure the ID is treated as a number
-                          console.log("Biller Changed: ", id);
                         }
                       }}
                       //initialSelected={(form.getValues("biller")) || ''}

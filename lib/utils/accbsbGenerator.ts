@@ -69,11 +69,7 @@ const generateUniqueInvoiceNumber = async (): Promise<string> => {
         // Add the latest ID to 20200 to generate the next invoice number
         const nextNumber = 20200 + latestBill.id + 1;
         nextInvoiceNumber = `INV/${nextNumber}`;
-        console.log("Generated next invoice number based on bill ID:", nextInvoiceNumber);
-      } else {
-        console.log("No existing bills found, using default invoice number:", nextInvoiceNumber);
-    }
-  
+      } 
     return nextInvoiceNumber;
   };
   

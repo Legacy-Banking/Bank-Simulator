@@ -61,13 +61,6 @@ const EditAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, st
 
     const result = await updatePasswordById(userId, newPassword);
 
-    if (result.success) {
-      console.log(result.message);
-      // Show success notification
-    } else {
-      console.log(result.message);
-      // Show error notification
-    }
     updateUser();
   };
 

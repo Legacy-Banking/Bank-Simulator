@@ -273,12 +273,6 @@ const filteredBill = selectedBill ? {
       {/* Add Assign Bill Sheet */}
       {selectedBill && (
         <>
-          {console.log("AssignUserSheet Props: ", {
-            biller: selectedBill.biller,
-            amount: selectedBill.amount,
-            description: selectedBill.description || "",
-            duedate: selectedBill.due_date
-          })}
           <AssignUserSheet
             isOpen={isAssignSheetOpen}
             onClose={() => setIsAssignSheetOpen(false)}

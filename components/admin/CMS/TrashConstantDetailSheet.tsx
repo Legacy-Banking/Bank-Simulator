@@ -42,7 +42,6 @@ const TrashConstantDetailSheet: React.FC<ConstantDetailSheetProps> = ({ constant
       console.error('Error deleting constant:', error.message);
     } else {
       setError('');
-      console.log('Constant deleted:', data);
       deleteConstant(); // Call parent function to refresh data
     }
   }

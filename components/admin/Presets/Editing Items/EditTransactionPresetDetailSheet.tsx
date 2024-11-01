@@ -83,13 +83,6 @@ const EditTransactionPresetDetailSheet: React.FC<TransactionPresetDetailSheetPro
 
     const result = await updateTransactionPresetById(transactionPresetId, transactionRecipient, dateIssued, amount);
 
-    if (result.success) {
-      console.log(result.message);
-      // Show success notification
-    } else {
-      console.log(result.message);
-      // Show error notification
-    }
   };
 
 

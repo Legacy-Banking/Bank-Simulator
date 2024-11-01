@@ -44,7 +44,6 @@ const TrashTransactionDetailSheet: React.FC<TransactionPresetDetailSheetProps> =
       console.error('Error deleting Transaction Preset:', error.message);
     } else {
       setError('');
-      console.log('Transaction Preset deleted:', data);
       deleteTransactionPreset(); // Call parent function to refresh data
     }
   }

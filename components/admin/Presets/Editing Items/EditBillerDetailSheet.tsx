@@ -72,13 +72,6 @@ const EditBillerDetailSheet: React.FC<BillerDetailSheetProps> = ({ biller, statu
 
     const result = await updateBillerById(billerId, billerCode, billerName);
 
-    if (result.success) {
-      console.log(result.message);
-      // Show success notification
-    } else {
-      console.log(result.message);
-      // Show error notification
-    }
   };
 
 

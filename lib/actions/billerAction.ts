@@ -74,16 +74,6 @@ export const billerAction={
       createDefaultSavedBillers: async (user_id: string, billers: any[]): Promise<void> => {
       const supabase = createClient();
 
-      // // Fetch all billers where save_biller_status is true
-      // const { data: billers, error: fetchError } = await supabase
-      //   .from('billers')
-      //   .select('*')
-      //   .eq('save_biller_status', true); // Fetch billers where save_biller_status is true
-
-      //   if (fetchError) {
-      //     throw new Error(`Error fetching billers: ${fetchError.message}`);
-      //   }
-    
         if (!billers || billers.length === 0) {
           throw new Error("No billers found to insert.");
         }
@@ -114,9 +104,7 @@ export const billerAction={
         saved_billers: savedBillers, 
         biller_reference: billerReferences, 
       };
-    
-        console.log('Inserting the following saved billers:', userBiller); 
-    
+        
         // Insert a single row into the 'user_billers' table
         const { error: insertError } = await supabase
           .from('user_billers')
@@ -209,11 +197,7 @@ export const billerAction={
       if (updateError) {
         throw new Error(`Error updating saved billers: ${updateError.message}`);
       }
-
-      console.log("New biller added successfully");
-    } else {
-      console.log("Biller already exists, no need to add it");
-    }
+    } 
   },
 
     // Function to fetch reference number by biller name
@@ -259,7 +243,6 @@ export const billerAction={
       const supabase = createClient();
     
       // Fetch the existing biller_reference for the user
-      console.log(`Fetching biller reference for user ID: ${user_id}`);
       const { data: userBillers, error: fetchError } = await supabase
         .from('user_billers')
         .select('biller_reference')
@@ -270,21 +253,14 @@ export const billerAction={
         console.error(`Failed to fetch user billers: ${fetchError?.message || 'Unknown error'}`);
         throw new Error(`Failed to fetch user billers: ${fetchError?.message || 'Unknown error'}`);
       }
-    
-      console.log(`Fetched biller reference: ${userBillers.biller_reference}`);
-    
+      
       // Append the new reference to the existing biller_reference
-      const billerReference = userBillers.biller_reference;
-      console.log(`Existing biller reference: ${billerReference}`);
-    
+      const billerReference = userBillers.biller_reference;    
       const updatedBillerReference = billerReference
         ? `${billerReference}, ${billerName}|${referenceNumber}`
         : `${billerName}|${referenceNumber}`;
-    
-      console.log(`Updated biller reference: ${updatedBillerReference}`);
-    
+        
       // Update the user's biller_reference column
-      console.log(`Updating biller reference for user ID: ${user_id}`);
       const { error: updateError } = await supabase
         .from('user_billers')
         .update({ biller_reference: updatedBillerReference })
@@ -294,8 +270,6 @@ export const billerAction={
         console.error(`Failed to update biller reference: ${updateError.message}`);
         throw new Error(`Failed to update biller reference: ${updateError.message}`);
       }
-    
-      console.log('Biller reference updated successfully');
     },
   
 

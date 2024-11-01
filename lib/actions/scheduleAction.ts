@@ -164,7 +164,6 @@ class ScheduleAction {
             payload.biller_code = biller_code;
             payload.reference_number = reference_number;
         }
-        console.log(payload);
 
         const { data, error } = await this.supabase.from('schedule_payments').insert([payload]);
 
@@ -191,9 +190,7 @@ class ScheduleAction {
             end_date: this.formatToISOString(this.end_date||new Date()),
             recur_count_dec: this.recur_count_dec
         }
-        console.log(payload);
         const { data: recur_payment, error: recur_error } = await this.supabase.from('recurring_payments').insert([payload]).select('id').single(); 
-        console.log(recur_error)
         await this.supabase.from('schedule_payments').update({ recurring_payment: recur_payment.id }).eq('id', schedule_payment.id);  
     }
     
@@ -207,7 +204,6 @@ class ScheduleAction {
             .select('*')
             .lte('pay_at', this.formatToISOString(currentTime)) // Fetch schedules where pay_at is <= current time
             .eq('status', 'pending');
-        console.log(schedulePayments);
         if(schedulePayments){
             for(const schedule of schedulePayments){
                 await this.executeSchedule(schedule);
@@ -238,12 +234,10 @@ class ScheduleAction {
     private async executeTransfer(schedule: any): Promise<void> {
         const { data:fromAccount, error:fromAccountError } = await this.supabase.from('account').select('*').eq('id', schedule.from_account).single();
         const { data:toAccount, error:toAccountError } = await this.supabase.from('account').select('*').eq('id', schedule.to_account).single();
-        console.log(fromAccount, toAccount);
         if(fromAccount && toAccount){
             await transactionAction.createTransaction(fromAccount, toAccount, schedule.amount, schedule.description, "pay anyone");
             await this.supabase.from('schedule_payments').update({status: 'completed'}).eq('id', schedule.id);
         }
-        console.log('transaction executed')
     }
     private async executeBpay(schedule: any): Promise<void> {
         const { data:biller, error:billerError } = await this.supabase.from('billers').select('*').eq('biller_code', schedule.biller_code).single();
@@ -303,7 +297,6 @@ class ScheduleAction {
         } else {
             await this.supabase.from('schedule_payments').update({ pay_at: this.formatToISOString(next_pay_at) ,status:'pending'}).eq('id', schedule.id);
         }
-        console.log(`Recurring payment updated for schedule: ${schedule.id}, pay_at updated to: ${next_pay_at}`);
     }
     
     

@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import SearchBar from '@/components/SearchBar';
 import AdminSideBar from '@/components/admin/AdminSideBar';
 import { createClient } from '@/lib/supabase/client';
-// import { AccountsTable } from '../Accounts/AccountsTable';
 import { useSearchParams } from 'next/navigation';
 import { Pagination } from '@/components/Pagination';
 import PopUp from '../Accounts/PopUp';
@@ -257,7 +256,7 @@ const PresetsPage = ({initialLoading = true}) => {
                 <PresetOption name="Transaction" activeTable={activeTable} setActiveTable={setActiveTable} />
                 <PresetOption name="Billers" activeTable={activeTable} setActiveTable={setActiveTable} />
               </div>
-              <AddButton  
+              <AddButton 
                 onClick={toggleAddItemDetailSheet}>
               </AddButton>
             </div>

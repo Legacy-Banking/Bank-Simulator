@@ -44,7 +44,6 @@ const TrashAccountDetailSheet: React.FC<AccountPresetDetailSheetProps> = ({ acco
       console.error('Error deleting Account Preset:', error.message);
     } else {
       setError('');
-      console.log('Account Preset deleted:', data);
       deleteAccountPreset(); // Call parent function to refresh data
     }
   }

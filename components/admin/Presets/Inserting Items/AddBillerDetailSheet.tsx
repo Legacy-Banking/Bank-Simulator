@@ -64,8 +64,6 @@ const AddBillerDetailSheet: React.FC<BillerDetailSheetProps> = ({ status, onClos
         // Handle any error that occurs during insertion
         setError(`Failed to add biller: ${error.message}`);
       } else {
-        // Handle successful insertion (optional)
-        console.log('Biller added successfully:', data);
         onClose(); // Close the dialog after adding the biller
         onAddStatus();
       }

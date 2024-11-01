@@ -88,8 +88,6 @@ const AddAccountPresetDetailSheet: React.FC<AccountPresetDetailSheetProps> = ({ 
         // Handle any error that occurs during insertion
         setError(`Failed to add constant: ${error.message}`);
       } else {
-        // Handle successful insertion (optional)
-        console.log('Account Preset added successfully:', data);
         onClose(); // Close the dialog after adding the constant
         onAddStatus();
       }

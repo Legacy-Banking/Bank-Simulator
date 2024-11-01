@@ -37,7 +37,6 @@ const TrashAccountDetailSheet: React.FC<AccountDetailSheetProps> = ({ account, s
       console.error('Error deleting user:', error.message);
     } else {
       setError('');
-      console.log('User deleted:', data);
       deleteAccount();
     }
   }

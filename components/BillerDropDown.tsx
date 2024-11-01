@@ -49,7 +49,6 @@ export const BillerDropdown = ({
       <Select
         value={String(selected) || ""}
         onValueChange={(value) => {
-          console.log("onValueChange triggered with:", value);
           handleBillerChange(value)}}
       >
         <SelectTrigger

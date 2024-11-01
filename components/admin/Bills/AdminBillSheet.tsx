@@ -30,7 +30,6 @@ const AdminBillDetailSheet: React.FC<AdminBillDetailProps> = ({ bill, onClose, o
             if (bill) {
                 try {
                     const data = await billAction.fetchAssignedUsersStatus(bill);
-                    // console.log("Fetched Assigned User Details:", data); // Log fetched data here
                     setAssignedUsersDetails(data); // Correctly set the state
                 } catch (error) {
                     console.error('Failed to fetch assigned users:', error);

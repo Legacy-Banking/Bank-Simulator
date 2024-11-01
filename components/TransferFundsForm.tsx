@@ -113,7 +113,6 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
                       onChange={(id) => {
                         if (id) {
                           form.setValue("fromBank", id);
-                          console.log("From Bank Changed: ", id);
                         }
                       }}
                       label="From Bank Account"
@@ -146,7 +145,6 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
                       onChange={(id) => {
                         if (id) {
                           form.setValue("toBank", id);
-                          console.log("To Bank Changed: ", id);
                         }
                       }}
                       label="To Bank Account"

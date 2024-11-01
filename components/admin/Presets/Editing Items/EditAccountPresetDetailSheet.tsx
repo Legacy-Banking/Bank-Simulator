@@ -92,14 +92,6 @@ const EditAccountPresetDetailSheet: React.FC<AccountPresetDetailSheetProps> = ({
     const accountPresetId = accountPreset?.id
 
     const result = await updateAccountPresetById(accountPresetId, accountPresetType, startingBalance);
-
-    if (result.success) {
-      console.log(result.message);
-      // Show success notification
-    } else {
-      console.log(result.message);
-      // Show error notification
-    }
   };
 
 

@@ -15,8 +15,6 @@ export const bpayAction = {
     ): Promise<void> => {
         const account = await accountAction.fetchAccountById(from_account.id);
         const bills = await billAction.fetchBillsByUserIdAndBillerName(user_id, biller_name);
-        console.log('account_balance', account.balance);
-        console.log('amount', amount);
 
         try {
             // Update account balance for the total payment upfront
@@ -38,7 +36,6 @@ export const bpayAction = {
                         account, biller_name, biller_code, reference_number, bill.amount, description
                     );
                     await billAction.updateBillStatus(bill, 'paid');
-                    console.log(`Bill ${bill.id} fully paid with ${bill.amount}`);
                     billcredit -= bill.amount;
                 } else {
                     // Partial payment
@@ -48,14 +45,12 @@ export const bpayAction = {
                     const newAmount = bill.amount - billcredit;
                     await billAction.updateBillStatus(bill, 'partial');
                     await billAction.updateBillAmount(bill, newAmount);
-                    console.log(`Bill ${bill.id} partially paid with ${billcredit}, remaining ${newAmount}`);
                     billcredit = 0;
                 }
             }
 
             // Refund remaining credit back to the account if overpayment
             if (billcredit > 0) {
-                console.log(`Refunding remaining credit of ${billcredit} to account`);
                 await transactionAction.updateAccounts(account, account.balance - amount + billcredit);
             }
 

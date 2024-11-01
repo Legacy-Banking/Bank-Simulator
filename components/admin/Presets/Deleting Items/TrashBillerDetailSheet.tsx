@@ -44,7 +44,6 @@ const TrashAccountDetailSheet: React.FC<BillerDetailSheetProps> = ({ biller, sta
       console.error('Error deleting biller:', error.message);
     } else {
       setError('');
-      console.log('Biller deleted:', data);
       deleteBiller(); // Call parent function to refresh data
     }
   }

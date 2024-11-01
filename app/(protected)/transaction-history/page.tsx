@@ -199,7 +199,6 @@ const TransactionHistoryContent = () => {
                   // Combine fetched transactions with dummy data
 
                   combinedData = combinedData.concat(updatedDummyData);
-                  console.log(combinedData);
                   // Filter transactions by the selected month
                   if (selectedMonth) {
                     combinedData = combinedData.filter((transaction) => {

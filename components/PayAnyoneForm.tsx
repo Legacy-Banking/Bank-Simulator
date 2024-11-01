@@ -127,7 +127,6 @@ const PayAnyoneForm = ({ accounts }: { accounts: Account[] }) => {
                       onChange={(id) => {
                         if (id) {
                           form.setValue("fromBank", id);  // Ensure the ID is treated as a number
-                          console.log("From Bank Changed: ", id);
                         }
                       }}
                       label="From Bank Account"

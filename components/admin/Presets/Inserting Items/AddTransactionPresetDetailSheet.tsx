@@ -74,8 +74,6 @@ const AddTransactionPresetDetailSheet: React.FC<TransactionPresetDetailSheetProp
         // Handle any error that occurs during insertion
         setError(`Failed to add transaction preset: ${error.message}`);
       } else {
-        // Handle successful insertion (optional)
-        console.log('Transaction Preset added successfully:', data);
         onClose(); // Close the dialog after adding the constant
         onAddStatus();
       }

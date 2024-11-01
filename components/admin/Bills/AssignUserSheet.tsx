@@ -69,7 +69,6 @@ const AssignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bill
 
       // Fetch all users from the admin list (to get last_sign_in_at)
       const adminUsers = await userAction.listMostRecentUsers();
-      console.log("Admin users with last_sign_in_at:", adminUsers);
 
       // Map the fetched owners to include last_sign_in_at from the adminUsers
       const mappedUsers = fetchedOwners
@@ -124,7 +123,6 @@ const AssignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bill
     try {
       // Call the createBillForUsers function from billAction
       await billAction.createBillForUsers(selectedUsers, biller, amount, description, due_date, linkedBill);
-      console.log("Bills successfully assigned to users:", selectedUsers);
 
       // Fetch the current assigned users from the linkedBill (admin bill)
       const { assigned_users: currentAssignedUsers } = await billAction.fetchAdminBillById(linkedBill); // Assume you have a function to fetch the bill by ID
@@ -148,8 +146,6 @@ const AssignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bill
 
       // Update the assigned users in the Admin Bill
       await billAction.updateAssignedUsers(linkedBill, updatedAssignedUsers);
-
-      console.log("Updated assigned users in Admin Bill:", updatedAssignedUsers);
 
       // Call onAssignComplete if it exists
       if (onAssignComplete) {

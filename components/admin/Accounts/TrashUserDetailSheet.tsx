@@ -43,9 +43,7 @@ const TrashUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status,
   
       if (cardError) {
         throw new Error(`Error deleting cards: ${cardError.message}`);
-      } else {
-        console.log('Cards deleted:', cardData);
-      }
+      } 
       // alter the transactions this account has affected other accounts
       const { data: fromAccountData, error: fromAccountError } = await supabase
       .from('transaction')
@@ -58,9 +56,7 @@ const TrashUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status,
 
     if (fromAccountError) {
       throw new Error(`Error updating transactions (payer): ${fromAccountError.message}`);
-    } else {
-      console.log('Updated transactions for payer:', fromAccountData);
-    }
+    } 
 
     // Update transactions where the deleted user is the recipient (to_account) for 'pay anyone' type only
     const { data: toAccountData, error: toAccountError } = await supabase
@@ -74,9 +70,7 @@ const TrashUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status,
 
     if (toAccountError) {
       throw new Error(`Error updating transactions (recipient): ${toAccountError.message}`);
-    } else {
-      console.log('Updated transactions for recipient:', toAccountData);
-    }
+    } 
 
     // Delete transactions for other transaction types (not 'pay anyone')
     const { data: otherTransactions, error: otherTransactionsError } = await supabase
@@ -104,7 +98,6 @@ const TrashUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status,
             throw new Error(`Error deleting Other Transactions: ${deleteError.message}`);
           }
 
-          console.log('Deleted Other Transactions for owner:', deleteData);
         }
       
       // Now delete accounts based on owner_username
@@ -115,10 +108,7 @@ const TrashUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status,
   
       if (accountError) {
         throw new Error(`Error deleting accounts: ${accountError.message}`);
-      } else {
-        console.log('Accounts deleted:', accountData);
       }
-  
       // Delete messages
       const { data: messagesData, error: messagesError } = await supabase
         .from('messages') // Replace with your messagess table name
@@ -127,8 +117,6 @@ const TrashUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status,
 
       if (messagesError) {
         throw new Error(`Error deleting messagess: ${messagesError.message}`);
-      } else {
-        console.log('Messages deleted:', messagesData);
       }
 
       // User Billers
@@ -139,9 +127,7 @@ const TrashUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status,
 
       if (userBillerError) {
         throw new Error(`Error deleting User Biller: ${userBillerError.message}`);
-      } else {
-        console.log('User Biller deleted:', userBillerData);
-      }
+      } 
 
       // Bills 
       const { data: billsData, error: billsError } = await supabase
@@ -151,9 +137,7 @@ const TrashUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status,
 
       if (billsError) {
         throw new Error(`Error deleting Bill: ${billsError.message}`);
-      } else {
-        console.log('Bill deleted:', billsData);
-      }
+      } 
 
       // Admin bills
       updateAdminBills(ownerUsername, ownerId);
@@ -169,21 +153,7 @@ const TrashUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status,
 
       if (fromSchedulePaymentError) {
         throw new Error(`Error deleting From Scheduled Payment: ${fromSchedulePaymentError.message}`);
-      } else {
-        console.log('From Schedule Payment deleted:', fromSchedulePaymentData);
-      }
-
-      // To
-      // const { data: toSchedulePaymentData, error: toSchedulePaymentError } = await supabase
-      // .from('schedule_payments') // Replace with your toSchedulePayments table name
-      // .delete()
-      // .eq('to_account', ownerId); // Match by ownerId
-
-      // if (toSchedulePaymentError) {
-      //   throw new Error(`Error deleting To Scheduled Payment: ${toSchedulePaymentError.message}`);
-      // } else {
-      //   console.log('To Schedule Payment deleted:', toSchedulePaymentData);
-      // }
+      } 
 
       // Delete Admin User
       const { data: adminUserData, error: adminUserError } = await supabase
@@ -193,9 +163,7 @@ const TrashUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status,
 
       if (adminUserError) {
         throw new Error(`Error deleting Admin User: ${adminUserError.message}`);
-      } else {
-        console.log('Admin User deleted:', adminUserData);
-      }
+      } 
 
 
       // Delete from supabase [hard delete]
@@ -207,7 +175,6 @@ const TrashUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status,
         console.error('Error deleting user:', error.message);
       } else {
         setError('');
-        console.log('User deleted:', data);
       }
 
       // Call parent function or refresh data after deletion
@@ -261,7 +228,6 @@ const TrashUserDetailSheet: React.FC<UserDetailSheetProps> = ({ account, status,
           throw new Error(`Error updating bill ${bill.id}: ${updateError.message}`);
         }
       }
-      console.log('All bills updated successfully');
     } catch (error) {
       console.error('Error processing admin bills:', error);
     }

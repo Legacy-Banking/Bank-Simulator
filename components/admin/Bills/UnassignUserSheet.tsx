@@ -67,7 +67,6 @@ const UnassignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bi
 
       // Fetch all users from the admin list (to get last_sign_in_at)
       const adminUsers = await userAction.listMostRecentUsers();
-      console.log("Admin users with last_sign_in_at:", adminUsers);
 
       // Map assigned users to include last_sign_in_at from the adminUsers list
       const mappedUsers = assignedUsersArray.map((assignedUser: { id: string; owner_username: string }) => {
@@ -110,7 +109,6 @@ const UnassignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bi
   };
 
   const handleUnassignUsers = async () => {
-    //console.log("Assigned Users:", selectedUsers);
     if (selectedUsers.length === 0) {
       console.error("No users selected to unassign the bill to");
       return;
@@ -121,7 +119,6 @@ const UnassignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bi
     try {
       // Call unassignAdminBill to remove references from "bills" and "messages" tables
       await billAction.unassignAdminBill(selectedUsers, linkedBill); // Assumes this will handle removal from "bills" and "messages"
-      console.log("Users successfully unassigned:", selectedUsers);
 
       // Fetch the current assigned users from the admin bill (linkedBill)
       const { assigned_users: currentAssignedUsers } = await billAction.fetchAdminBillById(linkedBill);
@@ -142,8 +139,6 @@ const UnassignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bi
 
       // Update the assigned users in the Admin Bill
       await billAction.updateAssignedUsers(linkedBill, updatedAssignedUsers);
-
-      console.log("Updated assigned users in Admin Bill:", updatedAssignedUsers);
 
       await onUnassignComplete(linkedBill);
 

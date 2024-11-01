@@ -23,9 +23,7 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
         if (user_id) {
             try {
                 const count = await inboxAction.getUnreadMessageCount(user_id);
-                console.log(`Fetched unread message count: ${count}`);
                 setUnreadMessages(count);  // Update state
-                console.log(`Unread Messages: ${count}`);  // Log count to console
             } catch (error) {
                 console.error('Error fetching unread messages:', error);
             } finally {
@@ -81,7 +79,6 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
     const handleLogout = async () => {
         const { error } = await supabase.auth.signOut()
         dispatch(updateUserId(''));
-        console.log("User logged out");
         router.push('/');
     };
 

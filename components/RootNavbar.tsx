@@ -19,9 +19,6 @@ const RootNavbar = () => {
 
     // Placeholder logout function
     const handleLogout = () => {
-        // Placeholder for logout logic (e.g., API call to log out the user)
-        console.log("User logged out");
-
         // Redirect to the home page after logout
         router.push('/');
     };

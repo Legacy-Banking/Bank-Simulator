@@ -1,5 +1,4 @@
 
-
 const PresetOption = ({name, activeTable, setActiveTable}: {name: string, activeTable: string, setActiveTable: (name: string) => void}) => {
     const isActive = activeTable == name;
     

@@ -46,18 +46,14 @@ export const BankDropdown = ({
   }, [initialSelected, accounts]);
 
   const handleBankChange = (id: string) => {
-    console.log("ID received:", id);  // Add a console log here for debugging
     if (id === "reset") {
-      console.log("here1");
       setSelected(null);
       onChange("reset");
     } else if (id === additionalOption?.id) {
-      console.log("here2");
       setSelected(null);
       onChange(id);
     } else {
     const account = accounts.find((account) => String(account.id) === String(id)) || null;
-    console.log("Account found:", account); // Log the found account
     setSelected(account);
     onChange(String(account?.id ?? ""));
     }
@@ -68,7 +64,6 @@ export const BankDropdown = ({
       <Select
         value={String(selected?.id)} 
         onValueChange={(value) => {
-          console.log("onValueChange triggered with:", value);  // Log to track
           handleBankChange(value);
         }}
       >
