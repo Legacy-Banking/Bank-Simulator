@@ -7,10 +7,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import * as z from "zod";
 import { BankDropdown } from "./BankDropDown";
-import { Button } from "./ui/button";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
-import { Input } from "./ui/input";
-import { Textarea } from "./ui/textarea";
+import { Button } from "./shadcn_ui/button";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./shadcn_ui/form";
+import { Input } from "./shadcn_ui/input";
+import { Textarea } from "./shadcn_ui/textarea";
 import { transactionAction } from '@/lib/actions/transactionAction'; // Import the transaction action
 
 // Zod schema for form validation, now using number for IDs
@@ -113,7 +113,6 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
                       onChange={(id) => {
                         if (id) {
                           form.setValue("fromBank", id);
-                          console.log("From Bank Changed: ", id);
                         }
                       }}
                       label="From Bank Account"
@@ -146,7 +145,6 @@ const TransferFundsForm = ({ accounts }: { accounts: Account[] }) => {
                       onChange={(id) => {
                         if (id) {
                           form.setValue("toBank", id);
-                          console.log("To Bank Changed: ", id);
                         }
                       }}
                       label="To Bank Account"

@@ -3,27 +3,27 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import HeaderBox from '@/components/HeaderBox';
 import { TransactionsTable } from '@/components/TransactionsTable';
-import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/shadcn_ui/select';
+import { Button } from '@/components/shadcn_ui/button';
 import { accountAction } from '@/lib/actions/accountAction';
 import { transactionAction } from '@/lib/actions/transactionAction';
 import { useSearchParams, useRouter } from 'next/navigation';
 import AccountBox from '@/components/AccountBox';
 import { Pagination } from '@/components/Pagination';
 import { useAppSelector } from '@/store/hooks';
-import { capitalizeFirstLetter, formatAmount } from '@/lib/utils';
+import { capitalizeFirstLetter, formatAmount } from '@/lib/utils/utils';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { startOfMonth, format } from "date-fns"
 import { Calendar as CalendarIcon, X } from "lucide-react"
 import MonthPicker from '@/components/MonthPicker';
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/shadcn_ui/popover"
 import "react-day-picker/dist/style.css";
 
 const TransactionHistoryContent = () => {
@@ -199,7 +199,6 @@ const TransactionHistoryContent = () => {
                   // Combine fetched transactions with dummy data
 
                   combinedData = combinedData.concat(updatedDummyData);
-                  console.log(combinedData);
                   // Filter transactions by the selected month
                   if (selectedMonth) {
                     combinedData = combinedData.filter((transaction) => {

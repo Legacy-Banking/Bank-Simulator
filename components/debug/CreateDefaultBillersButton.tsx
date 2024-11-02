@@ -11,7 +11,6 @@ const CreateDefaultBillersButton: React.FC<CreateDefaultBillersButtonProps> = ({
     const savedBillers = await billerAction.fetchPresetSavedBillers()
     try {
       await billerAction.createDefaultSavedBillers(user_id, savedBillers);
-      console.log('Default billers created successfully.');
     } catch (error) {
       console.error('Error creating default billers:', error);
     }

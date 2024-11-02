@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import HeaderBox from '@/components/HeaderBox';
 import DebitCard from '@/components/DebitCard';
 import CreditCardModel from '@/components/CreditCardModel';
-import { useSearchParams } from 'next/navigation';
 import { cardAction } from '@/lib/actions/cardAction';
 import { useAppSelector } from '@/store/hooks'; // To get the user's ID
 import { accountAction } from '@/lib/actions/accountAction';

@@ -42,16 +42,18 @@ export default function SignUp({
           return redirect(`/auth/sign-up?message=Invalid username. Please try again.`);
         case "invalid_password":
           return redirect(`/auth/sign-up?message=Invalid password. Please try again.`);
+        case "weak_password":
+          return redirect(`/auth/sign-up?message=The password should be at least 6 characters.`);
         default:
-          return redirect('/auth/sign-up?message=An error occured with our website.')
+          return redirect(`/auth/sign-up?message=${error}`);
       }
     }
     const user_id = data.user?.id || '';
     await accountAction.signUpInitialization(user_id, username);
-    accountAction.finalizeSignUpInitialization(user_id, username);
+    //await accountAction.finalizeSignUpInitialization(user_id, username);
 
     return redirect("/dashboard");
-    
+
   };
 
   return (

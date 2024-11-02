@@ -9,7 +9,7 @@ import {
   SelectItem,
   SelectLabel,
   SelectTrigger,
-} from "@/components/ui/select";
+} from "@/components/shadcn_ui/select";
 
 
 export const BillerDropdown = ({
@@ -49,7 +49,6 @@ export const BillerDropdown = ({
       <Select
         value={String(selected) || ""}
         onValueChange={(value) => {
-          console.log("onValueChange triggered with:", value);
           handleBillerChange(value)}}
       >
         <SelectTrigger

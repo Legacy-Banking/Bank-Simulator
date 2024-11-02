@@ -6,9 +6,9 @@ import {
     DialogTitle,
     DialogDescription,
     DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { formatDateTime } from "@/lib/utils";
+} from '@/components/shadcn_ui/dialog';
+import { Button } from '@/components/shadcn_ui/button';
+import { formatDateTime } from "@/lib/utils/utils";
 import { useRouter } from 'next/navigation';
 import { inboxAction } from '@/lib/actions/inboxAction';
 
