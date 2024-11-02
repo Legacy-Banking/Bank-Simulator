@@ -169,6 +169,7 @@ declare interface Message {
   type: string;
   bill_id: string;
   linked_bill: string;
+  linked_schedule: string;
 }
 
 declare interface Card {

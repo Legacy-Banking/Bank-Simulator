@@ -25,7 +25,6 @@ const SpecialNavbar = () => {
     const handleLogout = async () => {
         const { error } = await supabase.auth.signOut()
         dispatch(updateUserId(''));
-        console.log("User logged out");
         router.push('/');
     };
 

@@ -19,17 +19,13 @@ const BPAY = () => {
     const fetchData = async () => {
       try {
         // Fetch accounts
-        console.log("Fetching accounts for user ID:", user_id); // Debug: Check user ID
         const accounts = await accountAction.fetchAccountsbyUserId(user_id);
-        console.log("Fetched accounts data:", accounts); // Debug: Check fetched accounts
         // Filter out accounts with type "savings" and "credit"
         const filteredAccounts = accounts.filter((account) => account.type !== 'savings' && account.type !== 'credit');
         setAccountsData(filteredAccounts); // Store filtered accounts
 
         // Fetch billers
-        console.log("Fetching billers"); // Debug: Check biller fetch
         const billers = await billerAction.fetchBillersFromSavedBillers(user_id);
-        console.log("Fetched billers data:", billers); // Debug: Check fetched billers
         setBillersData(billers);
 
       } catch (err) {
@@ -57,10 +53,6 @@ const BPAY = () => {
     console.error("Error fetching accounts:", error); // Debug: Error state
     return <div>{error}</div>; // Display an error message if there's an issue fetching the accounts
   }
-
-  console.log("Accounts data passed to TransferFundForm:", accountsData); // Debug: Check passed accounts
-  console.log("Billers data passed to BPAYForm:", billersData); // Debug: Check passed billers
-
 
   return (
     <section className="flex flex-col bg-gray-25 md:max-h-screen py-6 lg:py-12 xl:py-16 px-8 lg:px-20 xl:px-40 2xl:px-72 xl:max-h-screen">

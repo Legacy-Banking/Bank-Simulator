@@ -2,11 +2,11 @@ import React from "react";
 import { useFormContext } from "react-hook-form";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-import { Button } from "./ui/button";
-import { Calendar } from "./ui/calendar";
-import { Popover, PopoverTrigger, PopoverContent } from "./ui/popover";
-import { FormField, FormItem, FormControl, FormMessage } from "./ui/form";
-import { cn } from "@/lib/utils";
+import { Button } from "./shadcn_ui/button";
+import { Calendar } from "./shadcn_ui/calendar";
+import { Popover, PopoverTrigger, PopoverContent } from "./shadcn_ui/popover";
+import { FormField, FormItem, FormControl, FormMessage } from "./shadcn_ui/form";
+import { cn } from "@/lib/utils/utils";
 
 interface DatePickerProps {
   name: string;

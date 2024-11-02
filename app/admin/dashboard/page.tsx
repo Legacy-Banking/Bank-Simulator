@@ -1,15 +1,15 @@
 "use client";
 
-import AccountsPage from '@/components/AdminSide/Accounts/AccountsPage';
-import AdminSideBar from '@/components/AdminSide/AdminSideBar'
-import CreateBillPage from '@/components/AdminSide/Bills/CreateBillPage';
-import PresetsPage from '@/components/AdminSide/Presets/PresetsPage';
+import AccountsPage from '@/components/admin/Accounts/AccountsPage';
+import AdminSideBar from '@/components/admin/AdminSideBar'
+import CreateBillPage from '@/components/admin/Bills/CreateBillPage';
+import PresetsPage from '@/components/admin/Presets/PresetsPage';
 import { useAppSelector } from '@/store/hooks';
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation';
 import BankNavbar from '@/components/BankNavbar';
 import { accountAction } from '@/lib/actions/accountAction';
-import CMSPage from '@/components/AdminSide/CMS/CMSPage';
+import CMSPage from '@/components/admin/CMS/CMSPage';
 
 const AdminDashboard = () => {
   const [activePage, setActivePage] = useState('accounts');

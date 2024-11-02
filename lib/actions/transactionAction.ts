@@ -1,5 +1,5 @@
 import { createClient } from "../supabase/client";
-import { capitalizeFirstLetter } from "@/lib/utils";
+import { capitalizeFirstLetter } from "@/lib/utils/utils";
 
 export const transactionAction = {
     createTransaction: async (fromAccount: Account, toAccount: Account, amount: number, description: string, transactionType: string): Promise<void> => {

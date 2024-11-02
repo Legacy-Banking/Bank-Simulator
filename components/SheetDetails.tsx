@@ -1,5 +1,5 @@
 import React from "react";
-import { formatDateTime } from "@/lib/utils";
+import { formatDateTime } from "@/lib/utils/utils";
 import { useAppSelector } from "@/store/hooks";
 import { Tooltip } from "react-tooltip";
 import { FaQuestionCircle } from "react-icons/fa";
