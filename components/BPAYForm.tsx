@@ -384,6 +384,7 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
             amountF,
             data.description || '',
             scheduleDate,
+            user_id
           );
         } catch (error) {
           console.error("Error Creating Schedule Entry:", error);
