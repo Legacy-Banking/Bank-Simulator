@@ -89,7 +89,6 @@ export const userAction = {
     let hasMore = true;
 
     while (hasMore) {
-      console.log(`Fetching users - Page: ${page}`);
       const { data: { users }, error } = await supabase.auth.admin.listUsers({ page, perPage: limit });
 
       if (error) {
@@ -125,5 +124,56 @@ export const userAction = {
 
     return sortedUsers;
   },
+  listOldUsers: async (): Promise<User[]> => {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SERVICE_ROLE_KEY!
+    );
+
+    let allUsers: User[] = [];
+    let page = 1;
+    let limit = 50; // Maximum 50 users per page
+    let hasMore = true;
+    const tenWeeksAgo = new Date();
+    tenWeeksAgo.setDate(tenWeeksAgo.getDate() - 70); // 70 days
+
+    while (hasMore) {
+      console.log(`Fetching users - Page: ${page}`);
+      const { data: { users }, error } = await supabase.auth.admin.listUsers({ page, perPage: limit });
+
+      if (error) {
+        console.error("Error fetching users:", error);
+        break;
+      }
+
+      if (!users || users.length === 0) {
+        hasMore = false;
+        break;
+      }
+
+      // Map users to match the User type structure
+      const mappedUsers = users.map((user) => ({
+        user_id: user.id,
+        last_sign_in_at: user.last_sign_in_at || null,
+        email: user.email // Include other properties if needed
+      } as User));
+
+      allUsers.push(...mappedUsers);
+      page += 1;
+
+      // If we received fewer users than the limit, assume we're done
+      if (users.length < limit) {
+        hasMore = false;
+      }
+    }
+
+    // Filter for users signed in more than 10 weeks ago, then sort by last_sign_in_at
+    const sortedUsers = allUsers
+    .filter(user => user.last_sign_in_at !== null && new Date(user.last_sign_in_at) < tenWeeksAgo)
+    .sort((a, b) => new Date(b.last_sign_in_at!).getTime() - new Date(a.last_sign_in_at!).getTime());
+
+    return sortedUsers;
+  },
+
 
 }

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/shadcn_ui/checkbox";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/shadcn_ui/select";
 import { DatePicker } from "./DatePicker";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/shadcn_ui/input";
 
 
 

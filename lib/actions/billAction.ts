@@ -136,14 +136,11 @@ export const billAction = {
         const messageDescription = `A new bill of $${amount} has been assigned to you from ${biller.name}. Please pay by ${newBill.due_date!.toLocaleDateString()}.`;
 
         try {
-            await inboxAction.createMessage(biller.name, user_id, messageDescription, 'bill', invoiceNumber, "");
-            console.log('Message sent to user about new bill');
+            await inboxAction.createMessage(biller.name, user_id, messageDescription, 'bill', invoiceNumber, '', '');
         } catch (messageError) {
             console.error('Failed to send message to user:', messageError);
             // Handle the message error gracefully if necessary
         }
-
-        console.log('Bill created:', data);
     },
 
     fetchBillDetails: async (user_id: string): Promise<BillDetails[]> => {
@@ -292,8 +289,6 @@ export const billAction = {
         if (error) {
             throw new Error(`Failed to create admin bill: ${error.message}`);
         }
-
-        console.log("Admin bill created:", data);
     },
 
     deleteAdminBillWithReferences: async (billId: string): Promise<void> => {
@@ -328,9 +323,6 @@ export const billAction = {
             if (deleteAdminBillError) {
                 throw new Error(`Failed to delete admin bill: ${deleteAdminBillError.message}`);
             }
-
-            console.log(`Successfully deleted admin bill and its related entries for bill ID: ${billId}`);
-
         } catch (error) {
             console.error('Failed to delete admin bill and its references:', error);
             throw error; // Propagate the error to be caught in the calling function
@@ -355,7 +347,6 @@ export const billAction = {
                 .in("to_user", selectedUsers) // assuming user_id is the field for users in "messages" table
                 .eq("linked_bill", linkedBill);
 
-            console.log("References successfully removed from bills and messages");
         } catch (error) {
             if (error instanceof Error) {
                 console.error("Failed to unassign users:", error.message);
@@ -368,7 +359,6 @@ export const billAction = {
 
     createBillForUsers: async (user_ids: string[], biller: Biller, amount: number, description: string, dueDate: Date, linkedBill: string): Promise<void> => {
         const supabase = createClient();
-        console.log("IN Creating Bill Form")
         for (const user_id of user_ids) {
             try {
                 // Fetch the reference number from user_billers if it exists
@@ -410,14 +400,11 @@ export const billAction = {
                 const messageDescription = `A new bill of $${amount} has been assigned to you from ${biller.name}. Please pay by ${newBill.due_date!.toLocaleDateString()}.`;
 
                 try {
-                    await inboxAction.createMessage(biller.name, user_id, messageDescription, 'bill', invoiceNumber, linkedBill);
-                    console.log(`Message sent to user ${user_id} about new bill.`);
+                    await inboxAction.createMessage(biller.name, user_id, messageDescription, 'bill', invoiceNumber, linkedBill, '');
                 } catch (messageError) {
                     console.error(`Failed to send message to user ${user_id}:`, messageError);
                     // Handle the message error gracefully if necessary
                 }
-
-                console.log(`Bill created for user ${user_id}:`, data);
             } catch (err) {
                 console.error(`Failed to create bill for user ${user_id}:`, err);
             }
@@ -488,92 +475,17 @@ export const billAction = {
         }
     },
 
-    // fetchAssignedUsersStatus: async (selectedBill: AdminBillWithBiller): Promise<{ name: string; status: string }[]> => {
-    //     const supabase = createClient();
-
-    //     try {
-    //         console.log('Selected Bill:', selectedBill);
-
-    //         // Get the assigned users string from the selected bill
-    //         const assignedUsersString = selectedBill.assigned_users || '';
-    //         console.log('Assigned users string:', assignedUsersString);
-
-    //         // Split the string by ',' to get individual pairs of username|userid
-    //         const assignedUserPairs = assignedUsersString ? assignedUsersString.split(',') : [];
-    //         console.log('Assigned User Pairs:', assignedUserPairs);
-
-    //         if (assignedUserPairs.length === 0) {
-    //             console.log('No assigned users found.');
-    //             return [];
-    //         }
-
-    //         // Fetch assigned user details for each user ID
-    //         const assignedUsersDetails = await Promise.all(
-    //             assignedUserPairs.map(async (pair) => {
-    //                 const [username, userId] = pair.split('|');
-
-    //                 // If the userId is a UUID (based on regex), fetch from the 'bills' table
-    //                 if (userId) {
-    //                     console.log('Fetching user by UUID:', userId);
-
-    //                     const { data: bill, error } = await supabase
-    //                         .from('bills') // Ensure this table exists
-    //                         .select('billed_user, status')
-    //                         .eq('billed_user', userId)
-    //                         .eq('linked_bill', selectedBill.id)  // Ensure it’s linked to the correct bill
-    //                         .single();
-
-    //                     if (error || !bill) {
-    //                         console.error(`Error fetching user ${userId}:`, error?.message);
-    //                         return { name: 'Unknown', status: 'unpaid' }; // Default to unpaid if error
-    //                     }
-
-    //                     // Return the billed user's name and status
-    //                     return {
-    //                         name: username || 'Unknown',
-    //                         status: bill.status || 'unpaid', // Default to unpaid if no status
-    //                     };
-    //                 } else {
-    //                     // Otherwise, treat the userId as a username
-    //                     console.log('Treating userId as a username:', userId);
-    //                     return {
-    //                         name: userId,  // Username directly from the string
-    //                         status: 'unpaid',  // Default status for usernames
-    //                     };
-    //                 }
-    //             })
-    //         );
-
-    //         // Filter out null values and ensure TypeScript understands the correct type
-    //         const validAssignedUsers = assignedUsersDetails.filter(
-    //             (user): user is { name: string; status: string } => user !== null
-    //         );
-
-    //         console.log('Final assigned users details:', validAssignedUsers);
-    //         return validAssignedUsers;
-
-    //     } catch (error) {
-    //         console.error('Error fetching assigned users:', error);
-    //         throw error;
-    //     }
-    // }
-
     fetchAssignedUsersStatus: async (selectedBill: AdminBillWithBiller): Promise<{ name: string; status: string }[]> => {
         const supabase = createClient();
 
         try {
-            console.log('Selected Bill:', selectedBill);
-
             // Get the assigned users string from the selected bill
             const assignedUsersString = selectedBill.assigned_users || '';
-            console.log('Assigned users string:', assignedUsersString);
 
             // Split the string by ',' to get individual pairs of username|userid
             const assignedUserPairs = assignedUsersString ? assignedUsersString.split(',') : [];
-            console.log('Assigned User Pairs:', assignedUserPairs);
 
             if (assignedUserPairs.length === 0) {
-                console.log('No assigned users found.');
                 return [];
             }
 
@@ -602,7 +514,6 @@ export const billAction = {
                 };
             });
 
-            console.log('Final assigned users details:', assignedUsersDetails);
             return assignedUsersDetails;
         } catch (error) {
             console.error('Error fetching assigned users:', error);
@@ -660,8 +571,6 @@ export const billAction = {
             if (error) {
                 throw new Error(`Failed to update preset status for bill ${billId}: ${error.message}`);
             }
-
-            console.log(`Preset status updated successfully for bill ID: ${billId}`);
         } catch (error) {
             console.error('Error updating preset status:', error);
             throw error; // Re-throw the error for further handling if needed

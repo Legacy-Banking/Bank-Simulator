@@ -23,9 +23,7 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
         if (user_id) {
             try {
                 const count = await inboxAction.getUnreadMessageCount(user_id);
-                console.log(`Fetched unread message count: ${count}`);
                 setUnreadMessages(count);  // Update state
-                console.log(`Unread Messages: ${count}`);  // Log count to console
             } catch (error) {
                 console.error('Error fetching unread messages:', error);
             } finally {
@@ -81,13 +79,14 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
     const handleLogout = async () => {
         const { error } = await supabase.auth.signOut()
         dispatch(updateUserId(''));
-        console.log("User logged out");
         router.push('/');
     };
 
     return (
         <>
-            <nav className="flexBetween navbar relative z-10 bg-white-200 text-black shadow-md">
+            <nav
+            data-testid={'bank-navbar'} 
+            className="flexBetween navbar relative z-10 bg-white-200 text-black shadow-md">
                 <div className='flex-1 flexStart gap-12'>
                     <Link href="/" className="flex items-center gap-0.5" onClick={handleLinkClick}>
                         <Image className='w-9 h-9 sm:w-12 sm:h-12'
@@ -260,7 +259,7 @@ const BankNavbar = ({ personalAccount }: { personalAccount: Account | null }) =>
                         {userRole === 'admin' && (
                             <li className='font-inter text-left'>
                                 <Link
-                                    href="/admin"
+                                    href="/admin/dashboard"
                                     className='block px-10 py-4 hover:text-blue-25 hover:underline underline-blue-25'
                                     onClick={handleLinkClick}
                                 >
