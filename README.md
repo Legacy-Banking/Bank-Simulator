@@ -239,7 +239,41 @@ https://github.com/Legacy-Banking/Bank-Simulator/wiki
 ## Changelog 
 [Click here to view the release versions!](https://github.com/Legacy-Banking/Bank-Simulator/wiki/Changelog)
 
-## Issues
+### Issues
 
-1.  ##
-2.  ##
+Here are some notable issues that have been identified but have not yet been fully addressed in the codebase:
+
+---
+
+#### 1. **User Session Expiry and Inactivity Logout Bug**
+The current implementation of the user session expiry, which logs users out after a period of inactivity or when they close the browser tab, occasionally fails. Specifically, the code does not always log the user out when they close the tab or when they switch between tabs.
+
+##### **Root Cause**:
+- The `beforeunload` event sometimes doesn't trigger correctly across all browsers when a tab is closed, particularly if the tab is closed quickly or if the user switches tabs frequently.
+- The `performance` check for reloads might not be capturing certain cases where the tab is closed without being reloaded, leading to situations where the logout isn't performed as expected.
+
+##### **Potential Fixes**:
+- Use more robust event handling for detecting when the tab is closed or the user becomes inactive for an extended period. Possible solutions could include using session storage or integrating a more reliable listener for detecting inactivity across tabs.
+- Explore adding background timers or service workers that can more reliably detect when the tab has been closed and trigger the logout process.
+
+---
+
+#### 2. **Code Optimization for Faster Load Times**
+The application's performance could be improved, especially in areas like user sign-up initialization, BPAY transactions, and other pages where data fetching and processing can be optimized for speed.
+
+##### **Sign-Up Initialization Performance Issue**:
+- Currently, during user sign-up, multiple asynchronous processes occur sequentially, leading to longer wait times before the user is fully registered.
+
+##### **Root Cause**:
+- The `signUpInitialization` function fetches preset data and processes each item sequentially, which causes delays. Additionally, the bills for the user are created one at a time, which increases the sign-up processing time.
+
+##### **Potential Fixes**:
+- Use `Promise.all` more effectively by bundling as many asynchronous operations as possible to run in parallel. For example, creating user accounts and initializing bills can happen simultaneously, reducing the wait time.
+- For the bill assignment process, refactor the loop to allow batch processing of bills and avoid redundant operations.
+- Consider caching some static data, like preset bills and saved billers, to reduce redundant fetch requests.
+
+---
+
+### Conclusion
+These issues represent areas of the codebase where improvements are needed to enhance both functionality and performance. Addressing these bugs and optimizations will result in a more seamless user experience and faster response times across the application.
+
