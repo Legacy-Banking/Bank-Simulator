@@ -196,8 +196,6 @@ export const accountAction = {
         // Fetch the user's personal account and transaction presets
         const transactionsPreset = await transactionAction.fetchTransactionPresetsOnCreation();
         const personalAcc = await accountAction.fetchPersonalAccountByUserId(user_id);
-
-        console.log(transactionsPreset);
         // Loop through transaction presets and create transactions for the user
         for (const transaction of transactionsPreset) {
             await transactionAction.createTransactionPreset(

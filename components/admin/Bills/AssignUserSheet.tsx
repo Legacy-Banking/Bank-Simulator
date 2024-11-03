@@ -112,7 +112,6 @@ const AssignUserSheet: React.FC<AssignUserSheetProps> = ({ isOpen, onClose, bill
   };
 
   const handleAssignUsers = async () => {
-    //console.log("Assigned Users:", selectedUsers);
     if (selectedUsers.length === 0) {
       console.error("No users selected to assign the bill to");
       return;

@@ -9,7 +9,6 @@ jest.mock('@/lib/supabase/client', () => {
   return {
     ...originalModule,
     createClient: jest.fn(() => {
-      console.log('createClient called'); // Log to verify mock usage
       return {
         from: jest.fn(() => ({
           select: jest.fn().mockResolvedValue({
@@ -97,6 +96,6 @@ describe('PresetsPage', () => {
     render(<PresetsPage />);
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
-  
-  
+
+
 });

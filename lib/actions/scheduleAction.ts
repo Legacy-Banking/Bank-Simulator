@@ -192,9 +192,7 @@ class ScheduleAction {
             end_date: this.formatToISOString(this.end_date||new Date()),
             recur_count_dec: this.recur_count_dec
         }
-        console.log(payload);
         const { data: recur_payment, error: recur_error } = await this.supabase.from('recurring_payments').insert([payload]).select('id').single(); 
-        console.log(recur_error)
         await this.supabase.from('schedule_payments').update({ recurring_payment: recur_payment.id }).eq('id', schedule_payment.id);  
     }
     
@@ -208,7 +206,6 @@ class ScheduleAction {
             .select('*')
             .lte('pay_at', this.formatToISOString(currentTime)) // Fetch schedules where pay_at is <= current time
             .eq('status', 'pending');
-        console.log(schedulePayments);
         if(schedulePayments){
             for(const schedule of schedulePayments){
                 await this.executeSchedule(schedule);
@@ -239,7 +236,6 @@ class ScheduleAction {
     private async executeTransfer(schedule: any): Promise<void> {
         const { data:fromAccount, error:fromAccountError } = await this.supabase.from('account').select('*').eq('id', schedule.from_account).single();
         const { data:toAccount, error:toAccountError } = await this.supabase.from('account').select('*').eq('id', schedule.to_account).single();
-        console.log(fromAccount, toAccount);
         if(fromAccount && toAccount){
             if(fromAccount.balance < schedule.amount){
                 const messageDescription = `Your scheduled payment to ${toAccount} of $${schedule.amount} has not been processed due to insufficient balance.`;
@@ -252,7 +248,6 @@ class ScheduleAction {
                 await this.supabase.from('schedule_payments').update({status: 'completed'}).eq('id', schedule.id);
             }
         }
-        console.log('transaction executed')
     }
     private async executeBpay(schedule: any): Promise<void> {
         const { data:fromAccount, error:fromAccountError } = await this.supabase.from('account').select('*').eq('id', schedule.from_account).single();
@@ -266,7 +261,6 @@ class ScheduleAction {
                 const messageDescription = `Your scheduled payment to ${biller.name} of $${schedule.amount} has been processed.`;
                 await inboxAction.createMessage('System', schedule.related_user, messageDescription, 'schedule', '', '', schedule.schedule_ref);
                 const billerReference=await billerAction.fetchReferenceNumberByBillerName(schedule.related_user,schedule.biller_name);
-                console.log(schedule.from_account,schedule.biller_name, schedule.biller_code, billerReference!, schedule.amount, schedule.description, schedule.related_user)
                 const account:Partial<Account>={id:schedule.from_account}
                 await bpayAction.payBills(account,schedule.biller_name, schedule.biller_code, billerReference!, schedule.amount, schedule.description, schedule.related_user);
                 await this.supabase.from('schedule_payments').update({status: 'completed'}).eq('id', schedule.id);
@@ -339,7 +333,6 @@ class ScheduleAction {
             await inboxAction.createMessage('System', schedule.related_user, messageDescription, 'recurring', '', '', schedule.schedule_ref);
         }
     
-        console.log(`Recurring payment updated for schedule: ${schedule.id}, pay_at updated to: ${next_pay_at}`);
     }
     
     
