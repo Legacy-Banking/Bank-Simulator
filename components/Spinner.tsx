@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '@/lib/utils'; // Make sure you have this utility function, or replace it with another one
+import { cn } from '@/lib/utils/utils'; // Make sure you have this utility function, or replace it with another one
 import { VariantProps, cva } from 'class-variance-authority';
 import { Loader2 } from 'lucide-react';
 

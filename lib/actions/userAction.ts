@@ -89,7 +89,6 @@ export const userAction = {
     let hasMore = true;
 
     while (hasMore) {
-      console.log(`Fetching users - Page: ${page}`);
       const { data: { users }, error } = await supabase.auth.admin.listUsers({ page, perPage: limit });
 
       if (error) {

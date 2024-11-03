@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { SubmitButton } from "@/components/submit-button";
 import { accountAction } from "@/lib/actions/accountAction";
+import { useState } from "react";
 
 export default function SignUp({
   searchParams,
@@ -90,6 +91,7 @@ export default function SignUp({
             href="/auth/login">Login</Link>
         </div>
       </div>
+      
     </div>
   );
 }

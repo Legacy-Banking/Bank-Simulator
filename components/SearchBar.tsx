@@ -1,8 +1,8 @@
 "use client"
 import React, { useState, useRef } from 'react';
 import { Search } from "lucide-react"; // Import the Search icon from Lucide
-import { Input } from '@/components/ui/input'; // Shadcn Input component
-import { Button } from '@/components/ui/button'; // Shadcn Button component
+import { Input } from '@/components/shadcn_ui/input'; // Shadcn Input component
+import { Button } from '@/components/shadcn_ui/button'; // Shadcn Button component
 
 interface SearchBarProps {
     inputValue: string;

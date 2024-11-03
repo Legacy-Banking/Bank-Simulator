@@ -8,10 +8,10 @@ import { Loader2 } from "lucide-react";
 import * as z from "zod";
 import { BankDropdown } from "./BankDropDown";
 import CardSidebar from './CardSidebar';
-import { Button } from "./ui/button";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
-import { Input } from "./ui/input";
-import { Checkbox } from "@/components/ui/checkbox"; // Import Checkbox from shadcn
+import { Button } from "./shadcn_ui/button";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./shadcn_ui/form";
+import { Input } from "./shadcn_ui/input";
+import { Checkbox } from "@/components/shadcn_ui/checkbox"; // Import Checkbox from shadcn
 import { PaymentWhenOptions } from "./PaymentWhenOptions";
 import { BillerDropdown } from './BillerDropDown';
 import { useAppSelector } from '@/store/hooks';
@@ -43,8 +43,6 @@ const formSchema = z.object({
   cvv: z.string().optional(),
 })
   .superRefine((data, ctx) => {
-
-    console.log("Form VALIDATION started", data);
 
     // If `billerCode`, `billerName`, and `referenceNum` are all filled, skip `toBiller` validation
     const hasManualBillerInfo = data.billerCode && data.billerName && data.referenceNum;
@@ -213,7 +211,6 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
   // Show card details if "Use Card" is selected
 
   useEffect(() => {
-    console.log("Check if card", fromBank);
     // If "Use Card" is selected, show the card details
     if (fromBank === "-1") {
       setShowCardDetails(true);
@@ -284,7 +281,6 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
 
         if (!isNaN(numPayments) && numPayments > 0) {
           totalAmount = amountF * numPayments;
-          console.log("Total Amount with numberOfPayments:", totalAmount);
         } else {
           setError("Invalid number of payments entered.");
           setIsLoading(false);
@@ -357,17 +353,9 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
         const scheduleDate = data.paymentOption === "schedule" ? data.scheduleDate! : data.recurringStartDate!;
         const scheduleType = data.paymentOption === "schedule" ? 'bpay_schedule' : 'bpay_recur';
 
-        console.log("Payment Option Selected:", data.paymentOption);
-        console.log("Schedule Date:", scheduleDate);
-        console.log("Schedule Type:", scheduleType);
-
-
         if (data.paymentOption === "recurring") {
           scheduleAction.setScheduleType(scheduleType);
           scheduleAction.setPayInterval(data.frequency || 'weekly');
-
-          console.log("Recurring Payment Selected");
-          console.log("Payment Interval:", data.frequency || 'weekly');
 
           // Handle different end conditions
           switch (data.endCondition) {
@@ -377,12 +365,10 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
             case "setEndDate":
               scheduleAction.setRecurRule('endDate');
               scheduleAction.setEndDate(data.endDate!);
-              console.log("End Date:", data.endDate!);
               break;
             case "numberOfPayments":
               scheduleAction.setRecurRule('numberOfPayments');
               scheduleAction.setRecurCount(parseInt(data.numberOfPayments!, 10));
-              console.log("Parsed Number of Payments:", (parseInt(data.numberOfPayments!, 10)));
               break;
           }
         }
@@ -398,8 +384,8 @@ const BPAYForm = ({ accounts, billers }: { accounts: Account[], billers: BillerA
             amountF,
             data.description || '',
             scheduleDate,
+            user_id
           );
-          console.log("Scheduled BPAY Entry Created:", scheduleRef);
         } catch (error) {
           console.error("Error Creating Schedule Entry:", error);
         }

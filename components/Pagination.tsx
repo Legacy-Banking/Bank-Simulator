@@ -3,8 +3,8 @@
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
-import { formUrlQuery } from "@/lib/utils";
+import { Button } from "@/components/shadcn_ui/button";
+import { formUrlQuery } from "@/lib/utils/utils";
 
 export const Pagination = ({ page, totalPages, setPage }: PaginationProps) => {
   const router = useRouter();
@@ -26,7 +26,9 @@ export const Pagination = ({ page, totalPages, setPage }: PaginationProps) => {
   };
 
   return (
-    <div className="flex justify-between gap-3">
+    <div 
+    data-testid={'pagination'}
+    className="flex justify-between gap-3">
       <Button
         size="lg"
         variant="ghost"
@@ -47,6 +49,7 @@ export const Pagination = ({ page, totalPages, setPage }: PaginationProps) => {
         {page} / {totalPages}
       </p>
       <Button
+        data-testid={'pagination-next'}
         size="lg"
         variant="ghost"
         className="p-0 hover:bg-transparent"

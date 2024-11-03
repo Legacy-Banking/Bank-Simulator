@@ -50,9 +50,6 @@ const TestAccountForm: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const result = await handleFormSubmit(account, user_id);
-        if (result) {
-            console.log('Form submitted successfully:', result);
-        }
     };
 
     return (

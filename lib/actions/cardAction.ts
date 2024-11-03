@@ -43,8 +43,6 @@ export const cardAction = {
 
     cardSignUpInitialization: async (user_id: string): Promise<void> => {
 
-      // console.log("userAccounts:", userAccounts);
-
         // Generate card details for Debit and Credit cards
         const { card_num: debit_card_num, expiry: debit_expiry, cvv: debit_cvv } = card_detailGenerator();
         const { card_num: credit_card_num, expiry: credit_expiry, cvv: credit_cvv } = card_detailGenerator();
@@ -77,26 +75,9 @@ export const cardAction = {
                 linked_to: creditAccount!.id,
             }
         ];
-        // for (const card of cards) {
-        //     await cardAction.createCard(card as Card);
-        // }
         await cardAction.createCards(cards as Card[]);
     },
     
-    // fetchCardById: async (ownerId: string): Promise<Card[]> => {
-    //     const supabase = createClient();
-
-    //     const { data, error } = await supabase
-    //         .from('cards')
-    //         .select('*')
-    //         .eq('owner', ownerId);
-
-    //     if (error) {
-    //         console.error('Error fetching Cards:', error);
-    //         throw error;
-    //     }
-    //     return data as Card[];
-    // }
     fetchCardById : async (ownerId: string): Promise<Card[]> => {
         const supabase = createClient();
     
@@ -137,8 +118,6 @@ export const cardAction = {
 
          const expiry = new Date(Date.UTC(expiryYear, expiryMonth, 1)); 
          const formattedExpiryDate = expiry.toISOString().split('T')[0];
-
-         console.log(formattedExpiryDate);
     
           // Query the database for the account linked to the provided card details
           const { data, error } = await supabase
@@ -153,8 +132,6 @@ export const cardAction = {
             throw new Error("Card details not found or not linked to any account.");
           }
 
-          console.log(data.linked_to)
-    
           // Fetch the account using the account ID linked to the card
           const { data: accountData, error: accountError } = await supabase
             .from('account')
@@ -187,7 +164,6 @@ export const cardAction = {
           }
     
           if (!cards || cards.length === 0) {
-            console.log("No cards found.");
             return;
           }
     
@@ -209,9 +185,7 @@ export const cardAction = {
     
             if (updateError) {
               console.error(`Error updating expiry date for card ID ${card.id}: ${updateError.message}`);
-            } else {
-              console.log(`Successfully updated expiry date for card ID ${card.id} to ${formattedExpiryDate}`);
-            }
+            } 
           }
     
         } catch (error) {

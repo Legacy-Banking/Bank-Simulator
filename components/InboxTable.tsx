@@ -9,9 +9,9 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
+} from "@/components/shadcn_ui/table";
 import InboxDetailSheet from './InboxDetailSheet';
-import { formatDateTime } from '@/lib/utils';
+import { formatDateTime } from '@/lib/utils/utils';
 import { inboxAction } from '@/lib/actions/inboxAction';
 
 export const InboxTable = ({ messages = [] }: InboxTableProps) => {
@@ -35,6 +35,8 @@ export const InboxTable = ({ messages = [] }: InboxTableProps) => {
                 return '/insufficient.png';
             case 'schedule':
                 return '/schedule.png';
+            case 'recurring':
+                return '/recurring.png';
             default:
                 return null;
         }

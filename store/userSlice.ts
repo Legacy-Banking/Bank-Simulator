@@ -4,7 +4,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
 // Define a type for the slice state
-interface UserState {
+export interface UserState {
   user_id: string;
   user_name?: string;
   user_role?: string;

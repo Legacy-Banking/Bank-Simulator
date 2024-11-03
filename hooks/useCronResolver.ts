@@ -42,9 +42,6 @@ export const useCronResolver = async () => {
                     for (let i = 0; i < missedRuns; i++) {
                         await executeFunction(); // Await each execution
                     }
-                    
-                    // Log success
-                    console.log(`Function ran ${missedRuns} times:`, scheduleFunction.function_key);
 
                     // Update next_activation_at to the next multiple of the interval
                     const newNextActivation = new Date(

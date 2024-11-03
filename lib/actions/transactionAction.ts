@@ -1,5 +1,5 @@
 import { createClient } from "../supabase/client";
-import { capitalizeFirstLetter } from "@/lib/utils";
+import { capitalizeFirstLetter } from "@/lib/utils/utils";
 
 export const transactionAction = {
     createTransaction: async (fromAccount: Account, toAccount: Account, amount: number, description: string, transactionType: string): Promise<void> => {
@@ -72,6 +72,34 @@ export const transactionAction = {
             if (toAccount.balance !== toNewBalance) {
                 await transactionAction.updateAccounts(toAccount, toAccount.balance);
             }
+
+            throw error;
+        }
+    },
+
+    createTransactionPreset: async (preset: string, owner_account: Account, owner_username: string ,amount: number, description: string, date_issued: Date): Promise<void> => {
+        const supabase = createClient();
+
+        try {
+            // Insert the new transaction
+            const newTransaction: Partial<Transaction> = {
+                description: description,
+                from_account: amount > 0 ? undefined : owner_account.id,
+                from_account_username: amount > 0 ? preset : owner_username,
+                to_account: amount > 0 ? owner_account.id : undefined,
+                to_account_username: amount > 0 ? owner_username : preset,
+                amount: amount < 0 ? amount * -1 : amount,
+                paid_on: date_issued,
+                transaction_type: 'pay anyone',
+            };
+
+            const { error: insertError } = await supabase
+                .from('transaction')
+                .insert(newTransaction);
+            }
+         catch (error) {
+            // If updating either account fails, revert any successful updates
+            console.error('Transaction error:', error);
 
             throw error;
         }
@@ -172,36 +200,55 @@ export const transactionAction = {
     
     },
 
-    fetchTransactionPresets: async (accountId: string, accountUsername: string): Promise<Transaction[]> => {
-
+    fetchTransactionPresetsOnCreation: async (): Promise<TransactionPresetType[]> => {
         const supabase = createClient();
-
+    
+        // Fetching transaction presets from the 'transaction_presets' table
         const { data, error } = await supabase
             .from('transaction_presets')
-            .select('*')
-            
+            .select('*');
+    
         if (error) {
             console.error('Error fetching transaction presets:', error);
             throw error;
         }
+    
+        // Ensuring data is defined to avoid runtime errors
+        if (!data) {
+            console.warn('No transaction presets found.');
+            return [];
+        }
+    
         const transactions = data as TransactionPresetType[];
-        // Assuming `fetchedTransactions` is the result of fetching from the database
+    
+        return transactions;
+    },    
+    fetchTransactionPresets: async (): Promise<Transaction[]> => {
+        const supabase = createClient();
+
+        // Fetching transaction presets from the 'transaction_presets' table
+        const { data, error } = await supabase
+            .from('transaction_presets')
+            .select('*');
+
+        const transactions = data as TransactionPresetType[]
+
         const transformedData = transactions.map(transaction => {
             const isPayingRecipient = transaction.amount < 0;
             
             return {
-            id: transaction.recipient + transaction.id,
-            description: "Some description", // Add logic to build the description
-            amount: transaction.amount,
-            paid_on: transaction.date_issued,
-            from_account: isPayingRecipient ? accountId : "default",
-            from_account_username: isPayingRecipient ? accountUsername : transaction.recipient,
-            to_account: isPayingRecipient ? "default" : accountId,
-            to_account_username: isPayingRecipient ? transaction.recipient: accountUsername,
-            transaction_type: 'pay anyone', // Adjust this based on your logic
+                id: `${transaction.id}-${transaction.recipient}`, // Ensure unique ID format
+                description: "A 'Preset Transaction' set by your instructor.",
+                amount: transaction.amount,
+                paid_on: transaction.date_issued,
+                from_account: isPayingRecipient ? 'user' : 'default', // Replace with actual logic if needed
+                from_account_username: isPayingRecipient ? 'user' : transaction.recipient,
+                to_account: isPayingRecipient ? 'default' : 'user',
+                to_account_username: isPayingRecipient ? transaction.recipient : 'user',
+                transaction_type: 'pay anyone', // Adjust based on your requirements
             };
         });
-        
+    
         return transformedData as Transaction[];
     },
 
