@@ -4,20 +4,25 @@
 </a>
 
 <p align="center">
- This document will guide you through setting up an account on Vercel, retrieving API keys from Supabase, and deploying the project to make it live.
+ This document will guide you through setting up an account on Vercel, retrieving API keys from Supabase,
+  and deploying the project<br> to make it live.<br><br>
+  Information regarding our user stories, models and more can be navigated in the <a href="#for-more-information-visit-our-wiki"> Wiki</a>!
 </p>
 
 <p align="center">
   <a href="#demo"><strong>Demo</strong></a> ·
   <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
   <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#issues"><strong>Issues</strong></a>
+  <a href="#issues"><strong>Issues</strong></a> ·
+  <a href="#changelog"><strong>Changelog</strong></a> ·
+  <a href="#for-more-information-visit-our-wiki"><strong>Wiki</strong></a>
 </p>
 <br/>
 
-
 ## Table of Contents
-
+### Demo
+- **[Demo](#demo)**
+### Deployment
 - **[Getting Started with Vercel](#1-getting-started-with-vercel)**
    - [Step 1: Sign Up for a Vercel Account](#step-1-sign-up-for-a-vercel-account)
    - [Step 2: Connect Vercel to GitHub](#step-2-connect-vercel-to-github)
@@ -27,67 +32,30 @@
 - **[Final Deployment on Vercel](#4-final-deployment-on-vercel)**
 - **[Customizing Domain and Additional Settings](#5-customizing-domain-and-additional-settings)**
 - **[Additional Resources](#6-additional-resources)**
+### Running Locally
+- **[System Requirements](#system-requirements)**
 - **[Clone and Run Locally](#clone-and-run-locally)**
+### Information
+- **[Wiki](#for-more-information-visit-our-wiki)**
+- **[Changelog](#changelog)**
 - **[Issues](#issues)**
 
 ## Demo
 
 You can view a fully working demo at [learn-to-bank.vercel.app](https://learn-to-bank.vercel.app/).
 ---
-## System Requirements
-
-This project, **Learn to Bank**, is a fake bank simulator designed to help seniors. The application was developed using the following tools and environment configurations. Please follow the setup guides linked for each item to ensure compatibility.
-
-### Operating System
-- **[Windows 11](https://www.microsoft.com/software-download/windows11)** (recommended): The project was primarily tested on Windows 11. Other operating systems (e.g., macOS, Linux) may work, but slight differences in setup might arise.
-
-### Development Tools and Dependencies
-
-- **[Node.js](https://nodejs.org/)**: JavaScript runtime environment required for both frontend and backend development.
-  - **Recommended Version**: 20.17.0 or above.
-  - Ensure that `npm` (Node Package Manager) is also installed with Node.js.
-
-- **[Git](https://git-scm.com/)**: Version control system for collaborative development.
-  - **Minimum Version**: 2.x
-  - Git is compatible with most versions, so any recent version should work fine.
-
-### Database
-
-- **[Supabase (PostgreSQL)](https://supabase.io)**: Primary database for data storage.
-  - Supabase is based on PostgreSQL, providing an SQL interface and real-time features.
-
-### Configuration Files
-
-- **Environment Variables**: Configuration files for environment variables (e.g., `.env` file) should include the following keys:
-  - `NEXT_PUBLIC_SUPABASE_URL`: The URL of your Supabase project.
-  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Public API key for Supabase.
-  - `SUPABASE_SERVICE_ROLE_KEY`: (if needed for backend operations).
-
-- **Frontend and Backend Dependencies**:
-  - For the versions of plugins, packages, and frameworks used, refer to:
-    - `package.json` in the root directory for frontend dependencies.
-    - Environment variables are specified in `.env.local` for both frontend and backend configurations.
-
-### Additional Tools
-
-- **[React Developer Tools](https://react.dev/)**: Recommended for inspecting and debugging React components.
-- **[Vercel Deployment Setup](https://vercel.com/)**: For deploying the application, use the Vercel CLI or link the GitHub repository to Vercel for automatic deployments.
-
-### Recommended IDE
-
-- **[Visual Studio Code](https://code.visualstudio.com/)** (VS Code) or any modern code editor with support for JavaScript and TypeScript.
-
+<br><br>
 ## Deploy to Vercel
 
-Vercel deployment will guide you through creating a Supabase account and project.
+In order to see <strong>Learn To Bank</strong> live, you will need to deploy using vercel, we have broken down the steps below.
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+By clicking this button below and follow the steps as instructed.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This%20starter%20configures%20Supabase%20Auth%20to%20use%20cookies%2C%20making%20the%20user's%20session%20available%20throughout%20the%20entire%20Next.js%20app%20-%20Client%20Components%2C%20Server%20Components%2C%20Route%20Handlers%2C%20Server%20Actions%20and%20Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6)
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
 
 If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+<br><br>
 ## 1. Getting Started with Vercel
 
 ### Step 1: Sign Up for a Vercel Account
@@ -179,11 +147,56 @@ If you wish to just develop locally and not deploy to Vercel, [follow the steps 
 
 By following this guide, you should be able to deploy **Bank-Simulator** successfully on Vercel! If you run into any issues, please reach out to your developer for further assistance.
 
+<br><br>
+------
+# Running Locally
+## System Requirements
 
+This project, **Learn to Bank**, is a fake bank simulator designed to help seniors. The application was developed using the following tools and environment configurations. Please follow the setup guides linked for each item to ensure compatibility.
+
+### Operating System
+- **[Windows 11](https://www.microsoft.com/software-download/windows11)** (recommended): The project was primarily tested on Windows 11. Other operating systems (e.g., macOS, Linux) may work, but slight differences in setup might arise.
+
+### Development Tools and Dependencies
+
+- **[Node.js](https://nodejs.org/)**: JavaScript runtime environment required for both frontend and backend development.
+  - **Recommended Version**: 20.17.0 or above.
+  - Ensure that `npm` (Node Package Manager) is also installed with Node.js.
+
+- **[Git](https://git-scm.com/)**: Version control system for collaborative development.
+  - **Minimum Version**: 2.x
+  - Git is compatible with most versions, so any recent version should work fine.
+
+### Database
+
+- **[Supabase (PostgreSQL)](https://supabase.io)**: Primary database for data storage.
+  - Supabase is based on PostgreSQL, providing an SQL interface and real-time features.
+
+### Configuration Files
+
+- **Environment Variables**: Configuration files for environment variables (e.g., `.env` file) should include the following keys:
+  - `NEXT_PUBLIC_SUPABASE_URL`: The URL of your Supabase project.
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Public API key for Supabase.
+  - `SUPABASE_SERVICE_ROLE_KEY`: (if needed for backend operations).
+
+- **Frontend and Backend Dependencies**:
+  - For the versions of plugins, packages, and frameworks used, refer to:
+    - `package.json` in the root directory for frontend dependencies.
+    - Environment variables are specified in `.env.local` for both frontend and backend configurations.
+
+### Additional Tools
+
+- **[React Developer Tools](https://react.dev/)**: Recommended for inspecting and debugging React components.
+- **[Vercel Deployment Setup](https://vercel.com/)**: For deploying the application, use the Vercel CLI or link the GitHub repository to Vercel for automatic deployments.
+
+### Recommended IDE
+
+- **[Visual Studio Code](https://code.visualstudio.com/)** (VS Code) or any modern code editor with support for JavaScript and TypeScript.
+<br><br>
 ## Clone and run locally
 1.
    ```bash
-   git clone [url]
+   git clone https://github.com/Legacy-Banking/Bank-Simulator.git
    ```
 
 2. Use `cd` to change into the app's directory
@@ -197,9 +210,10 @@ By following this guide, you should be able to deploy **Bank-Simulator** success
    ```
    NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
    NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
+   NEXT_PUBLIC_SERVICE_ROLE_KEY=[INSERT SUPABASE PROJECT SERVICE ROLE KEY]
    ```
 
-   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` can be found in [your Supabase project's API settings](https://app.supabase.com/project/_/settings/api)
+   All `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` and `NEXT_PUBLIC_SERVICE_ROLE_KEY` can be found in [your Supabase project's API settings](https://app.supabase.com/project/_/settings/api)
 
 4. You can now run the Next.js local development server:
 
@@ -210,10 +224,22 @@ By following this guide, you should be able to deploy **Bank-Simulator** success
    The starter kit should now be running on [localhost:3000](http://localhost:3000/).
 
 > Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+<br><br>
+## For more information, visit our wiki!
+Our wiki includes:
+- User Stories
+- Personas
+- Motivational Model
+- Domain Model
+- Architecture Diagram
+- Database Diagram
+
+https://github.com/Legacy-Banking/Bank-Simulator/wiki
+
+## Changelog 
+[Click here to view the release versions!](https://github.com/Legacy-Banking/Bank-Simulator/wiki/Changelog)
 
 ## Issues
 
-Describe issues in repository:
 1.  ##
 2.  ##
-
